@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import {
   AlertTriangle,
@@ -10,12 +10,17 @@ import {
   RefreshCcw,
   ShieldCheck,
   Sparkles,
-  Upload
+  Upload,
+  UserRound,
+  BriefcaseBusiness
 } from 'lucide-react'
 import JSZip from 'jszip'
 import './styles.css'
 
-const initialOffer = `Employé rayon poissonnerie — Intermarché
+const initialOffer = ''
+const initialMemory = ''
+
+const demoOffer = `Employé rayon poissonnerie — Intermarché
 
 Missions :
 - Préparer et mettre en valeur les produits de la mer.
@@ -28,7 +33,7 @@ Profil :
 - Débutants acceptés si motivation réelle et capacité à apprendre.
 - Rigueur, sens du service et respect des règles d’hygiène attendus.`
 
-const initialMemory = `Mémoire candidat locale :
+const demoMemory = `Mémoire candidat locale :
 - Expérience principale : recrutement / relation client / coordination.
 - Australie : travail sur bateau de pêche, usine de transformation, découpe de poisson, conditions difficiles.
 - Expériences diverses : adaptation, travail terrain, horaires atypiques, environnement physique exigeant.
@@ -43,7 +48,7 @@ const scenarios = {
     signalIcon: 'fish',
     triggerType: 'dormant_experience',
     hypothesisText:
-      'L’expérience autour de la pêche et de la découpe de poisson pourrait être reliée à la préparation, aux produits de la mer et aux contraintes d’hygiène.',
+      'Une expérience autour de la pêche, de la découpe ou de la transformation du poisson pourrait aider à défendre une candidature liée aux produits de la mer.',
     questions: [
       {
         question_id: 'Q1',
@@ -83,7 +88,7 @@ const scenarios = {
     signalIcon: 'talent',
     triggerType: 'missing_information',
     hypothesisText:
-      'L’expérience en recrutement, coordination, relation client ou structuration de process pourrait être reliée à un rôle de Talent Acquisition Lead.',
+      'Une expérience en recrutement, coordination, relation client ou structuration de process pourrait aider à défendre une candidature Talent Acquisition Lead.',
     questions: [
       {
         question_id: 'Q1',
@@ -131,7 +136,7 @@ const scenarios = {
     signalIcon: 'generic',
     triggerType: 'missing_information',
     hypothesisText:
-      'Une expérience non visible dans le CV pourrait être reliée à cette offre. Cette piste doit être vérifiée par des réponses factuelles.',
+      'Une expérience non visible dans le CV pourrait être reliée à cette offre. Cette piste doit être vérifiée par des réponses concrètes.',
     questions: [
       {
         question_id: 'Q1',
@@ -162,6 +167,10 @@ const scenarios = {
       }
     ]
   }
+}
+
+function cloneQuestions(scenarioKey) {
+  return scenarios[scenarioKey].questions.map((question) => ({ ...question }))
 }
 
 function detectScenario(offerText) {
@@ -199,56 +208,105 @@ function detectScenario(offerText) {
   return 'generic'
 }
 
-function evidenceValue(answer) {
-  const a = (answer || '').toLowerCase().trim()
 
-  if (!a) return 'none'
-  if (['non', 'no', 'n', 'jamais'].includes(a)) return 'none'
-  if (['oui', 'yes', 'y'].includes(a)) return 'medium'
+// TODO V0.9.5:
+// Le fuzzy matching, les synonymes, fautes légères et variantes lexicales
+// seront gérés par TBZ_AI_GATEWAY.
+// Cette logique locale est un garde-fou temporaire contre les réponses incohérentes,
+// pas un vrai moteur d’évaluation sémantique.
+function normalizeAnswer(text = '') {
+  return String(text)
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9+#.\s-]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+}
 
-  const strongTerms = [
-    'bateau',
-    'usine',
-    'découpe',
-    'decoupe',
-    'filet',
-    'emballage',
-    'conditionnement',
-    'contrôle',
-    'controle',
-    'qualité',
-    'qualite',
-    'hygiène',
-    'hygiene',
-    'chaîne du froid',
-    'chaine du froid',
-    'ats',
-    'linkedin recruiter',
-    'ashby',
-    'modernloop',
-    'bullhorn',
-    'recrutement',
-    'sourcing',
-    'process',
-    'reporting',
-    'dashboard',
-    'international',
-    'tech',
-    'développeur',
-    'developpeur',
-    'hiring manager',
-    'candidate experience',
-    'coordination',
-    'leadership',
-    'mentor',
-    'formation'
+function looksSuspiciousAnswer(answer = '') {
+  const normalized = normalizeAnswer(answer)
+  if (!normalized) return true
+
+  const words = normalized.split(/\s+/).filter(Boolean)
+  if (!words.length) return true
+
+  const negative = /\b(non|jamais|aucun|aucune|pas|no|never|none)\b/.test(normalized)
+  if (negative && normalized.length < 80) return true
+
+  // Très long, mais quasi aucune voyelle : typique du charabia clavier.
+  const letters = normalized.replace(/[^a-z]/g, '')
+  if (letters.length >= 25) {
+    const vowels = (letters.match(/[aeiouy]/g) || []).length
+    const vowelRatio = vowels / letters.length
+    if (vowelRatio < 0.22) return true
+  }
+
+  // Beaucoup de mots longs sans voyelles ou avec motifs improbables.
+  const oddWords = words.filter((w) => {
+    if (w.length < 7) return false
+    const hasVowel = /[aeiouy]/.test(w)
+    const repeatedConsonants = /[bcdfghjklmnpqrstvwxz]{5,}/.test(w)
+    const keyboardNoise = /(zq|qz|xk|kx|jz|zj|zd|dz|kj|jk|lkj|jkl)/.test(w)
+    return !hasVowel || repeatedConsonants || keyboardNoise
+  })
+
+  if (words.length >= 3 && oddWords.length / words.length > 0.45) return true
+
+  return false
+}
+
+function relevantSignals(answer = '') {
+  const a = normalizeAnswer(answer)
+  if (!a) return []
+
+  const signalGroups = [
+    ['linkedin recruiter', 'linkedin', 'linked in recruiter'],
+    ['bullhorn', 'bull horn'],
+    ['ashby', 'ashbyy'],
+    ['modernloop', 'modern loop'],
+    ['ats', 'applicant tracking'],
+    ['reporting', 'dashboard', 'dashboards', 'kpi', 'data', 'analytics'],
+    ['sourcing', 'boolean', 'approche directe', 'chasse'],
+    ['international', 'mobilite', 'relocation', 'anglais', 'english'],
+    ['recrutement', 'recruiting', 'talent acquisition', 'ta'],
+    ['manager', 'management', 'lead', 'mentor', 'coach', 'coaching', 'equipe'],
+    ['process', 'amelioration', 'harmonisation', 'structuration', 'outils'],
+    ['client', 'hiring manager', 'stakeholder', 'business leader'],
+    ['tech', 'it', 'java', 'python', 'react', 'salesforce', 'cobol', 'cyber'],
+    ['poisson', 'poissonnerie', 'filet', 'decoupe', 'chaine du froid', 'hygiene', 'mer'],
+    ['cro', 'clinical', 'gcp', 'ich', 'tmf', 'ctms', 'edc', 'audit', 'regulatory']
   ]
 
-  const hits = strongTerms.filter((term) => a.includes(term)).length
+  const found = []
+  for (const group of signalGroups) {
+    if (group.some((term) => a.includes(term))) found.push(group[0])
+  }
+  return found
+}
 
-  if (hits >= 2 || a.length > 90) return 'strong'
-  if (hits === 1 || a.length > 30) return 'medium'
-  return 'weak'
+function evidenceValue(answer, questionText = '') {
+  const a = normalizeAnswer(answer)
+  if (!a) return 'none'
+
+  if (looksSuspiciousAnswer(answer)) return 'none'
+
+  const signals = relevantSignals(`${questionText} ${answer}`)
+  const answerSignals = relevantSignals(answer)
+
+  // Une réponse courte mais précise doit pouvoir compter.
+  if (answerSignals.length >= 2) return 'strong'
+  if (answerSignals.length === 1) return 'medium'
+
+  // Réponses déclaratives simples : utiles, mais jamais fortes seules.
+  if (/\b(oui|yes|deja|j ai|j'ai|experience|fait|utilise|used|worked)\b/.test(a)) {
+    return signals.length ? 'weak' : 'weak'
+  }
+
+  // La longueur seule ne crée plus jamais un indice fort.
+  if (a.length > 120 && signals.length >= 1) return 'weak'
+
+  return 'none'
 }
 
 function aggregate(questions, hypothesis) {
@@ -262,7 +320,7 @@ function aggregate(questions, hypothesis) {
       'non_concluant',
       'do_not_use',
       'do_not_use',
-      'Plusieurs réponses factuelles sont absentes ou négatives : ne pas utiliser cette piste.'
+      'Plusieurs réponses concrètes sont absentes ou négatives.'
     ]
   }
 
@@ -271,7 +329,7 @@ function aggregate(questions, hypothesis) {
       'faible',
       'raw_only',
       'raw_only',
-      'Le candidat ne valide pas le lien : conserver cette information en mémoire locale seulement.'
+      'Le lien n’est pas confirmé : cette information reste dans la mémoire candidat locale.'
     ]
   }
 
@@ -280,7 +338,7 @@ function aggregate(questions, hypothesis) {
       'forte',
       'cv_argument',
       'eligible_cv_argument',
-      'Réponses factuelles fortes et hypothèse validée : piste intégrable comme argument de CV ciblé.'
+      'La piste est suffisamment concrète et confirmée pour être utilisée dans un CV ciblé.'
     ]
   }
 
@@ -289,7 +347,7 @@ function aggregate(questions, hypothesis) {
       'moyenne',
       'interview_argument',
       'eligible_interview_argument',
-      'Piste défendable en entretien, mais pas assez solide pour être automatiquement intégrée au CV.'
+      'La piste semble défendable en entretien, mais pas assez solide pour être intégrée automatiquement au CV.'
     ]
   }
 
@@ -297,8 +355,31 @@ function aggregate(questions, hypothesis) {
     'faible',
     'needs_human_review',
     'needs_human_review',
-    'Réponses insuffisantes ou hétérogènes : validation humaine recommandée.'
+    'Les réponses sont encore insuffisantes ou hétérogènes.'
   ]
+}
+
+function computeScore(questions, hypothesis, decision) {
+  const values = questions.map((q) => evidenceValue(q.candidate_answer))
+  const answered = values.filter((v) => v !== 'none').length
+  const strong = values.filter((v) => v === 'strong').length
+  const medium = values.filter((v) => v === 'medium').length
+
+  let score = 38
+
+  score += answered * 7
+  score += medium * 5
+  score += strong * 8
+
+  if (hypothesis === true) score += 10
+  if (hypothesis === false) score -= 10
+
+  if (decision === 'cv_argument') score = Math.max(score, 86)
+  if (decision === 'interview_argument') score = Math.max(score, 72)
+  if (decision === 'raw_only') score = Math.min(score, 55)
+  if (decision === 'do_not_use') score = Math.min(score, 42)
+
+  return Math.max(0, Math.min(100, score))
 }
 
 function cvText(decision, scenario) {
@@ -327,26 +408,101 @@ function cvText(decision, scenario) {
   }
 
   if (decision === 'do_not_use') {
-    return 'Ne pas utiliser cette piste : expérience non confirmée ou non défendable pour l’offre visée.'
+    return 'Une phrase sera proposée ici lorsque la piste sera confirmée par des réponses concrètes.'
   }
 
   if (decision === 'needs_human_review') {
-    return 'À revoir : éléments insuffisants pour décider si cette expérience doit aller dans le CV, rester en argument d’entretien ou être conservée en mémoire locale.'
+    return 'Une phrase pourra être proposée après vérification humaine ou réponses complémentaires.'
   }
 
-  return 'Argument potentiel à formuler après validation des réponses factuelles.'
+  return 'Argument potentiel à formuler après validation des réponses concrètes.'
+}
+
+function cvPreview(decision, scenario) {
+  const isConfirmed = decision === 'cv_argument' || decision === 'interview_argument'
+
+  if (!isConfirmed) {
+    return {
+      ready: false,
+      title: 'Prévisualisation non disponible',
+      message:
+        'TBZ ne prépare pas encore de CV adapté : la piste doit d’abord être confirmée par des réponses concrètes.',
+      nextStep:
+        'Répondez aux questions de l’assistant, puis confirmez ou écartez la piste détectée.'
+    }
+  }
+
+  if (scenario === 'talent') {
+    return {
+      ready: true,
+      title: 'Talent Acquisition / Recrutement IT international',
+      intro:
+        'Profil recrutement orienté accompagnement candidat, sourcing international, coordination avec les parties prenantes et amélioration de l’expérience candidat.',
+      bullets: [
+        'Recrutement de profils tech, business ou support dans des environnements exigeants.',
+        'Coordination avec managers, clients internes ou parties prenantes opérationnelles.',
+        'Utilisation d’outils de sourcing, ATS, reporting ou suivi candidat.',
+        'Capacité à défendre une candidature avec des exemples concrets et vérifiables.'
+      ],
+      styleNote:
+        'Style employeur à venir : adaptation visuelle inspirée de la charte ou du site de l’entreprise.'
+    }
+  }
+
+  if (scenario === 'fish') {
+    return {
+      ready: true,
+      title: 'Employé rayon produits de la mer / polyvalence produits frais',
+      intro:
+        'Profil terrain avec exposition à des environnements exigeants, rythme opérationnel, gestes de préparation et contraintes d’hygiène.',
+      bullets: [
+        'Expérience autour de la pêche, de la découpe ou de la transformation du poisson.',
+        'Adaptation à des conditions physiques et horaires exigeantes.',
+        'Sens du concret, du rythme et du respect des consignes.',
+        'Argument à relier prudemment à l’offre ciblée selon les réponses confirmées.'
+      ],
+      styleNote:
+        'Style employeur à venir : adaptation visuelle inspirée de la charte ou du site de l’entreprise.'
+    }
+  }
+
+  return {
+    ready: true,
+    title: 'CV adapté à l’offre ciblée',
+    intro:
+      'Profil à structurer selon les expériences confirmées et les attentes de l’offre.',
+    bullets: [
+      'Forces confirmées à reprendre dans le CV.',
+      'Arguments défendables à préparer.',
+      'Points à clarifier avant envoi.',
+      'Adaptation éditoriale selon l’employeur.'
+    ],
+    styleNote:
+      'Style employeur à venir : adaptation visuelle inspirée de la charte ou du site de l’entreprise.'
+  }
 }
 
 function decisionLabel(decision) {
   const labels = {
-    cv_argument: 'À intégrer au CV ciblé',
-    interview_argument: 'À préparer pour l’entretien',
+    cv_argument: 'Utilisable dans le CV ciblé',
+    interview_argument: 'Préparable pour l’entretien',
     raw_only: 'À garder en mémoire locale',
-    do_not_use: 'Ne pas utiliser cette piste',
+    do_not_use: 'Pas encore utilisable',
     needs_human_review: 'À vérifier'
   }
 
   return labels[decision] || decision
+}
+
+function convictionLabel(conviction) {
+  const labels = {
+    non_concluant: 'Pas assez d’éléments',
+    faible: 'Fragile',
+    moyenne: 'Défendable avec prudence',
+    forte: 'Solide'
+  }
+
+  return labels[conviction] || conviction
 }
 
 function questionTypeLabel(type) {
@@ -374,9 +530,9 @@ function Badge({ children, type = 'neutral' }) {
   return <span className={`badge ${type}`}>{children}</span>
 }
 
-function Card({ title, icon, children }) {
+function Card({ title, icon, children, className = '' }) {
   return (
-    <section className="card">
+    <section className={`card ${className}`}>
       <h2>
         {icon}
         {title}
@@ -386,23 +542,75 @@ function Card({ title, icon, children }) {
   )
 }
 
+function ScoreDonut({ score }) {
+  return (
+    <div className="scoreDonut" style={{ '--score': score }}>
+      <span>{score}%</span>
+    </div>
+  )
+}
+
 function App() {
   const [offer, setOffer] = useState(initialOffer)
   const [candidateMemory, setCandidateMemory] = useState(initialMemory)
   const [cvFileName, setCvFileName] = useState('')
   const [memoryFileName, setMemoryFileName] = useState('')
   const [analysisStatus, setAnalysisStatus] = useState('empty')
-  const [activeScenario, setActiveScenario] = useState('fish')
-  const [questions, setQuestions] = useState(scenarios.fish.questions)
+  const [activeScenario, setActiveScenario] = useState('generic')
+  const [questions, setQuestions] = useState(cloneQuestions('generic'))
   const [rating, setRating] = useState(5)
   const [hypothesis, setHypothesis] = useState(null)
+  const [showCvPreview, setShowCvPreview] = useState(false)
+  const [activeSection, setActiveSection] = useState('demo')
+
+  useEffect(() => {
+    const sectionIds = ['demo', 'assistant', 'resultat', 'methode']
+    const sections = sectionIds
+      .map((id) => document.getElementById(id))
+      .filter(Boolean)
+
+    if (!sections.length) return undefined
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
+
+        if (visible?.target?.id) {
+          setActiveSection(visible.target.id)
+        }
+      },
+      {
+        root: null,
+        rootMargin: '-25% 0px -55% 0px',
+        threshold: [0.1, 0.3, 0.6]
+      }
+    )
+
+    sections.forEach((section) => observer.observe(section))
+
+    return () => observer.disconnect()
+  }, [])
 
   const [conviction, decision, result, explanation] = useMemo(
     () => aggregate(questions, hypothesis),
     [questions, hypothesis]
   )
 
+  const matchingScore = useMemo(
+    () => computeScore(questions, hypothesis, decision),
+    [questions, hypothesis, decision]
+  )
+
   const active = scenarios[activeScenario] || scenarios.generic
+  const preview = cvPreview(decision, activeScenario)
+  const answeredQuestionsCount = questions.filter((q) =>
+    q.candidate_answer.trim()
+  ).length
+  const scoreNeedsWork =
+    analysisStatus === 'analyzed' &&
+    (answeredQuestionsCount === 0 || decision === 'do_not_use' || decision === 'needs_human_review')
 
   const flow = {
     conversation_id: active.conversation_id,
@@ -412,6 +620,7 @@ function App() {
     trigger_type: active.triggerType,
     trigger_source: activeScenario === 'fish' ? 'raw' : 'offer',
     trigger_status: 'hypothesis_to_verify',
+    matching_score: matchingScore,
     questions: questions.map((q) => ({
       ...q,
       evidence_value: evidenceValue(q.candidate_answer)
@@ -436,6 +645,13 @@ function App() {
     updated_at: new Date().toISOString()
   }
 
+  function scrollToSection(sectionId) {
+    document.getElementById(sectionId)?.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start'
+    })
+  }
+
   function updateQuestion(questionId, value) {
     setQuestions((current) =>
       current.map((q) =>
@@ -446,12 +662,12 @@ function App() {
 
   function handleOfferChange(event) {
     setOffer(event.target.value)
-    setAnalysisStatus('dirty')
+    setAnalysisStatus(event.target.value.trim() ? 'dirty' : 'empty')
   }
 
   function handleMemoryChange(event) {
     setCandidateMemory(event.target.value)
-    setAnalysisStatus('dirty')
+    setAnalysisStatus(offer.trim() ? 'dirty' : analysisStatus)
   }
 
   async function handleCvUpload(event) {
@@ -473,7 +689,7 @@ function App() {
 --- CV chargé : ${file.name} ---
 Fichier chargé. La lecture automatique du contenu PDF/Word sera ajoutée avec l’intégration IA.`.trim()
       )
-      setAnalysisStatus('dirty')
+      setAnalysisStatus(offer.trim() ? 'dirty' : analysisStatus)
       return
     }
 
@@ -486,7 +702,7 @@ Fichier chargé. La lecture automatique du contenu PDF/Word sera ajoutée avec l
 ${text}`.trim()
     )
 
-    setAnalysisStatus('dirty')
+    setAnalysisStatus(offer.trim() ? 'dirty' : analysisStatus)
   }
 
   async function handleJsonUpload(event) {
@@ -499,22 +715,12 @@ ${text}`.trim()
       const text = await file.text()
       const parsed = JSON.parse(text)
 
-      if (parsed.offer_text) {
-        setOffer(parsed.offer_text)
-      }
-
-      if (parsed.candidate_memory) {
-        setCandidateMemory(parsed.candidate_memory)
-      }
-
-      if (parsed.questions) {
-        setQuestions(parsed.questions)
-      }
-
+      if (parsed.offer_text) setOffer(parsed.offer_text)
+      if (parsed.candidate_memory) setCandidateMemory(parsed.candidate_memory)
+      if (parsed.questions) setQuestions(parsed.questions)
       if (typeof parsed.self_rating_0_10 === 'number') {
         setRating(parsed.self_rating_0_10)
       }
-
       if (parsed.transfer_hypothesis) {
         setHypothesis(parsed.transfer_hypothesis.candidate_validated ?? null)
       }
@@ -535,74 +741,50 @@ ${text}`.trim()
 
     const nextScenario = detectScenario(offer)
     setActiveScenario(nextScenario)
-    setQuestions(scenarios[nextScenario].questions)
+    setQuestions(cloneQuestions(nextScenario))
     setRating(5)
     setHypothesis(null)
     setAnalysisStatus('analyzed')
+    setShowCvPreview(false)
+    window.setTimeout(() => scrollToSection('resultat'), 80)
+  }
+
+  function resetOfferOnly() {
+    setOffer('')
+    setAnalysisStatus('empty')
+    setShowCvPreview(false)
+  }
+
+  function resetProfileOnly() {
+    setCandidateMemory('')
+    setCvFileName('')
+    setMemoryFileName('')
+    setAnalysisStatus(offer.trim() ? 'dirty' : 'empty')
+    setShowCvPreview(false)
   }
 
   function fillExample() {
-    const nextScenario = activeScenario
-
-    if (nextScenario === 'talent') {
-      setQuestions([
-        {
-          ...questions[0],
-          candidate_answer:
-            'Oui, recrutement IT international sur des profils tech et business dans des environnements exigeants.'
-        },
-        {
-          ...questions[1],
-          candidate_answer:
-            'Profils développeurs, infrastructure, cybersécurité, Salesforce, business et support.'
-        },
-        {
-          ...questions[2],
-          candidate_answer:
-            'Structuration de priorités, requalification des besoins, amélioration du suivi candidat et harmonisation des échanges avec les managers.'
-        },
-        {
-          ...questions[3],
-          candidate_answer:
-            'Accompagnement de collègues et partage de méthodes de sourcing, qualification et suivi candidat.'
-        },
-        {
-          ...questions[4],
-          candidate_answer:
-            'Bullhorn, LinkedIn Recruiter, reporting, suivi ATS, coordination avec hiring managers.'
-        }
-      ])
-    } else if (nextScenario === 'fish') {
-      setQuestions([
-        { ...questions[0], candidate_answer: 'Oui' },
-        { ...questions[1], candidate_answer: 'Oui' },
-        {
-          ...questions[2],
-          candidate_answer: 'Bateau de pêche et usine de transformation'
-        },
-        {
-          ...questions[3],
-          candidate_answer:
-            'Découpe de filets, emballage, contrôle qualité, nettoyage du poste'
-        }
-      ])
-    } else {
-      setQuestions(
-        questions.map((q, index) => ({
-          ...q,
-          candidate_answer:
-            index === 0
-              ? 'Oui'
-              : index === 1
-                ? 'Contexte professionnel proche, avec responsabilités comparables.'
-                : 'Tâches concrètes à préciser selon l’offre.'
-        }))
-      )
-    }
-
+    setOffer(demoOffer)
+    setCandidateMemory(demoMemory)
+    setActiveScenario('fish')
+    setQuestions([
+      { ...scenarios.fish.questions[0], candidate_answer: 'Oui' },
+      { ...scenarios.fish.questions[1], candidate_answer: 'Oui' },
+      {
+        ...scenarios.fish.questions[2],
+        candidate_answer: 'Bateau de pêche et usine de transformation'
+      },
+      {
+        ...scenarios.fish.questions[3],
+        candidate_answer:
+          'Découpe de filets, emballage, contrôle qualité, nettoyage du poste'
+      }
+    ])
     setRating(7)
     setHypothesis(true)
     setAnalysisStatus('analyzed')
+    setShowCvPreview(false)
+    window.setTimeout(() => scrollToSection('resultat'), 80)
   }
 
   function resetDemo() {
@@ -610,11 +792,12 @@ ${text}`.trim()
     setCandidateMemory(initialMemory)
     setCvFileName('')
     setMemoryFileName('')
-    setActiveScenario('fish')
-    setQuestions(scenarios.fish.questions)
+    setActiveScenario('generic')
+    setQuestions(cloneQuestions('generic'))
     setRating(5)
     setHypothesis(null)
     setAnalysisStatus('empty')
+    setShowCvPreview(false)
   }
 
   function exportJson() {
@@ -650,49 +833,86 @@ ${text}`.trim()
   return (
     <div className="app">
       <header>
-        <div className="brand">TalentBusterZ</div>
+        <div className="brand" aria-label="TalentBusterZ">
+          <span className="brandCap">T</span>
+          <span className="brandRest">alent</span>
+          <span className="brandCap">B</span>
+          <span className="brandRest">uster</span>
+          <span className="brandZ">Z</span>
+        </div>
 
-        <nav>
-          <a href="#demo">Démo</a>
-          <a href="#assistant">Assistant</a>
-          <a href="#resultat">Résultat</a>
-          <a href="#methode">Méthode</a>
+        <nav aria-label="Navigation principale">
+          <a
+            href="#demo"
+            className={activeSection === 'demo' ? 'active' : ''}
+            onClick={() => setActiveSection('demo')}
+          >
+            Démo
+          </a>
+          <a
+            href="#assistant"
+            className={activeSection === 'assistant' ? 'active' : ''}
+            onClick={() => setActiveSection('assistant')}
+          >
+            Assistant
+          </a>
+          <a
+            href="#resultat"
+            className={activeSection === 'resultat' ? 'active' : ''}
+            onClick={() => setActiveSection('resultat')}
+          >
+            Résultat
+          </a>
+          <a
+            href="#methode"
+            className={activeSection === 'methode' ? 'active' : ''}
+            onClick={() => setActiveSection('methode')}
+          >
+            Méthode
+          </a>
         </nav>
 
-        <Badge type="green">V0.9.3</Badge>
+        <div className="headerRight">
+          <a className="proLink" href="#pro">
+            TBZ Pro
+          </a>
+          <Badge type="green">V0.9.4.4</Badge>
+        </div>
       </header>
 
-      <section className="hero">
-        <Badge type="orange">Version exploratoire privée</Badge>
-        <h1>Le CV ne dit pas tout.</h1>
-        <p>
-          TalentBusterZ pose les bonnes questions pour révéler les expériences
-          utiles, construire un CV ciblé et préparer un argumentaire honnête.
-        </p>
+      <section className="hero compactHero">
+        <div className="heroText">
+          <Badge type="orange">Version candidat — prototype privé</Badge>
+          <h1>Le CV ne dit pas tout.</h1>
+          <p>
+            TalentBusterZ aide à relier une offre, un parcours et des arguments
+            défendables, sans inventer d’expérience.
+          </p>
 
-        <div className="heroActions">
-          <button onClick={fillExample}>
-            <Sparkles size={18} /> Remplir l’exemple
-          </button>
+          <div className="heroActions">
+            <button onClick={fillExample}>
+              <Sparkles size={18} /> Voir un exemple
+            </button>
 
-          <button className="secondary" onClick={resetDemo}>
-            <RefreshCcw size={18} /> Réinitialiser
-          </button>
+            <button className="secondary" onClick={resetDemo}>
+              <RefreshCcw size={18} /> Réinitialiser
+            </button>
+          </div>
         </div>
       </section>
 
       <main id="demo" className="grid">
         <Card title="Offre ciblée" icon={<FileText />}>
           <p className="muted">
-            Collez ici l’offre à analyser. En V0.9.3, l’analyse est locale et
-            provisoire. L’IA viendra ensuite générer des questions plus fines.
+            Collez ici l’offre à analyser. L’IA viendra ensuite générer des
+            questions plus fines ; cette version reste locale et exploratoire.
           </p>
 
           <textarea
             className="offerTextarea"
             value={offer}
             onChange={handleOfferChange}
-            placeholder="Collez ici l’offre d’emploi..."
+            placeholder="Collez ici votre offre..."
           />
 
           {analysisStatus === 'dirty' && (
@@ -707,12 +927,17 @@ ${text}`.trim()
             </div>
           )}
 
-          <button className="primaryAction" onClick={handleAnalyzeOffer}>
-            Analyser cette offre
-          </button>
+          <div className="offerActions">
+            <button className="primaryAction" onClick={handleAnalyzeOffer}>
+              Analyser cette offre
+            </button>
+            <button className="secondaryAction" onClick={resetOfferOnly}>
+              Réinitialiser l’offre
+            </button>
+          </div>
         </Card>
 
-        <Card title="Profil candidat" icon={<Database />}>
+        <Card title="Profil candidat" icon={<UserRound />}>
           <p className="muted">
             Le CV ne dit pas toujours tout. Ajoutez ici les expériences
             anciennes, projets personnels, missions courtes ou compétences
@@ -753,17 +978,21 @@ ${text}`.trim()
             onChange={handleMemoryChange}
             placeholder="Ajoutez ici ce que le CV ne raconte pas toujours : expériences anciennes, projets, missions courtes, compétences oubliées..."
           />
+
+          <button className="secondaryAction profileReset" onClick={resetProfileOnly}>
+            Réinitialiser le profil candidat
+          </button>
         </Card>
 
         <Card
-          title="Signal ou piste à vérifier"
+          title="Piste détectée"
           icon={active.signalIcon === 'fish' ? <Fish /> : <Sparkles />}
         >
-          <Badge type="blue">hypothesis_to_verify</Badge>
+          <Badge type="blue">À vérifier</Badge>
           <h3>{active.signalTitle}</h3>
           <p>
-            TBZ ne conclut pas. Il interroge pour vérifier si cette piste est
-            défendable.
+            TBZ a repéré un lien possible avec l’offre. Cette piste doit être
+            confirmée avant d’être utilisée dans le CV ou en entretien.
           </p>
         </Card>
 
@@ -771,15 +1000,15 @@ ${text}`.trim()
           <ul>
             <li>Absence CV ≠ absence d’expérience.</li>
             <li>Autoévaluation = signal secondaire.</li>
-            <li>Hypothèse de transfert à valider.</li>
-            <li>Décision d’usage traçable.</li>
+            <li>Une piste détectée doit être confirmée.</li>
+            <li>La décision finale reste humaine.</li>
           </ul>
         </Card>
       </main>
 
       <section id="assistant" className="assistant">
         <h2>
-          <Bot /> Assistant conversationnel
+          <Bot /> Assistant d’enrichissement
         </h2>
 
         {questions.map((q) => {
@@ -832,45 +1061,93 @@ ${text}`.trim()
         </div>
 
         <div className="hypothesis">
-          <h3>Hypothèse de transfert</h3>
+          <h3>Piste détectée</h3>
           <p>{flow.transfer_hypothesis.hypothesis_text}</p>
+          <p className="muted">
+            Cette piste ne sera utilisée que si elle est confirmée par des
+            éléments concrets.
+          </p>
 
           <button
             className={hypothesis === true ? 'active' : 'secondary'}
             onClick={() => setHypothesis(true)}
           >
-            Validée
+            Confirmer
           </button>
 
           <button
             className={hypothesis === false ? 'active danger' : 'secondary'}
             onClick={() => setHypothesis(false)}
           >
-            Non validée
+            Écarter
           </button>
 
           <button
             className={hypothesis === null ? 'active neutral' : 'secondary'}
             onClick={() => setHypothesis(null)}
           >
-            À vérifier
+            Garder à vérifier
           </button>
         </div>
       </section>
 
       <section id="resultat" className="grid">
-        <Card title="Décision d’usage" icon={<Sparkles />}>
+        <Card title="Score de matching" icon={<Sparkles />}>
+          {analysisStatus === 'analyzed' ? (
+            <>
+              <div className="resultScoreBlock">
+                <ScoreDonut score={matchingScore} />
+                <div>
+                  <strong>{matchingScore}% — score provisoire — mis à jour en direct</strong>
+                  <p>
+                    Ce score évolue selon l’offre analysée, les réponses
+                    candidat et les pistes confirmées. Il aide à lire le
+                    matching, sans décider à la place de l’humain.
+                  </p>
+                </div>
+              </div>
+
+              {scoreNeedsWork && (
+                <div className="scoreCoach">
+                  <strong>
+                    Assistant : améliorez votre score en répondant à ces
+                    questions.
+                  </strong>
+                  <p>
+                    Le score est bas ou incomplet parce que les expériences ne
+                    sont pas encore confirmées par des éléments concrets.
+                  </p>
+                  <button onClick={() => scrollToSection('assistant')}>
+                    Répondre aux questions
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="scorePlaceholder">
+              <strong>Score non disponible</strong>
+              <p>
+                Collez une offre puis cliquez sur “Analyser cette offre” pour
+                obtenir une première lecture du matching.
+              </p>
+            </div>
+          )}
+        </Card>
+
+        <Card title="Conclusion provisoire" icon={<Sparkles />}>
           <div className={`decision ${decision}`}>
             <strong>{decisionLabel(decision)}</strong>
-            <span>Niveau de conviction : {conviction}</span>
+            <span>{convictionLabel(conviction)}</span>
           </div>
 
           <p>
-            <b>Règle :</b> {flow.aggregation_rule_applied} v
-            {flow.aggregation_rule_version}
+            <b>Pourquoi ?</b> {explanation}
           </p>
 
-          <p>{explanation}</p>
+          <p>
+            <b>Prochaine étape :</b> répondez aux questions de l’assistant pour
+            faire évoluer cette conclusion.
+          </p>
 
           {decision === 'needs_human_review' && (
             <p className="warn">
@@ -881,17 +1158,86 @@ ${text}`.trim()
 
         <Card title="Phrase CV / argument proposé" icon={<FileText />}>
           <pre>{cvText(decision, activeScenario)}</pre>
-        </Card>
 
-        <Card title="Export local" icon={<Download />}>
-          <button onClick={exportJson}>Exporter mémoire TBZ (.json)</button>
-          <button className="secondary" onClick={exportZip}>
-            Exporter ZIP
+          <button
+            className="primaryAction previewButton"
+            onClick={() => setShowCvPreview((current) => !current)}
+          >
+            Prévisualiser mon CV adapté
           </button>
         </Card>
 
-        <Card title="JSON vivant" icon={<Database />}>
-          <pre className="json">{JSON.stringify(flow, null, 2)}</pre>
+        {showCvPreview && (
+          <Card
+            title="Prévisualisation CV adapté"
+            icon={<FileText />}
+            className={`wideCard cvPreviewCard ${preview.ready ? 'ready' : 'notReady'}`}
+          >
+            {!preview.ready ? (
+              <div className="cvPreviewPlaceholder">
+                <h3>{preview.title}</h3>
+                <p>{preview.message}</p>
+                <p>
+                  <b>Prochaine étape :</b> {preview.nextStep}
+                </p>
+              </div>
+            ) : (
+              <div className="cvPreview">
+                <div className="cvPreviewHeader">
+                  <span>CV adapté — version provisoire</span>
+                  <strong>{preview.title}</strong>
+                </div>
+
+                <p className="cvIntro">{preview.intro}</p>
+
+                <h3>Arguments proposés</h3>
+                <ul>
+                  {preview.bullets.map((bullet) => (
+                    <li key={bullet}>{bullet}</li>
+                  ))}
+                </ul>
+
+                <div className="styleNote">{preview.styleNote}</div>
+              </div>
+            )}
+          </Card>
+        )}
+
+        <Card title="Sauvegarde & mémoire locale" icon={<Download />} className="wideCard">
+          <div className="exportPanel">
+            <div className="exportBlock">
+              <h3>Mémoire TBZ</h3>
+              <p>
+                Sauvegardez l’analyse en cours pour la reprendre plus tard sans
+                repartir de zéro.
+              </p>
+              <button onClick={exportJson}>Exporter mémoire TBZ (.json)</button>
+            </div>
+
+            <div className="exportBlock">
+              <h3>Dossier complet</h3>
+              <p>
+                Exportez l’offre, la mémoire candidat, la conclusion et la phrase
+                proposée.
+              </p>
+              <button className="secondary" onClick={exportZip}>
+                Exporter ZIP
+              </button>
+            </div>
+
+            <div className="exportBlock technicalBlock">
+              <h3>Détails techniques</h3>
+              <p>
+                Réservé aux tests : affiche la mémoire structurée utilisée par le
+                moteur local.
+              </p>
+
+              <details>
+                <summary>Afficher le JSON technique</summary>
+                <pre className="json">{JSON.stringify(flow, null, 2)}</pre>
+              </details>
+            </div>
+          </div>
         </Card>
       </section>
 
@@ -899,9 +1245,21 @@ ${text}`.trim()
         <h2>Méthode</h2>
         <p>
           <b>TalentBusterZ ne fabrique pas d’expérience.</b> Il repère un indice
-          explicite, pose des questions factuelles, puis propose une décision
-          d’usage traçable.
+          explicite, pose des questions concrètes, puis propose une conclusion
+          provisoire et traçable.
         </p>
+      </section>
+
+      <section id="pro" className="proCallout">
+        <BriefcaseBusiness />
+        <div>
+          <strong>Professionnel du recrutement ou employeur ?</strong>
+          <p>
+            La version candidat est pensée pour travailler son propre parcours.
+            Un usage multi-candidats relèvera de TalentBusterZ Pro.
+          </p>
+        </div>
+        <button>Découvrir TBZ Pro</button>
       </section>
 
       <div className="mobileStickyAction">
