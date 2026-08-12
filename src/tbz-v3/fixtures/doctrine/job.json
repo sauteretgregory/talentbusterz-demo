@@ -1,0 +1,135 @@
+{
+  "artifact_type": "canonical_job_data_state",
+  "artifact_id": "job_doctrine_talent_acquisition_manager",
+  "state_version": "v1.0",
+  "engine_name": "TBZ_JOB_DATA_ENGINE",
+  "engine_version": "V1",
+  "processing_mode": "PRODUCTION",
+  "generated_at": "2026-07-21T13:14:21.472579+00:00",
+  "source_metadata": {
+    "source_type": "job_posting_text",
+    "received_filename_for_audit_only": "Texte collé(39).txt",
+    "source_language": "fr"
+  },
+  "job_data_state": {
+    "job_identity": {
+      "job_title": "Talent Acquisition Manager",
+      "employment_type": "Temps plein",
+      "seniority_level": "Expérience confirmée"
+    },
+    "employer_identity": {
+      "company_name": "Doctrine",
+      "company_sector": "LegalTech / IA juridique",
+      "company_stage": "Scale-up",
+      "company_size_claimed_in_posting": "Environ 250 personnes",
+      "geographic_presence": [
+        "France",
+        "Italie",
+        "Allemagne",
+        "Espagne",
+        "Luxembourg"
+      ],
+      "customer_base_claimed": "27 000 professionnels du droit"
+    },
+    "client_assignment_context": {
+      "department": "People",
+      "reporting_line": "DRH, Gabrielle de Luppé",
+      "team_context": "Quatre autres Talent Acquisition Managers et collaboration directe avec les hiring managers",
+      "internal_or_external_recruitment": "Interne"
+    },
+    "responsibilities": [
+      "Comprendre les besoins de l’organisation et les profils adaptés",
+      "Analyser et sélectionner les candidatures",
+      "Mener l’approche directe multicanale",
+      "Conduire des entretiens à distance et en présentiel",
+      "Garantir une expérience candidat de qualité",
+      "Agir comme business partner des hiring managers",
+      "Améliorer les processus de recrutement",
+      "Contribuer à la marque employeur"
+    ],
+    "objectives": [
+      "Soutenir la croissance de Doctrine",
+      "Recruter les profils les plus adaptés",
+      "Améliorer l’efficacité et la qualité du recrutement",
+      "Renforcer l’expérience candidat et le partenariat managers"
+    ],
+    "requirements": {
+      "mandatory": [
+        "Expérience confirmée en recrutement en startup ou scale-up",
+        "Excellent relationnel",
+        "Capacité à agir comme business partner",
+        "Approche data-oriented",
+        "Maîtrise de l’approche directe",
+        "Anglais courant"
+      ],
+      "preferred_requirements": [
+        "Autonomie sur le cycle complet du recrutement, du sourcing au closing",
+        "Capacité à améliorer les process",
+        "Contribution à la marque employeur",
+        "Adhésion à une culture d’ownership et d’itération"
+      ]
+    },
+    "job_constraints": {
+      "work_model": "Hybride",
+      "remote_policy": "Jusqu’à trois jours de télétravail par semaine selon les équipes",
+      "salary": null,
+      "contract_type": null
+    },
+    "operational_location": {
+      "city": "Paris",
+      "region": "Île-de-France",
+      "country": "France"
+    },
+    "employment_jurisdiction": {
+      "country": "France"
+    },
+    "work_model": {
+      "model": "Hybride",
+      "remote_days_max_per_week": 3,
+      "conditional_by_team": true
+    },
+    "employer_sponsorship_policy": {
+      "visa_sponsorship": null,
+      "work_authorization_requirement": null
+    },
+    "recruitment_process": [
+      "Échange de 30 minutes avec un Talent Acquisition Manager",
+      "Entretien d’une heure avec le ou la future manager",
+      "Un ou deux tests techniques",
+      "Venue dans les bureaux avec déjeuner inter-départements, échange valeurs et rencontre CEO"
+    ],
+    "benefits": [
+      "Congés flexibles",
+      "Mobilité interne",
+      "Budget formation annuel de 750 euros",
+      "Gymlib",
+      "Moka.care",
+      "Mutuelle Alan",
+      "Carte Swile et forfait mobilité durable de 66,60 euros par mois",
+      "Avantages CSE Happypal",
+      "Équipement Apple neuf"
+    ],
+    "diversity_and_accessibility": {
+      "disability_inclusion_statement": true,
+      "accommodation_commitment": true,
+      "process_adaptation_possible": true
+    },
+    "offer_ambiguities": [
+      "Rémunération non indiquée",
+      "Type précis de contrat non indiqué",
+      "Adresse exacte non indiquée",
+      "Volumes et périmètre de recrutement non indiqués",
+      "Outils ATS et reporting non indiqués",
+      "Niveau d’autonomie initial ambigu",
+      "Nature des tests techniques non précisée",
+      "Politique de sponsoring non précisée"
+    ]
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "json_parse_passed": true,
+    "expected_root_object_present": true,
+    "expected_state_version_present": true,
+    "artifact_type_valid": true
+  }
+}
