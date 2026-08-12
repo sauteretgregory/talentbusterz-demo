@@ -51,3 +51,15 @@ export function createFranceTravailProviderRequest(input) {
     credentials_present: false
   }
 }
+
+export async function franceTravailExtractor({ source_url }) {
+  const providerRequest =
+    createFranceTravailProviderRequest(source_url)
+
+  return {
+    provider_id: 'france_travail',
+    provider_payload: providerRequest,
+    raw_job_content: null,
+    structured_source_data: null
+  }
+}

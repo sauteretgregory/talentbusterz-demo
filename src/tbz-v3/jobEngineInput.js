@@ -88,6 +88,11 @@ export function createJobEngineInputPayload({
     payload.extraction.error_message = extractionResult.error
   }
 
+  if (extractionResult.provider_payload) {
+    payload.provider_payload =
+      extractionResult.provider_payload
+  }
+
   if (extractionResult.raw_job_content) {
     payload.raw_job_content =
       extractionResult.raw_job_content

@@ -63,6 +63,7 @@ export async function extractJobFromIntake(
       source_url: request.source_url,
       detected_source: request.detected_source,
       provider_id: null,
+      provider_payload: null,
       raw_job_content: null,
       structured_source_data: null,
       error: 'no_extractor_available'
@@ -89,6 +90,7 @@ export async function extractJobFromIntake(
         source_url: request.source_url,
         detected_source: request.detected_source,
         provider_id: result.provider_id || null,
+        provider_payload: result.provider_payload || null,
         raw_job_content: null,
         structured_source_data: null,
         error: 'no_job_content_extracted'
@@ -100,6 +102,7 @@ export async function extractJobFromIntake(
       source_url: request.source_url,
       detected_source: request.detected_source,
       provider_id: result.provider_id || 'unknown_provider',
+      provider_payload: result.provider_payload || null,
       raw_job_content: result.raw_job_content || null,
       structured_source_data:
         result.structured_source_data || null,
@@ -111,6 +114,7 @@ export async function extractJobFromIntake(
       source_url: request.source_url,
       detected_source: request.detected_source,
       provider_id: null,
+      provider_payload: null,
       raw_job_content: null,
       structured_source_data: null,
       error: error.message
