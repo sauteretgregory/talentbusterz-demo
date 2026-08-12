@@ -12,6 +12,14 @@ import {
   createFixtureJobDataEngineProvider
 } from './providers/fixtureJobDataEngine.js'
 
+import {
+  createFixtureMatchEngineProvider
+} from './providers/fixtureMatchEngine.js'
+
+import {
+  createFixtureProbeEngineProvider
+} from './providers/fixtureProbeEngine.js'
+
 export function createTbzEngineRegistry({
   engineMode = process.env.TBZ_ENGINE_MODE || 'fixture',
   openaiApiKey = process.env.OPENAI_API_KEY,
@@ -25,6 +33,18 @@ export function createTbzEngineRegistry({
       registry,
       ENGINE_IDS.JOB_DATA,
       createFixtureJobDataEngineProvider()
+    )
+
+    registerEngineProvider(
+      registry,
+      ENGINE_IDS.MATCH,
+      createFixtureMatchEngineProvider()
+    )
+
+    registerEngineProvider(
+      registry,
+      ENGINE_IDS.PROBE,
+      createFixtureProbeEngineProvider()
     )
 
     return registry

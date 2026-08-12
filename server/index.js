@@ -18,6 +18,8 @@ import {
   createTbzEngineRegistry
 } from './engineRegistry.js'
 
+import candidateFixture from '../src/tbz-v3/fixtures/doctrine/candidate.json' with { type: 'json' }
+
 const PORT = 8787
 
 const engineRegistry = createTbzEngineRegistry()
@@ -149,17 +151,77 @@ const server = http.createServer(async (req, res) => {
         return
       }
 
+      const canonicalJob =
+        jobEngineExecution.output_artifact
+
+      const matchExecution =
+        await executeEngine(
+          engineRegistry,
+          ENGINE_IDS.MATCH,
+          {
+            candidate_data_state:
+              candidateFixture,
+            job_data_state:
+              canonicalJob
+          }
+        )
+
+      if (
+        matchExecution.status !== 'completed' ||
+        !matchExecution.output_artifact
+      ) {
+        sendJson(res, 502, {
+          status: 'failed',
+          stage: 'match_engine',
+          error: matchExecution.error,
+          engine_status:
+            matchExecution.status
+        })
+        return
+      }
+
+      const canonicalMatch =
+        matchExecution.output_artifact
+
+      const probeExecution =
+        await executeEngine(
+          engineRegistry,
+          ENGINE_IDS.PROBE,
+          canonicalMatch
+        )
+
+      if (
+        probeExecution.status !== 'completed' ||
+        !probeExecution.output_artifact
+      ) {
+        sendJson(res, 502, {
+          status: 'failed',
+          stage: 'probe_engine',
+          error: probeExecution.error,
+          engine_status:
+            probeExecution.status
+        })
+        return
+      }
+
+      const canonicalProbe =
+        probeExecution.output_artifact
+
       sendJson(res, 200, {
         status: 'completed',
         stage:
-          'canonical_job_data_state_generated',
+          'candidate_application_analysis_generated',
         detected_source: 'france_travail',
         provider_id: extraction.provider_id,
         provider_payload:
           extraction.provider_payload,
         job_engine_processable: true,
         canonical_job_data_state:
-          jobEngineExecution.output_artifact
+          canonicalJob,
+        canonical_match_state:
+          canonicalMatch,
+        canonical_probe_plan:
+          canonicalProbe
       })
     } catch (error) {
       sendJson(res, 500, {
