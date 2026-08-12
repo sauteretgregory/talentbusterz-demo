@@ -1,4 +1,7 @@
+import { TBZ_ARTIFACT_TYPES } from './artifactTypes.js'
 import { validateCanonicalArtifact } from './artifactValidator.js'
+
+export { TBZ_ARTIFACT_TYPES }
 
 /**
  * TalentBusterZ V3 — Canonical Artifact Store
@@ -11,14 +14,6 @@ import { validateCanonicalArtifact } from './artifactValidator.js'
  * - does NOT generate probe questions
  * - does NOT reinterpret canonical engine decisions
  */
-
-export const TBZ_ARTIFACT_TYPES = Object.freeze({
-  CANDIDATE: 'canonical_candidate_state',
-  JOB: 'canonical_job_state',
-  MATCH: 'canonical_match_state',
-  PROBE_PLAN: 'canonical_probe_plan',
-  PROBE_DIALOG: 'canonical_probe_dialog_state'
-})
 
 export function createArtifactStore() {
   return {

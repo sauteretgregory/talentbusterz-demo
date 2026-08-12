@@ -1,4 +1,4 @@
-import { TBZ_ARTIFACT_TYPES } from './artifactStore.js'
+import { TBZ_ARTIFACT_TYPES } from './artifactTypes.js'
 
 const SUPPORTED_TYPES = new Set(Object.values(TBZ_ARTIFACT_TYPES))
 
