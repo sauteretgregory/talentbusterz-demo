@@ -1,13 +1,10 @@
 import React, { useState } from 'react'
 
 import candidate from './fixtures/doctrine/candidate.json'
-import job from './fixtures/job-france-travail-210SDTY.json'
-import match from './fixtures/match-france-travail-210SDTY.json'
-import probePlan from './fixtures/probe-france-travail-210SDTY.json'
 
 import { createJobIntakeRequest } from './jobIntake.js'
 
-function getJobTitle() {
+function getJobTitle(job) {
   return (
     job?.job_data_state?.job_identity?.title ||
     job?.job_data_state?.job_identity?.job_title ||
@@ -15,7 +12,7 @@ function getJobTitle() {
   )
 }
 
-function getCompanyName() {
+function getCompanyName(job) {
   return (
     job?.job_data_state?.employer_identity?.name ||
     job?.job_data_state?.company_name ||
@@ -23,7 +20,7 @@ function getCompanyName() {
   )
 }
 
-function getCompatibilityScore() {
+function getCompatibilityScore(match) {
   const score =
     match?.match_state?.professional_compatibility
       ?.professional_match_score
@@ -33,7 +30,7 @@ function getCompatibilityScore() {
     : null
 }
 
-function getCandidateQuestions() {
+function getCandidateQuestions(probePlan) {
   const critical =
     probePlan?.probe_plan?.critical_questions || []
 
@@ -58,12 +55,14 @@ export default function V3Preview() {
   const [jobUrl, setJobUrl] = useState('')
   const [jobIntake, setJobIntake] = useState(null)
   const [jobIntakeError, setJobIntakeError] = useState('')
+  const [analysis, setAnalysis] = useState(null)
 
   async function handleJobUrlSubmit(event) {
     event.preventDefault()
 
     setJobIntake(null)
     setJobIntakeError('')
+    setAnalysis(null)
 
     try {
       const request = createJobIntakeRequest(jobUrl)
@@ -98,10 +97,13 @@ export default function V3Preview() {
         ...request,
         extraction_status: 'completed',
         provider_id: result.provider_id,
-        provider_payload: result.provider_payload,
-        raw_job_content: result.raw_job_content,
-        structured_source_data:
-          result.structured_source_data
+        provider_payload: result.provider_payload
+      })
+
+      setAnalysis({
+        job: result.canonical_job_data_state,
+        match: result.canonical_match_state,
+        probePlan: result.canonical_probe_plan
       })
     } catch (error) {
       setJobIntake(null)
@@ -110,8 +112,15 @@ export default function V3Preview() {
   }
 
 
-  const score = getCompatibilityScore()
-  const questions = getCandidateQuestions()
+  const dynamicJob = analysis?.job || null
+  const dynamicMatch = analysis?.match || null
+  const dynamicProbePlan = analysis?.probePlan || null
+
+  const score =
+    getCompatibilityScore(dynamicMatch)
+
+  const questions =
+    getCandidateQuestions(dynamicProbePlan)
 
   const firstName =
     candidate?.candidate_data_state?.identity_state?.first_name ||
@@ -221,6 +230,7 @@ export default function V3Preview() {
         )}
       </section>
 
+      {analysis && (
       <section
         style={{
           border: '1px solid #d9e1ee',
@@ -237,11 +247,13 @@ export default function V3Preview() {
             opacity: 0.65
           }}
         >
-          Exemple actuellement chargé
+          {analysis
+            ? 'Analyse TalentBusterZ'
+            : 'En attente d’une offre'}
         </p>
 
         <h2 style={{ marginBottom: 8 }}>
-          {getJobTitle()}
+          {getJobTitle(dynamicJob)}
         </h2>
 
         <p
@@ -251,7 +263,7 @@ export default function V3Preview() {
             opacity: 0.72
           }}
         >
-          {getCompanyName()}
+          {getCompanyName(dynamicJob)}
         </p>
 
         {score !== null && (
@@ -284,8 +296,9 @@ export default function V3Preview() {
           de cette offre.
         </p>
       </section>
+      )}
 
-      {questions.length > 0 && (
+      {analysis && questions.length > 0 && (
         <section style={{ marginTop: 32 }}>
           <h2>
             Quelques précisions avant de préparer votre candidature
@@ -334,6 +347,7 @@ export default function V3Preview() {
         </section>
       )}
 
+      {analysis && (
       <section style={{ marginTop: 36 }}>
         <button
           type="button"
@@ -352,6 +366,7 @@ export default function V3Preview() {
           Je souhaite postuler
         </button>
       </section>
+      )}
     </main>
   )
 }
