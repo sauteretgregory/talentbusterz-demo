@@ -1,8 +1,11 @@
+import { validateCanonicalArtifact } from './artifactValidator.js'
+
 /**
  * TalentBusterZ V3 — Canonical Artifact Store
  *
  * Frontend boundary:
  * - stores canonical artifacts received from TBZ engines
+ * - validates artifact type and version before ingestion
  * - does NOT perform matching
  * - does NOT enrich candidate/job state
  * - does NOT generate probe questions
@@ -45,21 +48,13 @@ export function getArtifactSlot(artifactType) {
 }
 
 export function ingestCanonicalArtifact(store, artifact) {
-  if (!artifact || typeof artifact !== 'object') {
-    throw new Error('TBZ V3: artifact must be a JSON object.')
-  }
+  validateCanonicalArtifact(artifact)
 
-  const artifactType = artifact.artifact_type
-
-  if (!artifactType) {
-    throw new Error('TBZ V3: artifact_type is missing.')
-  }
-
-  const slot = getArtifactSlot(artifactType)
+  const slot = getArtifactSlot(artifact.artifact_type)
 
   if (!slot) {
     throw new Error(
-      `TBZ V3: unsupported artifact_type "${artifactType}".`
+      `TBZ V3: unsupported artifact_type "${artifact.artifact_type}".`
     )
   }
 
