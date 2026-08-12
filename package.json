@@ -6,11 +6,11 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
+    "jszip": "latest",
+    "lucide-react": "latest",
+    "openai": "^7.4.0",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest",
-    "jszip": "latest"
-  },
-  "devDependencies": {}
+    "vite": "latest"
+  }
 }
