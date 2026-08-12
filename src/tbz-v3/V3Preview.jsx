@@ -1,9 +1,9 @@
 import React, { useState } from 'react'
 
 import candidate from './fixtures/doctrine/candidate.json'
-import job from './fixtures/doctrine/job.json'
-import match from './fixtures/doctrine/match.json'
-import probePlan from './fixtures/doctrine/probe-plan.json'
+import job from './fixtures/job-france-travail-210SDTY.json'
+import match from './fixtures/match-france-travail-210SDTY.json'
+import probePlan from './fixtures/probe-france-travail-210SDTY.json'
 
 import { createJobIntakeRequest } from './jobIntake.js'
 
@@ -24,71 +24,34 @@ function getCompanyName() {
 }
 
 function getCompatibilityScore() {
-  const scoring =
-    match?.match_state?.professional_compatibility?.scoring
+  const score =
+    match?.match_state?.professional_compatibility
+      ?.professional_match_score
 
-  const candidates = [
-    scoring?.final_score,
-    scoring?.score,
-    match?.match_state?.professional_compatibility?.score
-  ]
-
-  const direct = candidates.find(
-    (value) => typeof value === 'number'
-  )
-
-  if (typeof direct === 'number') {
-    return direct <= 1
-      ? Math.round(direct * 100)
-      : Math.round(direct)
-  }
-
-  const confidence =
-    match?.match_state?.professional_compatibility?.confidence
-
-  return typeof confidence === 'number'
-    ? Math.round(confidence * 100)
+  return typeof score === 'number'
+    ? Math.round(score)
     : null
 }
 
 function getCandidateQuestions() {
-  const candidates = [
-    probePlan?.probe_questions,
-    probePlan?.questions,
-    probePlan?.probe_plan?.questions,
-    probePlan?.probe_result?.questions
-  ]
+  const critical =
+    probePlan?.probe_plan?.critical_questions || []
 
-  const questions = candidates.find(Array.isArray)
+  const secondary =
+    probePlan?.probe_plan?.secondary_questions || []
 
-  if (questions?.length) {
-    return questions
-      .map((question, index) => ({
-        id:
-          question.question_id ||
-          question.probe_candidate_id ||
-          `question-${index}`,
-        text:
-          question.question_text ||
-          question.question ||
-          question.text ||
-          question.label
-      }))
-      .filter((question) => question.text)
-  }
-
-  return (
-    match?.match_state?.candidate_unknowns || []
-  ).map((unknown, index) => ({
-    id:
-      unknown.probe_candidate_id ||
-      unknown.unknown_id ||
-      `unknown-${index}`,
-    text:
-      unknown.related_job_requirement
-        ? `Pouvez-vous préciser votre expérience concernant : ${unknown.related_job_requirement} ?`
-        : 'Une information complémentaire est nécessaire.'
-  }))
+  return [...critical, ...secondary]
+    .map((question, index) => ({
+      id:
+        question.question_id ||
+        `question-${index}`,
+      text: question.question,
+      priority:
+        index < critical.length
+          ? 'critical'
+          : 'secondary'
+    }))
+    .filter((question) => question.text)
 }
 
 export default function V3Preview() {
