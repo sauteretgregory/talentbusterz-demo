@@ -8,14 +8,25 @@ import {
   createTbzEngineRegistry
 } from './engineRegistry.js'
 
-const emptyRegistry =
+const fixtureRegistry =
   createTbzEngineRegistry({
+    engineMode: 'fixture'
+  })
+
+assert.equal(
+  fixtureRegistry.has(ENGINE_IDS.JOB_DATA),
+  true
+)
+
+const emptyOpenAIRegistry =
+  createTbzEngineRegistry({
+    engineMode: 'openai',
     openaiApiKey: '',
     openaiModel: ''
   })
 
 assert.equal(
-  emptyRegistry.has(ENGINE_IDS.JOB_DATA),
+  emptyOpenAIRegistry.has(ENGINE_IDS.JOB_DATA),
   false
 )
 
@@ -36,23 +47,36 @@ const fakeClient = {
   }
 }
 
-const configuredRegistry =
+const configuredOpenAIRegistry =
   createTbzEngineRegistry({
+    engineMode: 'openai',
     openaiModel: 'test-model',
     openaiClient: fakeClient
   })
 
 assert.equal(
-  configuredRegistry.has(ENGINE_IDS.JOB_DATA),
+  configuredOpenAIRegistry.has(ENGINE_IDS.JOB_DATA),
   true
 )
 
-console.log('✓ TBZ engine registry tests passed')
+assert.throws(
+  () =>
+    createTbzEngineRegistry({
+      engineMode: 'unknown'
+    }),
+  /unsupported engine mode/
+)
+
+console.log('✓ TBZ engine mode registry tests passed')
 console.log(
-  'JOB DATA without OpenAI config:',
-  emptyRegistry.has(ENGINE_IDS.JOB_DATA)
+  'Fixture JOB DATA:',
+  fixtureRegistry.has(ENGINE_IDS.JOB_DATA)
 )
 console.log(
-  'JOB DATA with OpenAI config:',
-  configuredRegistry.has(ENGINE_IDS.JOB_DATA)
+  'OpenAI without config:',
+  emptyOpenAIRegistry.has(ENGINE_IDS.JOB_DATA)
+)
+console.log(
+  'OpenAI configured:',
+  configuredOpenAIRegistry.has(ENGINE_IDS.JOB_DATA)
 )
