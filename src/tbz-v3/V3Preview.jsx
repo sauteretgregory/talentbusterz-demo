@@ -59,18 +59,56 @@ export default function V3Preview() {
   const [jobIntake, setJobIntake] = useState(null)
   const [jobIntakeError, setJobIntakeError] = useState('')
 
-  function handleJobUrlSubmit(event) {
+  async function handleJobUrlSubmit(event) {
     event.preventDefault()
+
+    setJobIntake(null)
+    setJobIntakeError('')
 
     try {
       const request = createJobIntakeRequest(jobUrl)
-      setJobIntake(request)
-      setJobIntakeError('')
+
+      setJobIntake({
+        ...request,
+        extraction_status: 'loading'
+      })
+
+      const response = await fetch(
+        'http://localhost:8787/api/job-intake',
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            url: request.source_url
+          })
+        }
+      )
+
+      const result = await response.json()
+
+      if (!response.ok || result.status !== 'completed') {
+        throw new Error(
+          result.error || 'Échec de l’extraction de l’offre.'
+        )
+      }
+
+      setJobIntake({
+        ...request,
+        extraction_status: 'completed',
+        provider_id: result.provider_id,
+        provider_payload: result.provider_payload,
+        raw_job_content: result.raw_job_content,
+        structured_source_data:
+          result.structured_source_data
+      })
     } catch (error) {
       setJobIntake(null)
       setJobIntakeError(error.message)
     }
   }
+
 
   const score = getCompatibilityScore()
   const questions = getCandidateQuestions()
@@ -157,7 +195,22 @@ export default function V3Preview() {
           >
             Source détectée : <strong>{jobIntake.detected_source}</strong>
             <br />
-            Extraction : <strong>à connecter</strong>
+            Extraction :{' '}
+            <strong>
+              {jobIntake.extraction_status === 'loading'
+                ? 'en cours…'
+                : jobIntake.extraction_status === 'completed'
+                  ? 'réussie'
+                  : jobIntake.extraction_status}
+            </strong>
+
+            {jobIntake.provider_payload?.offer_id && (
+              <>
+                <br />
+                Offre détectée :{' '}
+                <strong>{jobIntake.provider_payload.offer_id}</strong>
+              </>
+            )}
           </div>
         )}
 
