@@ -4,6 +4,11 @@ import {
   fetchFranceTravailPublicJob
 } from './providers/franceTravailPublic.js'
 
+import {
+  createJobEngineInputPayload,
+  canJobEngineProcess
+} from '../src/tbz-v3/jobEngineInput.js'
+
 const PORT = 8787
 
 function sendJson(res, statusCode, payload) {
@@ -63,14 +68,31 @@ const server = http.createServer(async (req, res) => {
       const extraction =
         await fetchFranceTravailPublicJob(sourceUrl)
 
+      const jobEngineInput =
+        createJobEngineInputPayload({
+          extractionResult: {
+            extraction_status: 'completed',
+            source_url: sourceUrl,
+            detected_source: 'france_travail',
+            provider_id: extraction.provider_id,
+            provider_payload: extraction.provider_payload,
+            raw_job_content: extraction.raw_job_content,
+            structured_source_data:
+              extraction.structured_source_data,
+            error: null
+          },
+          requestId:
+            `req_${extraction.provider_payload.offer_id}_${Date.now()}`
+        })
+
       sendJson(res, 200, {
         status: 'completed',
         detected_source: 'france_travail',
         provider_id: extraction.provider_id,
         provider_payload: extraction.provider_payload,
-        raw_job_content: extraction.raw_job_content,
-        structured_source_data:
-          extraction.structured_source_data
+        job_engine_input: jobEngineInput,
+        job_engine_processable:
+          canJobEngineProcess(jobEngineInput)
       })
     } catch (error) {
       sendJson(res, 500, {
