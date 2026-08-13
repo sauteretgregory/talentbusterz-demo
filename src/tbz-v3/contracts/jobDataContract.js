@@ -14,6 +14,11 @@ export const REQUIREMENT_TYPES = Object.freeze([
   'digital_environment',
   'experience_duration',
   'education_level',
+  'education_field',
+  'professional_qualification',
+  'technology_skill',
+  'methodology_skill',
+  'regulatory_eligibility',
   'unclassified'
 ])
 
@@ -37,6 +42,11 @@ export const REQUIREMENT_TYPE_EVALUATION_MODES = Object.freeze({
   digital_environment: ['evidence_supported'],
   experience_duration: ['structured_verifiable'],
   education_level: ['structured_verifiable'],
+  education_field: ['structured_verifiable'],
+  professional_qualification: ['structured_verifiable'],
+  technology_skill: ['evidence_supported'],
+  methodology_skill: ['evidence_supported'],
+  regulatory_eligibility: ['structured_verifiable'],
   unclassified: ['unclassified']
 })
 
@@ -221,6 +231,62 @@ function assertStructuredVerifiableParameters(
       }
       break
 
+    case 'education_field':
+      assertAllowedKeys(
+        params,
+        ['accepted_fields', 'logic'],
+        path
+      )
+
+      assertNonEmptyStringArray(
+        params.accepted_fields,
+        `${path}.accepted_fields`
+      )
+
+      assertLogicWhenComposite(
+        params,
+        'accepted_fields',
+        path
+      )
+      break
+
+    case 'professional_qualification':
+      assertAllowedKeys(
+        params,
+        ['accepted_qualifications', 'logic'],
+        path
+      )
+
+      assertNonEmptyStringArray(
+        params.accepted_qualifications,
+        `${path}.accepted_qualifications`
+      )
+
+      assertLogicWhenComposite(
+        params,
+        'accepted_qualifications',
+        path
+      )
+      break
+
+    case 'regulatory_eligibility':
+      assertAllowedKeys(
+        params,
+        ['eligibility_type', 'accepted_values'],
+        path
+      )
+
+      assertNonEmptyString(
+        params.eligibility_type,
+        `${path}.eligibility_type`
+      )
+
+      assertNonEmptyStringArray(
+        params.accepted_values,
+        `${path}.accepted_values`
+      )
+      break
+
     default:
       throw new Error(
         `TBZ: ${path} has no structured_verifiable contract for requirement_type "${requirement.requirement_type}".`
@@ -248,6 +314,12 @@ function assertEvidenceSupportedParameters(
 
     return
   }
+
+  assertAllowedKeys(
+    params,
+    ['target_concepts', 'logic'],
+    path
+  )
 
   assertNonEmptyStringArray(
     params.target_concepts,

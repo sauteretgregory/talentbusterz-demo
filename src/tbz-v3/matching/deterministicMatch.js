@@ -331,6 +331,16 @@ export const MATCH_ROUTE_POLICIES = Object.freeze({
     'evaluator',
   'structured_verifiable:education_level':
     'explicit_unknown',
+  'structured_verifiable:education_field':
+    'explicit_unknown',
+  'structured_verifiable:professional_qualification':
+    'explicit_unknown',
+  'evidence_supported:technology_skill':
+    'explicit_unknown',
+  'evidence_supported:methodology_skill':
+    'explicit_unknown',
+  'structured_verifiable:regulatory_eligibility':
+    'explicit_unknown',
   'unclassified:unclassified':
     'explicit_unknown'
 })

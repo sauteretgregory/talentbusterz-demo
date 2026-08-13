@@ -357,7 +357,7 @@ assert.deepEqual(
 
 assert.equal(
   Object.keys(MATCH_ROUTE_POLICIES).length,
-  12
+  17
 )
 
 console.log(

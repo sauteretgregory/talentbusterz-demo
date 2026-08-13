@@ -215,6 +215,236 @@ function cloneValidArtifact() {
   )
 }
 
+
+// ------------------------------------------------------------
+// Generic requirement vocabulary expansion
+// ------------------------------------------------------------
+
+const newValidRequirements = [
+  {
+    requirement_type: 'education_field',
+    evaluation_mode: 'structured_verifiable',
+    structured_parameters: {
+      accepted_fields: ['biostatistics']
+    }
+  },
+  {
+    requirement_type: 'professional_qualification',
+    evaluation_mode: 'structured_verifiable',
+    structured_parameters: {
+      accepted_qualifications: [
+        'state_registered_nurse'
+      ]
+    }
+  },
+  {
+    requirement_type: 'technology_skill',
+    evaluation_mode: 'evidence_supported',
+    structured_parameters: {
+      target_concepts: ['python']
+    }
+  },
+  {
+    requirement_type: 'methodology_skill',
+    evaluation_mode: 'evidence_supported',
+    structured_parameters: {
+      target_concepts: ['mbse']
+    }
+  },
+  {
+    requirement_type: 'regulatory_eligibility',
+    evaluation_mode: 'structured_verifiable',
+    structured_parameters: {
+      eligibility_type: 'work_authorization',
+      accepted_values: ['france']
+    }
+  }
+]
+
+for (const newRequirement of newValidRequirements) {
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    newRequirement.requirement_type
+  requirement.evaluation_mode =
+    newRequirement.evaluation_mode
+  requirement.structured_parameters =
+    newRequirement.structured_parameters
+
+  assert.equal(
+    assertCanonicalJobDataState(artifact),
+    artifact
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'technology_skill'
+  requirement.evaluation_mode =
+    'structured_verifiable'
+  requirement.structured_parameters = {
+    target_concepts: ['python']
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /incompatible requirement_type\/evaluation_mode/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'education_field'
+  requirement.evaluation_mode =
+    'structured_verifiable'
+  requirement.structured_parameters = {
+    accepted_fields: []
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /accepted_fields.*non-empty array/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'professional_qualification'
+  requirement.evaluation_mode =
+    'structured_verifiable'
+  requirement.structured_parameters = {
+    accepted_qualifications: [
+      'qualification_a',
+      'qualification_b'
+    ]
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /logic must be "all" or "any"/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'technology_skill'
+  requirement.evaluation_mode =
+    'evidence_supported'
+  requirement.structured_parameters = {
+    target_concepts: [
+      'python',
+      'sql'
+    ]
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /logic must be "all" or "any"/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'methodology_skill'
+  requirement.evaluation_mode =
+    'evidence_supported'
+  requirement.structured_parameters = {
+    target_concepts: ['mbse'],
+    unsupported_key: true
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /unsupported structured parameter/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'regulatory_eligibility'
+  requirement.evaluation_mode =
+    'structured_verifiable'
+  requirement.structured_parameters = {
+    eligibility_type: '',
+    accepted_values: ['france']
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /eligibility_type.*non-empty string/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'regulatory_eligibility'
+  requirement.evaluation_mode =
+    'structured_verifiable'
+  requirement.structured_parameters = {
+    eligibility_type: 'security_clearance',
+    accepted_values: []
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /accepted_values.*non-empty array/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type =
+    'education_field'
+  requirement.evaluation_mode =
+    'structured_verifiable'
+  requirement.structured_parameters = {
+    accepted_fields: ['electronics'],
+    unexpected: 'value'
+  }
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /unsupported structured parameter/
+  )
+}
+
+console.log(
+  '✓ Generic JOB requirement vocabulary tests passed'
+)
+
 console.log('✓ JOB DATA contract rejection tests passed')
 
 console.log('✓ JOB DATA contract tests passed')
