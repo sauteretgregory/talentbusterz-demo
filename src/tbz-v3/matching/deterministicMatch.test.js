@@ -364,3 +364,38 @@ console.log(
   '✓ MATCH handling policies exhaust canonical JOB routes:',
   declaredMatchRoutes.size
 )
+
+const digitalEnvironmentResult =
+  evaluation.requirements.find(
+    (result) =>
+      result.requirement_type ===
+      'digital_environment'
+  )
+
+assert.ok(
+  digitalEnvironmentResult,
+  'digital_environment result must exist'
+)
+
+assert.equal(
+  digitalEnvironmentResult.status,
+  'partial_match'
+)
+
+assert.equal(
+  digitalEnvironmentResult.confidence,
+  0.8
+)
+
+assert.equal(
+  digitalEnvironmentResult.evidence.concept,
+  'digital_environment'
+)
+
+assert.ok(
+  digitalEnvironmentResult.evidence.evidence.length > 0
+)
+
+console.log(
+  '✓ digital_environment canonical evaluator passed'
+)

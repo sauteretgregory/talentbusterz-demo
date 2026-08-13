@@ -326,7 +326,7 @@ export const MATCH_ROUTE_POLICIES = Object.freeze({
   'non_scoring:behavioral_traits':
     'non_scoring',
   'evidence_supported:digital_environment':
-    'explicit_unknown',
+    'evaluator',
   'structured_verifiable:experience_duration':
     'evaluator',
   'structured_verifiable:education_level':
@@ -412,6 +412,16 @@ export function evaluateDeterministicMatch({
         'evidence_supported:workload_capacity'
       ) {
         return evaluateWorkloadCapacityRequirement(
+          requirement,
+          candidateState
+        )
+      }
+
+      if (
+        routeKey ===
+        'evidence_supported:digital_environment'
+      ) {
+        return evaluateDigitalEnvironmentRequirement(
           requirement,
           candidateState
         )
@@ -1105,6 +1115,104 @@ function findWorkloadCapacityEvidence(
     unsupported: true,
     evidence: null
   }
+}
+
+function collectDigitalEnvironmentEvidence(
+  candidateState
+) {
+  const evidence = []
+
+  const skills = candidateState.skills_state || {}
+
+  for (const tool of skills.tools_claimed || []) {
+    evidence.push({
+      source: 'skills.tools_claimed',
+      text: tool,
+      evidence_status:
+        skills.global_evidence_status || null,
+      evidence_origin_type:
+        skills.primary_evidence_origin_type || null
+    })
+  }
+
+  const channels =
+    skills.recruitment_channels_declared || {}
+
+  if (channels.primary_ats_type?.value) {
+    evidence.push({
+      source:
+        'skills.recruitment_channels_declared.primary_ats_type',
+      text: channels.primary_ats_type.value,
+      evidence_status:
+        channels.primary_ats_type.evidence_status || null,
+      evidence_origin_type:
+        channels.primary_ats_type.evidence_origin_type || null
+    })
+  }
+
+  for (const platform of channels.platforms || []) {
+    if (!platform?.name) {
+      continue
+    }
+
+    evidence.push({
+      source:
+        'skills.recruitment_channels_declared.platforms',
+      text: platform.name,
+      evidence_status:
+        platform.evidence_status || null,
+      evidence_origin_type:
+        platform.evidence_origin_type || null
+    })
+  }
+
+  return evidence
+}
+
+function evaluateDigitalEnvironmentRequirement(
+  requirement,
+  candidateState
+) {
+  const concepts =
+    requirement.structured_parameters?.target_concepts
+
+  if (
+    !Array.isArray(concepts) ||
+    concepts.length !== 1 ||
+    concepts[0] !== 'digital_environment'
+  ) {
+    return buildResult(
+      requirement,
+      'unknown',
+      0,
+      null,
+      'Digital-environment requirement uses an unsupported canonical concept.'
+    )
+  }
+
+  const evidence =
+    collectDigitalEnvironmentEvidence(candidateState)
+
+  if (evidence.length === 0) {
+    return buildResult(
+      requirement,
+      'unknown',
+      0,
+      null,
+      'No canonical professional digital-environment evidence is available.'
+    )
+  }
+
+  return buildResult(
+    requirement,
+    'partial_match',
+    0.8,
+    {
+      concept: 'digital_environment',
+      evidence
+    },
+    'Professional digital-environment usage is evidenced, but explicit comfort or mastery is not canonically confirmed.'
+  )
 }
 
 function evaluateWorkloadCapacityRequirement(
