@@ -1,5 +1,9 @@
 import OpenAI from 'openai'
 
+import {
+  assertCanonicalJobDataState
+} from '../../src/tbz-v3/contracts/jobDataContract.js'
+
 function assertJobEngineInput(input) {
   if (!input || typeof input !== 'object') {
     throw new Error('TBZ: JOB DATA ENGINE input is required.')
@@ -16,38 +20,6 @@ function assertJobEngineInput(input) {
       'TBZ: unsupported JOB DATA ENGINE input contract.'
     )
   }
-}
-
-function assertCanonicalJobState(artifact) {
-  if (!artifact || typeof artifact !== 'object') {
-    throw new Error(
-      'TBZ: OpenAI returned an invalid JOB artifact.'
-    )
-  }
-
-  if (artifact.artifact_type !== 'canonical_job_data_state') {
-    throw new Error(
-      'TBZ: OpenAI output is not canonical_job_data_state.'
-    )
-  }
-
-  if (!artifact.artifact_id) {
-    throw new Error('TBZ: JOB artifact_id is missing.')
-  }
-
-  if (!artifact.state_version) {
-    throw new Error('TBZ: JOB state_version is missing.')
-  }
-
-  if (
-    artifact?.validation_report?.validation_status !== 'passed'
-  ) {
-    throw new Error(
-      'TBZ: JOB canonical validation did not pass.'
-    )
-  }
-
-  return artifact
 }
 
 export function createOpenAIJobDataEngineProvider({
@@ -129,6 +101,6 @@ export function createOpenAIJobDataEngineProvider({
       )
     }
 
-    return assertCanonicalJobState(artifact)
+    return assertCanonicalJobDataState(artifact)
   }
 }

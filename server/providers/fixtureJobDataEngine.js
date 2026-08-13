@@ -1,5 +1,9 @@
 import jobFranceTravail from '../../src/tbz-v3/fixtures/job-france-travail-210SDTY.json' with { type: 'json' }
 
+import {
+  assertCanonicalJobDataState
+} from '../../src/tbz-v3/contracts/jobDataContract.js'
+
 export function createFixtureJobDataEngineProvider() {
   return async function fixtureJobDataEngine(input) {
     if (
@@ -20,6 +24,10 @@ export function createFixtureJobDataEngineProvider() {
       )
     }
 
-    return structuredClone(jobFranceTravail)
+    // TODO: align fixture input validation with
+    // OPENAI provider input_contract_version checks.
+    return assertCanonicalJobDataState(
+      structuredClone(jobFranceTravail)
+    )
   }
 }
