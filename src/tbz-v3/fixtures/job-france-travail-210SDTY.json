@@ -130,7 +130,14 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "current_education_status",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "allowed_statuses": [
+            "current_student"
+          ]
+        }
       },
       {
         "requirement_id": "req_experience_it_esn_001",
@@ -144,7 +151,22 @@
         "source_ids": [
           "source_req_ft_210SDTY_create"
         ],
-        "source_text": "Une première expérience en recrutement IT et en sociétes de services/ESN est indispensable"
+        "source_text": "Une première expérience en recrutement IT et en sociétes de services/ESN est indispensable",
+        "requirement_type": "domain_experience",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "required_components": [
+            {
+              "component_type": "professional_domain",
+              "value": "recruitment_it"
+            },
+            {
+              "component_type": "employment_context",
+              "value": "esn"
+            }
+          ],
+          "logic": "all"
+        }
       },
       {
         "requirement_id": "req_interest_recruitment_tech_001",
@@ -157,7 +179,15 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "professional_interest",
+        "evaluation_mode": "self_declared",
+        "structured_parameters": {
+          "target_concepts": [
+            "recruitment",
+            "technology"
+          ]
+        }
       },
       {
         "requirement_id": "req_sourcing_prospecting_cold_calling_001",
@@ -170,7 +200,17 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "professional_practice",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "sourcing",
+            "prospecting",
+            "cold_calling"
+          ],
+          "logic": "all"
+        }
       },
       {
         "requirement_id": "req_french_communication_001",
@@ -183,7 +223,16 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "language_communication",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "french_oral_communication",
+            "french_written_communication"
+          ],
+          "logic": "all"
+        }
       },
       {
         "requirement_id": "req_english_b2_001",
@@ -196,7 +245,13 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "language_level",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "language": "en",
+          "minimum_level": "B2"
+        }
       },
       {
         "requirement_id": "req_volume_pace_001",
@@ -209,7 +264,16 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "workload_capacity",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "high_volume",
+            "fast_pace"
+          ],
+          "logic": "all"
+        }
       },
       {
         "requirement_id": "req_autonomous_dynamic_rigorous_solution_001",
@@ -222,7 +286,17 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "behavioral_traits",
+        "evaluation_mode": "non_scoring",
+        "structured_parameters": {
+          "traits": [
+            "autonomy",
+            "dynamism",
+            "rigor",
+            "solution_orientation"
+          ]
+        }
       },
       {
         "requirement_id": "req_interpersonal_persistence_conviction_001",
@@ -235,7 +309,16 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "behavioral_traits",
+        "evaluation_mode": "non_scoring",
+        "structured_parameters": {
+          "traits": [
+            "interpersonal_skills",
+            "persistence",
+            "conviction"
+          ]
+        }
       },
       {
         "requirement_id": "req_digital_environment_001",
@@ -248,7 +331,14 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "digital_environment",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "digital_environment"
+          ]
+        }
       },
       {
         "requirement_id": "req_expected_qualities_001",
@@ -261,7 +351,20 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "behavioral_traits",
+        "evaluation_mode": "non_scoring",
+        "structured_parameters": {
+          "traits": [
+            "positive_attitude",
+            "energy",
+            "resilience",
+            "organization",
+            "persuasiveness",
+            "human_contact_orientation",
+            "prospecting_orientation"
+          ]
+        }
       },
       {
         "requirement_id": "req_experience_2_years_001",
@@ -275,7 +378,12 @@
         "source_ids": [
           "source_req_ft_210SDTY_create"
         ],
-        "source_text": "2 An(s) Cette expérience est indispensable"
+        "source_text": "2 An(s) Cette expérience est indispensable",
+        "requirement_type": "experience_duration",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "minimum_months": 24
+        }
       },
       {
         "requirement_id": "req_bac5_001",
@@ -288,7 +396,12 @@
         "evidence_status": "confirmed",
         "source_ids": [
           "source_req_ft_210SDTY_create"
-        ]
+        ],
+        "requirement_type": "education_level",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "minimum_level": "bac_plus_5"
+        }
       }
     ],
     "constraints_explicit": [

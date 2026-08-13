@@ -35,6 +35,19 @@ const fakeClient = {
           state_version: 'v1.0',
           validation_report: {
             validation_status: 'passed'
+          },
+          job_data_state: {
+            requirements_explicit: [
+              {
+                requirement_id: 'req_mock_001',
+                requirement: '2 ans d’expérience',
+                requirement_type: 'experience_duration',
+                evaluation_mode: 'structured_verifiable',
+                structured_parameters: {
+                  minimum_months: 24
+                }
+              }
+            ]
           }
         })
       }
