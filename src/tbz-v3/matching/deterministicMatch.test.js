@@ -324,3 +324,43 @@ assert.equal(
 console.log(
   '✓ language_communication canonical evaluator passed'
 )
+
+import {
+  REQUIREMENT_TYPE_EVALUATION_MODES
+} from '../contracts/jobDataContract.js'
+
+import {
+  MATCH_ROUTE_POLICIES
+} from './deterministicMatch.js'
+
+const canonicalContractRoutes = new Set(
+  Object.entries(
+    REQUIREMENT_TYPE_EVALUATION_MODES
+  ).flatMap(
+    ([requirementType, modes]) =>
+      modes.map(
+        (mode) =>
+          `${mode}:${requirementType}`
+      )
+  )
+)
+
+const declaredMatchRoutes =
+  new Set(
+    Object.keys(MATCH_ROUTE_POLICIES)
+  )
+
+assert.deepEqual(
+  declaredMatchRoutes,
+  canonicalContractRoutes
+)
+
+assert.equal(
+  Object.keys(MATCH_ROUTE_POLICIES).length,
+  12
+)
+
+console.log(
+  '✓ MATCH handling policies exhaust canonical JOB routes:',
+  declaredMatchRoutes.size
+)

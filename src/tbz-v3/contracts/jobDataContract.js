@@ -25,7 +25,7 @@ export const EVALUATION_MODES = Object.freeze([
   'unclassified'
 ])
 
-const REQUIREMENT_TYPE_EVALUATION_MODES = Object.freeze({
+export const REQUIREMENT_TYPE_EVALUATION_MODES = Object.freeze({
   current_education_status: ['structured_verifiable'],
   domain_experience: ['evidence_supported'],
   professional_interest: ['self_declared'],

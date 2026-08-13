@@ -308,6 +308,51 @@ export function evaluateRequirement(
   }
 }
 
+export const MATCH_ROUTE_POLICIES = Object.freeze({
+  'structured_verifiable:current_education_status':
+    'explicit_unknown',
+  'evidence_supported:domain_experience':
+    'evaluator',
+  'self_declared:professional_interest':
+    'self_declared',
+  'evidence_supported:professional_practice':
+    'evaluator',
+  'evidence_supported:language_communication':
+    'evaluator',
+  'structured_verifiable:language_level':
+    'evaluator',
+  'evidence_supported:workload_capacity':
+    'evaluator',
+  'non_scoring:behavioral_traits':
+    'non_scoring',
+  'evidence_supported:digital_environment':
+    'explicit_unknown',
+  'structured_verifiable:experience_duration':
+    'evaluator',
+  'structured_verifiable:education_level':
+    'explicit_unknown',
+  'unclassified:unclassified':
+    'explicit_unknown'
+})
+
+export function getRequirementHandlingPolicy(
+  requirement
+) {
+  const routeKey =
+    getRequirementRouteKey(requirement)
+
+  const policy =
+    MATCH_ROUTE_POLICIES[routeKey]
+
+  if (!policy) {
+    throw new Error(
+      `TBZ deterministic match: no handling policy for canonical route "${routeKey}".`
+    )
+  }
+
+  return policy
+}
+
 export function evaluateDeterministicMatch({
   candidateState,
   jobState
@@ -406,9 +451,21 @@ export function evaluateDeterministicMatch({
         )
       }
 
-      return evaluateRequirement(
-        requirement,
-        context.candidateEvidence
+      const handlingPolicy =
+        getRequirementHandlingPolicy(requirement)
+
+      if (handlingPolicy === 'explicit_unknown') {
+        return buildResult(
+          requirement,
+          'unknown',
+          0,
+          null,
+          'Canonical MATCH route is recognized but does not yet have a resolvable evaluator for the current candidate schema.'
+        )
+      }
+
+      throw new Error(
+        `TBZ deterministic match: canonical route "${routeKey}" reached no executable handler.`
       )
     }
   )
