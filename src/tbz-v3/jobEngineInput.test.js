@@ -16,6 +16,12 @@ import {
   canJobEngineProcess
 } from './jobEngineInput.js'
 
+import {
+  JOB_ENGINE_INPUT_ARTIFACT_TYPE,
+  JOB_ENGINE_INPUT_CONTRACT_VERSION,
+  assertJobEngineInputPayload
+} from './contracts/jobEngineInputContract.js'
+
 const franceTravailUrl =
   'https://candidat.francetravail.fr/offres/recherche/detail/210SDTY'
 
@@ -49,12 +55,23 @@ const payload = createJobEngineInputPayload({
 
 assert.equal(
   payload.artifact_type,
-  'job_data_engine_input_payload'
+  JOB_ENGINE_INPUT_ARTIFACT_TYPE
 )
 
 assert.equal(
   payload.input_contract_version,
-  'v1.0'
+  JOB_ENGINE_INPUT_CONTRACT_VERSION
+)
+
+assert.equal(assertJobEngineInputPayload(payload), payload)
+
+assert.throws(
+  () =>
+    assertJobEngineInputPayload({
+      artifact_type: JOB_ENGINE_INPUT_ARTIFACT_TYPE,
+      input_contract_version: 'v2.0'
+    }),
+  /unsupported JOB DATA ENGINE input contract/
 )
 
 assert.equal(

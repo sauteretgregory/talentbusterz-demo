@@ -4,23 +4,9 @@ import {
   assertCanonicalJobDataState
 } from '../../src/tbz-v3/contracts/jobDataContract.js'
 
-function assertJobEngineInput(input) {
-  if (!input || typeof input !== 'object') {
-    throw new Error('TBZ: JOB DATA ENGINE input is required.')
-  }
-
-  if (input.artifact_type !== 'job_data_engine_input_payload') {
-    throw new Error(
-      'TBZ: expected job_data_engine_input_payload.'
-    )
-  }
-
-  if (input.input_contract_version !== 'v1.0') {
-    throw new Error(
-      'TBZ: unsupported JOB DATA ENGINE input contract.'
-    )
-  }
-}
+import {
+  assertJobEngineInputPayload
+} from '../../src/tbz-v3/contracts/jobEngineInputContract.js'
 
 export function createOpenAIJobDataEngineProvider({
   apiKey = process.env.OPENAI_API_KEY,
@@ -43,7 +29,7 @@ export function createOpenAIJobDataEngineProvider({
     client || new OpenAI({ apiKey })
 
   return async function openaiJobDataEngine(input) {
-    assertJobEngineInput(input)
+    assertJobEngineInputPayload(input)
 
     const response = await openai.responses.create({
       model,

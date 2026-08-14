@@ -39,11 +39,24 @@ await assert.rejects(
   () =>
     provider({
       artifact_type: 'job_data_engine_input_payload',
+      input_contract_version: 'v1.0',
       provider_payload: {
         offer_id: 'UNKNOWN'
       }
     }),
   /no fixture/
+)
+
+await assert.rejects(
+  () =>
+    provider({
+      artifact_type: 'job_data_engine_input_payload',
+      input_contract_version: 'v2.0',
+      provider_payload: {
+        offer_id: '210SDTY'
+      }
+    }),
+  /unsupported JOB DATA ENGINE input contract/
 )
 
 console.log('✓ Fixture JOB DATA ENGINE tests passed')

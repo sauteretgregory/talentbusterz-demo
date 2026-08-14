@@ -4,16 +4,13 @@ import {
   assertCanonicalJobDataState
 } from '../../src/tbz-v3/contracts/jobDataContract.js'
 
+import {
+  assertJobEngineInputPayload
+} from '../../src/tbz-v3/contracts/jobEngineInputContract.js'
+
 export function createFixtureJobDataEngineProvider() {
   return async function fixtureJobDataEngine(input) {
-    if (
-      !input ||
-      input.artifact_type !== 'job_data_engine_input_payload'
-    ) {
-      throw new Error(
-        'TBZ fixture JOB DATA ENGINE: invalid input artifact.'
-      )
-    }
+    assertJobEngineInputPayload(input)
 
     const offerId =
       input?.provider_payload?.offer_id
@@ -24,8 +21,6 @@ export function createFixtureJobDataEngineProvider() {
       )
     }
 
-    // TODO: align fixture input validation with
-    // OPENAI provider input_contract_version checks.
     return assertCanonicalJobDataState(
       structuredClone(jobFranceTravail)
     )

@@ -61,6 +61,15 @@ const provider =
     model: 'test-model'
   })
 
+await assert.rejects(
+  () =>
+    provider({
+      artifact_type: 'job_data_engine_input_payload',
+      input_contract_version: 'v2.0'
+    }),
+  /unsupported JOB DATA ENGINE input contract/
+)
+
 const artifact = await provider({
   artifact_type: 'job_data_engine_input_payload',
   input_contract_version: 'v1.0',

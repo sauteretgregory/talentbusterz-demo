@@ -1,5 +1,10 @@
 import { EXTRACTION_STATUS } from './extractorGateway.js'
 
+import {
+  JOB_ENGINE_INPUT_ARTIFACT_TYPE,
+  JOB_ENGINE_INPUT_CONTRACT_VERSION
+} from './contracts/jobEngineInputContract.js'
+
 function mapExtractionStatus(status) {
   switch (status) {
     case EXTRACTION_STATUS.COMPLETED:
@@ -57,8 +62,9 @@ export function createJobEngineInputPayload({
     mapExtractionStatus(extractionResult.extraction_status)
 
   const payload = {
-    artifact_type: 'job_data_engine_input_payload',
-    input_contract_version: 'v1.0',
+    artifact_type: JOB_ENGINE_INPUT_ARTIFACT_TYPE,
+    input_contract_version:
+      JOB_ENGINE_INPUT_CONTRACT_VERSION,
     request_id: requestId,
     operation,
     source: {
