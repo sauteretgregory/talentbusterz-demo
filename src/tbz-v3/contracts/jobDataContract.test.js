@@ -8,6 +8,10 @@ import {
   TBZ_ARTIFACT_TYPES
 } from '../artifactTypes.js'
 
+import {
+  EDUCATION_LEVELS
+} from './educationLevelVocabulary.js'
+
 const validArtifact = {
   artifact_type: TBZ_ARTIFACT_TYPES.JOB,
   artifact_id: 'job_mock_001',
@@ -92,6 +96,95 @@ assert.equal(
 
 function cloneValidArtifact() {
   return structuredClone(validArtifact)
+}
+
+function configureEducationLevelRequirement(
+  artifact,
+  structuredParameters
+) {
+  const requirement =
+    artifact.job_data_state.requirements_explicit[0]
+
+  requirement.requirement_type = 'education_level'
+  requirement.evaluation_mode = 'structured_verifiable'
+  requirement.structured_parameters = structuredParameters
+}
+
+for (const level of EDUCATION_LEVELS) {
+  const artifact = cloneValidArtifact()
+
+  configureEducationLevelRequirement(artifact, {
+    minimum_level: level
+  })
+
+  assert.equal(
+    assertCanonicalJobDataState(artifact),
+    artifact
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+
+  configureEducationLevelRequirement(artifact, {
+    minimum_level: 'master'
+  })
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /minimum_level must be a supported canonical education level/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+
+  configureEducationLevelRequirement(artifact, {
+    minimum_level: 'bac',
+    maximum_level: 'master'
+  })
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /maximum_level must be a supported canonical education level/
+  )
+}
+
+{
+  const artifact = cloneValidArtifact()
+
+  configureEducationLevelRequirement(artifact, {
+    minimum_level: 'bac_plus_5',
+    maximum_level: 'bac_plus_2'
+  })
+
+  assert.throws(
+    () => assertCanonicalJobDataState(artifact),
+    /minimum_level must not exceed maximum_level/
+  )
+}
+
+for (const structuredParameters of [
+  {
+    minimum_level: 'bac_plus_5',
+    maximum_level: 'bac_plus_5'
+  },
+  {
+    minimum_level: 'bac_plus_2',
+    maximum_level: 'bac_plus_5'
+  }
+]) {
+  const artifact = cloneValidArtifact()
+
+  configureEducationLevelRequirement(
+    artifact,
+    structuredParameters
+  )
+
+  assert.equal(
+    assertCanonicalJobDataState(artifact),
+    artifact
+  )
 }
 
 {

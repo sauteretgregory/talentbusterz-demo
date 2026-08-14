@@ -10,8 +10,30 @@ import jobArtifact from '../fixtures/job-france-travail-210SDTY.json' with {
 
 import {
   createDeterministicMatchContext,
+  EDUCATION_LEVEL_ORDER,
   normalizeText
 } from './deterministicMatch.js'
+
+import {
+  EDUCATION_LEVEL_ORDER as CANONICAL_EDUCATION_LEVEL_ORDER,
+  EDUCATION_LEVELS
+} from '../contracts/educationLevelVocabulary.js'
+
+assert.strictEqual(
+  EDUCATION_LEVEL_ORDER,
+  CANONICAL_EDUCATION_LEVEL_ORDER
+)
+
+assert.deepEqual(EDUCATION_LEVELS, [
+  'below_bac',
+  'bac',
+  'bac_plus_1',
+  'bac_plus_2',
+  'bac_plus_3',
+  'bac_plus_4',
+  'bac_plus_5',
+  'bac_plus_8'
+])
 
 assert.equal(
   normalizeText('Préqualification & Entretiens'),
@@ -63,6 +85,10 @@ console.log(
 import {
   evaluateDeterministicMatch
 } from './deterministicMatch.js'
+
+const candidateStateBeforeEvaluation = structuredClone(
+  candidateArtifact.candidate_data_state
+)
 
 const evaluation = evaluateDeterministicMatch({
   candidateState: candidateArtifact.candidate_data_state,
@@ -144,6 +170,159 @@ assert.equal(
 
 console.log(
   '✓ experience_duration canonical evaluator passed'
+)
+
+const educationLevelResult =
+  evaluation.requirements.find(
+    (result) =>
+      result.requirement_id === 'req_bac5_001'
+  )
+
+assert.ok(
+  educationLevelResult,
+  'education_level result must exist'
+)
+
+assert.equal(
+  educationLevelResult.status,
+  'unknown'
+)
+
+assert.equal(
+  educationLevelResult.confidence, 0)
+
+assert.deepEqual(
+  educationLevelResult.evidence.confirmed_completed_levels,
+  []
+)
+
+assert.deepEqual(
+  candidateArtifact.candidate_data_state,
+  candidateStateBeforeEvaluation
+)
+
+assert.equal(
+  MATCH_ROUTE_POLICIES[
+    'structured_verifiable:education_level'
+  ], 'evaluator')
+
+const educationJobState = {
+  requirements_explicit: [
+    jobArtifact.job_data_state.requirements_explicit.find(
+      (requirement) =>
+        requirement.requirement_id === 'req_bac5_001'
+    )
+  ]
+}
+
+const confirmedBac5Result = evaluateDeterministicMatch({
+  candidateState: {
+    education_state: [
+      {
+        education_id: 'edu_master_confirmed',
+        completed_level: {
+          value: 'bac_plus_5',
+          evidence_status: 'confirmed'
+        },
+        completion_status: {
+          value: 'completed',
+          evidence_status: 'confirmed'
+        }
+      },
+      {
+        education_id: 'edu_btsa_interrupted',
+        completed_level: {
+          value: 'bac_plus_2',
+          evidence_status: 'confirmed'
+        },
+        completion_status: {
+          value: 'not_completed',
+          evidence_status: 'confirmed'
+        }
+      }
+    ]
+  },
+  jobState: educationJobState
+}).requirements[0]
+
+assert.equal(confirmedBac5Result.status, 'match')
+assert.equal(confirmedBac5Result.confidence, 0.95)
+assert.deepEqual(
+  confirmedBac5Result.evidence.confirmed_completed_levels,
+  [
+    {
+      source: 'edu_master_confirmed',
+      level: 'bac_plus_5'
+    }
+  ]
+)
+
+const confirmedBac2Result = evaluateDeterministicMatch({
+  candidateState: {
+    education_state: [
+      {
+        education_id: 'edu_bts_confirmed',
+        completed_level: {
+          value: 'bac_plus_2',
+          evidence_status: 'confirmed'
+        },
+        completion_status: {
+          value: 'completed',
+          evidence_status: 'confirmed'
+        }
+      }
+    ]
+  },
+  jobState: educationJobState
+}).requirements[0]
+
+assert.equal(confirmedBac2Result.status, 'mismatch')
+assert.equal(confirmedBac2Result.confidence, 0.95)
+
+const highestCompletedLevelResult =
+  evaluateDeterministicMatch({
+    candidateState: {
+      highest_completed_education_level: {
+        value: 'bac_plus_5',
+        evidence_status: 'confirmed'
+      },
+      education_state: []
+    },
+    jobState: educationJobState
+  }).requirements[0]
+
+assert.equal(highestCompletedLevelResult.status, 'match')
+assert.deepEqual(
+  highestCompletedLevelResult.evidence
+    .confirmed_completed_levels,
+  [
+    {
+      source: 'highest_completed_education_level',
+      level: 'bac_plus_5'
+    }
+  ]
+)
+
+const invalidEducationJobState = structuredClone(
+  educationJobState
+)
+
+invalidEducationJobState.requirements_explicit[0]
+  .structured_parameters.minimum_level = 'master'
+
+assert.throws(
+  () =>
+    evaluateDeterministicMatch({
+      candidateState: {
+        education_state: []
+      },
+      jobState: invalidEducationJobState
+    }),
+  /education_level requires valid canonical minimum_level/
+)
+
+console.log(
+  '✓ education_level canonical evaluator passed'
 )
 
 const domainExperienceResult =

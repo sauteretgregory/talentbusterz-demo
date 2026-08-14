@@ -2,6 +2,11 @@ import {
   TBZ_ARTIFACT_TYPES
 } from '../artifactTypes.js'
 
+import {
+  compareEducationLevels,
+  isCanonicalEducationLevel
+} from './educationLevelVocabulary.js'
+
 export const REQUIREMENT_TYPES = Object.freeze([
   'current_education_status',
   'domain_experience',
@@ -78,6 +83,16 @@ function assertNonEmptyStringArray(value, path) {
   ) {
     throw new Error(
       `TBZ: ${path} must be a non-empty array of non-empty strings.`
+    )
+  }
+}
+
+function assertCanonicalEducationLevel(value, path) {
+  assertNonEmptyString(value, path)
+
+  if (!isCanonicalEducationLevel(value)) {
+    throw new Error(
+      `TBZ: ${path} must be a supported canonical education level.`
     )
   }
 }
@@ -218,16 +233,27 @@ function assertStructuredVerifiableParameters(
         ['minimum_level', 'maximum_level'],
         path
       )
-      assertNonEmptyString(
+      assertCanonicalEducationLevel(
         params.minimum_level,
         `${path}.minimum_level`
       )
 
       if ('maximum_level' in params) {
-        assertNonEmptyString(
+        assertCanonicalEducationLevel(
           params.maximum_level,
           `${path}.maximum_level`
         )
+
+        if (
+          compareEducationLevels(
+            params.minimum_level,
+            params.maximum_level
+          ) > 0
+        ) {
+          throw new Error(
+            `TBZ: ${path}.minimum_level must not exceed maximum_level.`
+          )
+        }
       }
       break
 

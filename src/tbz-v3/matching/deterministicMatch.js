@@ -1,3 +1,12 @@
+import {
+  EDUCATION_LEVEL_ORDER,
+  isCanonicalEducationLevel
+} from '../contracts/educationLevelVocabulary.js'
+
+export {
+  EDUCATION_LEVEL_ORDER
+} from '../contracts/educationLevelVocabulary.js'
+
 const IMPORTANCE_WEIGHTS = Object.freeze({
   critical: 4,
   high: 3,
@@ -330,7 +339,7 @@ export const MATCH_ROUTE_POLICIES = Object.freeze({
   'structured_verifiable:experience_duration':
     'evaluator',
   'structured_verifiable:education_level':
-    'explicit_unknown',
+    'evaluator',
   'structured_verifiable:education_field':
     'explicit_unknown',
   'structured_verifiable:professional_qualification':
@@ -382,6 +391,16 @@ export function evaluateDeterministicMatch({
         'structured_verifiable:experience_duration'
       ) {
         return evaluateExperienceDurationRequirement(
+          requirement,
+          candidateState
+        )
+      }
+
+      if (
+        routeKey ===
+        'structured_verifiable:education_level'
+      ) {
+        return evaluateEducationLevelRequirement(
           requirement,
           candidateState
         )
@@ -712,6 +731,174 @@ function buildUnknownStructuredResult(
     0,
     null,
     reason
+  )
+}
+
+const COMPLETED_EDUCATION_STATUSES = new Set([
+  'completed',
+  'validated',
+  'graduated',
+  'obtained',
+  'mene a terme'
+])
+
+function extractConfirmedValue(value, fallbackStatus) {
+  if (typeof value === 'string') {
+    return fallbackStatus === 'confirmed'
+      ? value
+      : null
+  }
+
+  if (
+    value &&
+    typeof value === 'object' &&
+    typeof value.value === 'string' &&
+    value.evidence_status === 'confirmed'
+  ) {
+    return value.value
+  }
+
+  return null
+}
+
+function extractConfirmedCompletedEducationLevels(
+  candidateState
+) {
+  const levels = []
+
+  const highestCompletedLevel =
+    extractConfirmedValue(
+      candidateState.highest_completed_education_level
+    )
+
+  if (highestCompletedLevel) {
+    levels.push({
+      source: 'highest_completed_education_level',
+      level: highestCompletedLevel
+    })
+  }
+
+  for (const education of candidateState.education_state || []) {
+    const completionStatus = extractConfirmedValue(
+      education.completion_status,
+      education.evidence_status
+    )
+
+    if (
+      !completionStatus ||
+      !COMPLETED_EDUCATION_STATUSES.has(
+        normalizeText(completionStatus)
+      )
+    ) {
+      continue
+    }
+
+    const level = extractConfirmedValue(
+      education.completed_level,
+      education.evidence_status
+    )
+
+    if (!level) {
+      continue
+    }
+
+    levels.push({
+      source: education.education_id || null,
+      level
+    })
+  }
+
+  return levels.filter(
+    ({ level }) => isCanonicalEducationLevel(level)
+  )
+}
+
+function evaluateEducationLevelRequirement(
+  requirement,
+  candidateState
+) {
+  const minimumLevel =
+    requirement.structured_parameters?.minimum_level
+  const maximumLevel =
+    requirement.structured_parameters?.maximum_level
+
+  if (
+    typeof minimumLevel !== 'string' ||
+    !isCanonicalEducationLevel(minimumLevel) ||
+    (
+      maximumLevel !== undefined &&
+      (
+        typeof maximumLevel !== 'string' ||
+        !isCanonicalEducationLevel(maximumLevel)
+      )
+    )
+  ) {
+    throw new Error(
+      'TBZ deterministic match: education_level requires valid canonical minimum_level and optional maximum_level.'
+    )
+  }
+
+  const completedLevels =
+    extractConfirmedCompletedEducationLevels(candidateState)
+
+  if (completedLevels.length === 0) {
+    return buildResult(
+      requirement,
+      'unknown',
+      0,
+      {
+        confirmed_completed_levels: [],
+        minimum_level: minimumLevel,
+        maximum_level: maximumLevel || null
+      },
+      'No completed education level is canonically confirmed; programme titles, partial evidence, and interrupted studies are not used as qualifications.'
+    )
+  }
+
+  const highestCompletedLevel = completedLevels.reduce(
+    (highest, level) =>
+      EDUCATION_LEVEL_ORDER[level.level] >
+      EDUCATION_LEVEL_ORDER[highest.level]
+        ? level
+        : highest
+  )
+
+  const meetsMinimum =
+    EDUCATION_LEVEL_ORDER[highestCompletedLevel.level] >=
+    EDUCATION_LEVEL_ORDER[minimumLevel]
+  const meetsMaximum =
+    !maximumLevel ||
+    EDUCATION_LEVEL_ORDER[highestCompletedLevel.level] <=
+      EDUCATION_LEVEL_ORDER[maximumLevel]
+
+  if (meetsMinimum && meetsMaximum) {
+    return buildResult(
+      requirement,
+      'match',
+      0.95,
+      {
+        confirmed_completed_levels: completedLevels,
+        highest_completed_level:
+          highestCompletedLevel.level,
+        minimum_level: minimumLevel,
+        maximum_level: maximumLevel || null
+      },
+      'Highest canonically confirmed completed education level satisfies the requirement.'
+    )
+  }
+
+  return buildResult(
+    requirement,
+    'mismatch',
+    0.95,
+    {
+      confirmed_completed_levels: completedLevels,
+      highest_completed_level:
+        highestCompletedLevel.level,
+      minimum_level: minimumLevel,
+      maximum_level: maximumLevel || null
+    },
+    'Highest canonically confirmed completed education level does not satisfy the requirement.'
   )
 }
 
