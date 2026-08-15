@@ -36,10 +36,6 @@ function getAnswers(input) {
     : []
 }
 
-function findAnswer(answers, id) {
-  return answers.find((item) => item.question_id === id)?.answer?.trim() || null
-}
-
 function upsertActivity(experience, value) {
   experience.activities = Array.isArray(experience.activities)
     ? experience.activities
@@ -57,19 +53,22 @@ function upsertActivity(experience, value) {
 
 function updateEsnExperience(candidateState, answer) {
   const normalized = normalize(answer)
+  const positive = /\b(oui|yes)\b/.test(normalized) && !/\bnon\b/.test(normalized)
   const experience = candidateState.experience_state?.find(
     (item) => item.experience_id === 'exp_anywr_2022_2025'
   )
 
   if (!experience) return
 
-  upsertActivity(
-    experience,
-    `Réponse PROBE — contexte ESN / société de services : ${answer}`
-  )
+  if (positive) {
+    upsertActivity(
+      experience,
+      `Réponse PROBE confirmée : recrutement IT en contexte ESN / société de services. ${answer}`
+    )
+  }
 
   experience.probe_response_state = {
-    context_confirmed: !/\bnon\b/.test(normalized),
+    context_confirmed: positive,
     response: answer,
     evidence_status: 'confirmed',
     evidence_origin_type: 'direct_user_statement'
@@ -212,6 +211,10 @@ export function reingestProbeResponses(candidateArtifact, probeResponses) {
     if (!handler) continue
     handler(candidateState, answer.answer)
     applied.push(answer.question_id)
+  }
+
+  if (!applied.length) {
+    throw new Error('TBZ CANDIDATE DATA ENGINE: no supported probe question_id was supplied.')
   }
 
   const previousVersion = candidateState.state_version || canonical.state_version || 'v1.3_probe_response_integration'
