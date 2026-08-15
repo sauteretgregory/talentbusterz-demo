@@ -1,6 +1,9 @@
 import { TBZ_ARTIFACT_TYPES } from '../artifactTypes.js'
+import { assertProbeFinalState } from './probeFinalStateContract.js'
 
 export const APPLICATION_READINESS_CONTRACT_VERSION = 'v1.0'
+export const APPLICATION_READINESS_ENGINE_NAME = 'applicationReadinessContract'
+export const APPLICATION_READINESS_ENGINE_VERSION = APPLICATION_READINESS_CONTRACT_VERSION
 
 export const APPLICATION_READINESS_STATUSES = Object.freeze([
   'ready',
@@ -33,6 +36,16 @@ function assertNullableNumber(value, path) {
   }
 }
 
+function assertProvenance(value, path) {
+  assertObject(value, path)
+
+  for (const field of ['artifact_id', 'state_version', 'engine_name', 'engine_version']) {
+    if (typeof value[field] !== 'string' || !value[field].trim()) {
+      throw new Error(`TBZ: ${path}.${field} is required.`)
+    }
+  }
+}
+
 function createArtifactId(candidate, job) {
   const candidateId = candidate.artifact_id || candidate.candidate_data_state?.candidate_identity?.candidate_id
   const jobId = job.artifact_id || job.job_data_state?.job_identity?.job_id
@@ -48,7 +61,8 @@ export function createApplicationReadinessState({
   candidateDataState,
   jobDataState,
   matchState,
-  probeFinalState
+  probeFinalState,
+  generatedAt = new Date().toISOString()
 }) {
   assertCanonicalArtifact(
     candidateDataState,
@@ -65,10 +79,10 @@ export function createApplicationReadinessState({
     TBZ_ARTIFACT_TYPES.MATCH,
     'match_state'
   )
-  assertObject(probeFinalState, 'probe_final_state')
+  assertProbeFinalState(probeFinalState)
 
-  if (probeFinalState.contract_version !== 'v1.0') {
-    throw new Error('TBZ: application readiness requires PROBE final state contract v1.0.')
+  if (typeof generatedAt !== 'string' || !generatedAt.trim() || Number.isNaN(Date.parse(generatedAt))) {
+    throw new Error('TBZ: application readiness generated_at must be a valid ISO date string.')
   }
 
   const score = matchState?.match_state?.professional_compatibility?.professional_match_score
@@ -77,6 +91,22 @@ export function createApplicationReadinessState({
   if (score === null) {
     throw new Error('TBZ: application readiness requires a canonical MATCH score.')
   }
+
+  const matchProvenance = {
+    artifact_id: matchState.artifact_id,
+    state_version: matchState.state_version || 'v1.0',
+    engine_name: matchState.engine_name,
+    engine_version: matchState.engine_version
+  }
+  const probeProvenance = {
+    artifact_id: probeFinalState.artifact_id,
+    state_version: probeFinalState.state_version || 'v1.0',
+    engine_name: probeFinalState.engine_name,
+    engine_version: probeFinalState.engine_version
+  }
+
+  assertProvenance(matchProvenance, 'source_alignment.match')
+  assertProvenance(probeProvenance, 'source_alignment.probe')
 
   let status = 'not_ready'
   let recommendation = 'continue_enrichment'
@@ -105,6 +135,13 @@ export function createApplicationReadinessState({
     artifact_filename: `${artifactId}.json`.replace('_v1.json', '_v1.0.json'),
     state_version: 'v1.0',
     contract_version: APPLICATION_READINESS_CONTRACT_VERSION,
+    engine_name: APPLICATION_READINESS_ENGINE_NAME,
+    engine_version: APPLICATION_READINESS_ENGINE_VERSION,
+    generated_at: generatedAt,
+    source_alignment: {
+      match: matchProvenance,
+      probe: probeProvenance
+    },
     application_readiness: {
       status,
       recommendation,
@@ -142,6 +179,22 @@ export function assertApplicationReadinessState(state) {
   if (typeof state.artifact_filename !== 'string' || !state.artifact_filename.endsWith('.json')) {
     throw new Error('TBZ: application readiness artifact_filename must be a JSON filename.')
   }
+
+  if (state.engine_name !== APPLICATION_READINESS_ENGINE_NAME) {
+    throw new Error('TBZ: application readiness engine_name is invalid.')
+  }
+
+  if (state.engine_version !== APPLICATION_READINESS_ENGINE_VERSION) {
+    throw new Error('TBZ: application readiness engine_version is invalid.')
+  }
+
+  if (typeof state.generated_at !== 'string' || Number.isNaN(Date.parse(state.generated_at))) {
+    throw new Error('TBZ: application readiness generated_at must be a valid ISO date string.')
+  }
+
+  assertObject(state.source_alignment, 'source_alignment')
+  assertProvenance(state.source_alignment.match, 'source_alignment.match')
+  assertProvenance(state.source_alignment.probe, 'source_alignment.probe')
 
   const readiness = state.application_readiness
   assertObject(readiness, 'application_readiness')
