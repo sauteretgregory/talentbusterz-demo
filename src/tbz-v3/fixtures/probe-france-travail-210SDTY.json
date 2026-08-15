@@ -10,10 +10,10 @@
   "source_match_artifact": {
     "artifact_type": "canonical_match_state",
     "artifact_id": "match_gregory_sauteret_france_travail_210SDTY",
-    "artifact_filename": "match_gregory_france_travail_210SDTY_v1.0.json",
+    "artifact_filename": "match_gregory_sauteret_france_travail_210SDTY_v1.0.json",
     "state_version": "v1.0",
     "engine_name": "TBZ_MATCH_ENGINE",
-    "engine_version": "V4",
+    "engine_version": "V1",
     "match_id": "match_gregory_sauteret_france_travail_210SDTY_v1"
   },
   "input_validation": {
@@ -104,9 +104,9 @@
       {
         "rank": 5,
         "question_id": "MPC_FT_003",
-        "question": "As-tu pratiqué récemment du cold calling ou de la prospection téléphonique dans un contexte recrutement, sourcing ou développement commercial ? Si oui, précise fréquence, objectif et contexte.",
-        "why_this_matters": "Le MATCH signale que le cold calling récent en recrutement n’est pas explicitement documenté.",
-        "linked_gap": "sourcing_prospecting_cold_calling",
+        "question": "Dans tes expériences récentes en recrutement, quel volume et quel rythme devais-tu gérer concrètement ? Précise si possible le nombre d'entretiens, de recrutements ou de placements par semaine ou par mois, et comment tu gérais les périodes de forte charge.",
+        "why_this_matters": "Le MATCH établit une expérience significative du volume de recrutement mais ne confirme pas encore la capacité à maintenir un rythme soutenu.",
+        "linked_gap": "workload_capacity",
         "impact_weight": "medium",
         "expected_information_gain": "medium",
         "possible_score_effect": {
@@ -114,8 +114,8 @@
           "max": 2
         },
         "answer_effort_estimate": "low",
-        "minimum_useful_answer": "Oui/non + fréquence approximative + objectif.",
-        "skip_cost": "La preuve restera limitée à la prospection et au sourcing général."
+        "minimum_useful_answer": "Volume approximatif + rythme hebdomadaire ou mensuel + exemple de période de forte charge.",
+        "skip_cost": "Le volume restera documenté mais la capacité à maintenir un rythme soutenu restera partiellement établie."
       }
     ],
     "deferred_questions": [

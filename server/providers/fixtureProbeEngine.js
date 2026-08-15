@@ -1,4 +1,6 @@
-import probeFranceTravail from '../../src/tbz-v3/fixtures/probe-france-travail-210SDTY.json' with { type: 'json' }
+import probeFranceTravail from '../../src/tbz-v3/fixtures/probe-france-travail-210SDTY.json' with {
+  type: 'json'
+}
 
 export function createFixtureProbeEngineProvider() {
   return async function fixtureProbeEngine(input) {
@@ -20,12 +22,39 @@ export function createFixtureProbeEngineProvider() {
       )
     }
 
+    const expectedSource =
+      probeFranceTravail.source_match_artifact
+
+    if (!expectedSource) {
+      throw new Error(
+        'TBZ fixture PROBE ENGINE: probe fixture source_match_artifact is missing.'
+      )
+    }
+
     if (
       match.artifact_id !==
-      'match_gregory_sauteret_france_travail_210SDTY'
+      expectedSource.artifact_id
     ) {
       throw new Error(
-        'TBZ fixture PROBE ENGINE: no fixture for this match.'
+        `TBZ fixture PROBE ENGINE: match artifact_id mismatch. Expected ${expectedSource.artifact_id}, received ${match.artifact_id}.`
+      )
+    }
+
+    if (
+      match.engine_version !==
+      expectedSource.engine_version
+    ) {
+      throw new Error(
+        `TBZ fixture PROBE ENGINE: match engine_version mismatch. Expected ${expectedSource.engine_version}, received ${match.engine_version}.`
+      )
+    }
+
+    if (
+      match.match_id !==
+      expectedSource.match_id
+    ) {
+      throw new Error(
+        `TBZ fixture PROBE ENGINE: match_id mismatch. Expected ${expectedSource.match_id}, received ${match.match_id}.`
       )
     }
 

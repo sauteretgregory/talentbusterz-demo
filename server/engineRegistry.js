@@ -17,6 +17,10 @@ import {
 } from './providers/fixtureMatchEngine.js'
 
 import {
+  createDeterministicMatchEngineProvider
+} from './providers/deterministicMatchEngine.js'
+
+import {
   createFixtureProbeEngineProvider
 } from './providers/fixtureProbeEngine.js'
 
@@ -39,6 +43,28 @@ export function createTbzEngineRegistry({
       registry,
       ENGINE_IDS.MATCH,
       createFixtureMatchEngineProvider()
+    )
+
+    registerEngineProvider(
+      registry,
+      ENGINE_IDS.PROBE,
+      createFixtureProbeEngineProvider()
+    )
+
+    return registry
+  }
+
+  if (engineMode === 'deterministic') {
+    registerEngineProvider(
+      registry,
+      ENGINE_IDS.JOB_DATA,
+      createFixtureJobDataEngineProvider()
+    )
+
+    registerEngineProvider(
+      registry,
+      ENGINE_IDS.MATCH,
+      createDeterministicMatchEngineProvider()
     )
 
     registerEngineProvider(

@@ -1,3 +1,5 @@
+import fs from 'node:fs/promises'
+import path from 'node:path'
 import http from 'node:http'
 
 import {
@@ -23,6 +25,55 @@ import candidateFixture from '../src/tbz-v3/fixtures/doctrine/candidate.json' wi
 const PORT = 8787
 
 const engineRegistry = createTbzEngineRegistry()
+
+const OUTPUT_DIR =
+  path.resolve('server/output')
+
+async function persistCanonicalArtifact(
+  artifact
+) {
+  if (
+    !artifact ||
+    typeof artifact !== 'object'
+  ) {
+    throw new Error(
+      'TBZ: cannot persist invalid canonical artifact.'
+    )
+  }
+
+  if (
+    !artifact.artifact_filename ||
+    typeof artifact.artifact_filename !== 'string'
+  ) {
+    throw new Error(
+      'TBZ: canonical artifact_filename is required.'
+    )
+  }
+
+  await fs.mkdir(
+    OUTPUT_DIR,
+    { recursive: true }
+  )
+
+  const outputPath =
+    path.join(
+      OUTPUT_DIR,
+      artifact.artifact_filename
+    )
+
+  await fs.writeFile(
+    outputPath,
+    JSON.stringify(
+      artifact,
+      null,
+      2
+    ) + '\n',
+    'utf8'
+  )
+
+  return outputPath
+}
+
 
 function sendJson(res, statusCode, payload) {
   const body = JSON.stringify(payload)
@@ -83,10 +134,34 @@ const server = http.createServer(async (req, res) => {
         return
       }
 
-      const extraction =
-        await fetchFranceTravailPublicJob(
-          sourceUrl
-        )
+      let extraction
+
+      const deterministicMode =
+        process.env.TBZ_ENGINE_MODE === 'deterministic'
+
+      if (
+        deterministicMode &&
+        sourceUrl.includes('/210SDTY')
+      ) {
+        extraction = {
+          provider_id: 'france_travail_fixture',
+          provider_payload: {
+            offer_id: '210SDTY',
+            source_url: sourceUrl,
+            http_status: 200,
+            content_type: 'application/json',
+            parser_id: 'fixture',
+            parser_version: 'v1'
+          },
+          raw_job_content: 'fixture',
+          structured_source_data: {}
+        }
+      } else {
+        extraction =
+          await fetchFranceTravailPublicJob(
+            sourceUrl
+          )
+      }
 
       const jobEngineInput =
         createJobEngineInputPayload({
@@ -154,6 +229,10 @@ const server = http.createServer(async (req, res) => {
       const canonicalJob =
         jobEngineExecution.output_artifact
 
+      await persistCanonicalArtifact(
+        canonicalJob
+      )
+
       const matchExecution =
         await executeEngine(
           engineRegistry,
@@ -183,6 +262,10 @@ const server = http.createServer(async (req, res) => {
       const canonicalMatch =
         matchExecution.output_artifact
 
+      await persistCanonicalArtifact(
+        canonicalMatch
+      )
+
       const probeExecution =
         await executeEngine(
           engineRegistry,
@@ -206,6 +289,10 @@ const server = http.createServer(async (req, res) => {
 
       const canonicalProbe =
         probeExecution.output_artifact
+
+      await persistCanonicalArtifact(
+        canonicalProbe
+      )
 
       sendJson(res, 200, {
         status: 'completed',

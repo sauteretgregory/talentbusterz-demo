@@ -556,5 +556,6 @@
     "canonical_state_owner": "TBZ_JOB_DATA_ENGINE",
     "provider_agnostic_input_accepted": true,
     "canonical_job_data_state_created": true
-  }
+  },
+  "artifact_filename": "job_france_travail_talent_acquisition_210SDTY_v1.0.json"
 }

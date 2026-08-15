@@ -26,6 +26,11 @@ assert.equal(
 )
 
 assert.equal(
+  result.artifact_filename,
+  'job_france_travail_talent_acquisition_210SDTY_v1.0.json'
+)
+
+assert.equal(
   result.state_version,
   'v1.0'
 )
