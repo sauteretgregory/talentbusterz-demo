@@ -16,6 +16,48 @@ function getQuestionIds(probePlan) {
     .filter(Boolean)
 }
 
+function normalizeAnswer(answer) {
+  return String(answer || '')
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .toLowerCase()
+    .trim()
+}
+
+function isInsufficientAnswer(answer) {
+  const normalized = normalizeAnswer(answer)
+  return normalized.length < 2 || /^(je ne sais pas|je sais pas|aucune idee|pas d'idee|je ne peux pas|impossible|pas sur|je ne suis pas sur|inconnu|unknown|n\/a|na)$/i.test(normalized)
+}
+
+function isContradictoryAnswer(answer) {
+  const normalized = normalizeAnswer(answer)
+  const affirmative = /\b(oui|yes)\b/.test(normalized)
+  const negative = /\b(non|no)\b/.test(normalized)
+  return affirmative && negative
+}
+
+function classifyResponseQuality(responses) {
+  const insufficientQuestionIds = responses
+    .filter((response) => isInsufficientAnswer(response?.answer))
+    .map((response) => response?.question_id)
+    .filter(Boolean)
+
+  const contradictoryQuestionIds = responses
+    .filter((response) => isContradictoryAnswer(response?.answer))
+    .map((response) => response?.question_id)
+    .filter(Boolean)
+
+  return {
+    status: contradictoryQuestionIds.length
+      ? 'contradictory'
+      : insufficientQuestionIds.length
+        ? 'insufficient'
+        : 'usable',
+    insufficient_question_ids: insufficientQuestionIds,
+    contradictory_question_ids: contradictoryQuestionIds
+  }
+}
+
 function closeAnsweredQuestions(probePlan, candidateDataState) {
   const answered = new Set(candidateDataState?.candidate_data_state?.probe_response_state?.applied_question_ids || [])
   const next = structuredClone(probePlan)
@@ -53,6 +95,71 @@ function isProbeCycleComplete(probePlan) {
   )
 }
 
+function applyAdaptiveDecision(probePlan, originalProbePlan, responseQuality) {
+  const next = structuredClone(probePlan)
+  const clarificationIds = new Set([
+    ...responseQuality.insufficient_question_ids,
+    ...responseQuality.contradictory_question_ids
+  ])
+
+  if (clarificationIds.size > 0) {
+    const originalCritical = originalProbePlan?.probe_plan?.critical_questions || []
+    const originalSecondary = originalProbePlan?.probe_plan?.secondary_questions || []
+    const currentCritical = next?.probe_plan?.critical_questions || []
+    const currentSecondary = next?.probe_plan?.secondary_questions || []
+
+    next.probe_plan.critical_questions = [
+      ...currentCritical,
+      ...originalCritical.filter((question) => clarificationIds.has(question?.question_id) && !currentCritical.some((item) => item?.question_id === question?.question_id))
+    ]
+    next.probe_plan.secondary_questions = [
+      ...currentSecondary,
+      ...originalSecondary.filter((question) => clarificationIds.has(question?.question_id) && !currentSecondary.some((item) => item?.question_id === question?.question_id))
+    ]
+  }
+
+  const remaining = getQuestionIds(next)
+  let decision = 'complete'
+  let status = 'complete'
+  if (responseQuality.status === 'contradictory' || responseQuality.status === 'insufficient') {
+    decision = 'clarification_required'
+    status = 'needs_clarification'
+  } else if (remaining.length > 0) {
+    decision = 'continue_probe'
+    status = 'open'
+  }
+
+  next.loop_closure = {
+    ...(next.loop_closure || {}),
+    status,
+    decision,
+    decision_reason: responseQuality.status === 'contradictory'
+      ? 'one_or_more_candidate_answers_contain_conflicting_assertions'
+      : responseQuality.status === 'insufficient'
+        ? 'one_or_more_candidate_answers_are_insufficient_to_stabilize_evidence'
+        : remaining.length > 0
+          ? 'material_candidate_answerable_gaps_remain'
+          : 'no_answerable_probe_questions_remain_in_current_cycle',
+    insufficient_question_ids: responseQuality.insufficient_question_ids,
+    contradictory_question_ids: responseQuality.contradictory_question_ids,
+    remaining_question_ids: remaining
+  }
+
+  next.probe_result = {
+    ...(next.probe_result || {}),
+    loop_status: status,
+    adaptive_decision: decision,
+    decision_reason: next.loop_closure.decision_reason,
+    insufficient_question_count: responseQuality.insufficient_question_ids.length,
+    contradictory_question_count: responseQuality.contradictory_question_ids.length,
+    remaining_question_count: remaining.length,
+    recommended_question_count: remaining.length,
+    probe_triggered: remaining.length > 0
+  }
+
+  return next
+}
+
 export async function processProbeResponses({
   engineRegistry,
   candidateDataState,
@@ -68,6 +175,7 @@ export async function processProbeResponses({
   if (isProbeCycleComplete(probePlan)) throw new Error('TBZ PROBE RESPONSE LOOP: probe cycle is already complete.')
 
   const previousMatch = previousMatchState || candidateDataState?.match_state || null
+  const responseQuality = classifyResponseQuality(responses)
 
   const candidateExecution = await executeEngine(
     engineRegistry,
@@ -97,7 +205,7 @@ export async function processProbeResponses({
   const candidateClosedProbePlan = closeAnsweredQuestions(probePlan, updatedCandidate)
   let canonicalProbePlan = candidateClosedProbePlan
 
-  if (candidateClosedProbePlan.loop_closure.status !== 'complete') {
+  if (candidateClosedProbePlan.loop_closure.status !== 'complete' && responseQuality.status === 'usable') {
     const nextProbeExecution = await executeEngine(
       engineRegistry,
       ENGINE_IDS.PROBE,
@@ -109,6 +217,8 @@ export async function processProbeResponses({
     canonicalProbePlan = closeAnsweredQuestions(nextProbeExecution.output_artifact, updatedCandidate)
   }
 
+  canonicalProbePlan = applyAdaptiveDecision(canonicalProbePlan, probePlan, responseQuality)
+
   const previousScore = getScore(previousMatch)
   const currentScore = getScore(updatedMatch)
 
@@ -118,6 +228,8 @@ export async function processProbeResponses({
     current_score: currentScore,
     score_delta: previousScore !== null && currentScore !== null ? currentScore - previousScore : null,
     probe_cycle_status: canonicalProbePlan.loop_closure.status,
+    probe_adaptive_decision: canonicalProbePlan.loop_closure.decision,
+    probe_response_quality: responseQuality,
     canonical_candidate_data_state: updatedCandidate,
     canonical_match_state: updatedMatch,
     canonical_probe_plan: canonicalProbePlan
