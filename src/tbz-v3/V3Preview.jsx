@@ -80,7 +80,8 @@ export default function V3Preview() {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            url: request.source_url
+            url: request.source_url,
+            candidate
           })
         }
       )
@@ -170,202 +171,92 @@ export default function V3Preview() {
             placeholder="https://..."
             style={{
               flex: 1,
-              padding: '14px 16px',
-              borderRadius: 10,
-              border: '1px solid #cbd5e1',
-              fontSize: 16
+              padding: '12px 14px',
+              border: '1px solid #ccc',
+              borderRadius: 8
             }}
           />
 
           <button
             type="submit"
             style={{
-              padding: '14px 20px',
-              border: 0,
-              borderRadius: 10,
-              fontWeight: 800,
+              padding: '12px 18px',
+              borderRadius: 8,
+              border: 'none',
               cursor: 'pointer',
-              background: '#0b57d0',
-              color: '#fff'
+              fontWeight: 700
             }}
           >
             Analyser
           </button>
         </form>
 
-        {jobIntake && (
-          <div
-            style={{
-              marginTop: 14,
-              padding: 14,
-              borderRadius: 10,
-              background: '#f3f7ff'
-            }}
-          >
-            Source détectée : <strong>{jobIntake.detected_source}</strong>
-            <br />
-            Extraction :{' '}
-            <strong>
-              {jobIntake.extraction_status === 'loading'
-                ? 'en cours…'
-                : jobIntake.extraction_status === 'completed'
-                  ? 'réussie'
-                  : jobIntake.extraction_status}
-            </strong>
-
-            {jobIntake.provider_payload?.offer_id && (
-              <>
-                <br />
-                Offre détectée :{' '}
-                <strong>{jobIntake.provider_payload.offer_id}</strong>
-              </>
-            )}
-          </div>
+        {jobIntake?.extraction_status === 'loading' && (
+          <p style={{ marginTop: 16 }}>
+            Analyse de l’offre en cours…
+          </p>
         )}
 
         {jobIntakeError && (
-          <p style={{ color: '#b42318' }}>
+          <p style={{ marginTop: 16 }}>
             {jobIntakeError}
           </p>
         )}
       </section>
 
-      {analysis && (
-      <section
-        style={{
-          border: '1px solid #d9e1ee',
-          borderRadius: 18,
-          padding: 28,
-          background: '#fff'
-        }}
-      >
-        <p
+      {dynamicJob && (
+        <section
           style={{
-            margin: 0,
-            fontSize: 14,
-            fontWeight: 700,
-            opacity: 0.65
+            border: '1px solid #ddd',
+            borderRadius: 12,
+            padding: 24,
+            marginBottom: 24
           }}
         >
-          {analysis
-            ? 'Analyse TalentBusterZ'
-            : 'En attente d’une offre'}
-        </p>
-
-        <h2 style={{ marginBottom: 8 }}>
-          {getJobTitle(dynamicJob)}
-        </h2>
-
-        <p
-          style={{
-            marginTop: 0,
-            fontSize: 18,
-            opacity: 0.72
-          }}
-        >
-          {getCompanyName(dynamicJob)}
-        </p>
-
-        {score !== null && (
-          <div
-            style={{
-              marginTop: 28,
-              padding: 20,
-              borderRadius: 14,
-              background: '#f3f7ff'
-            }}
-          >
-            <strong
-              style={{
-                display: 'block',
-                fontSize: 32
-              }}
-            >
-              {score} %
-            </strong>
-
-            <span>
-              compatibilité professionnelle estimée par TalentBusterZ
-            </span>
-          </div>
-        )}
-
-        <p style={{ marginTop: 24, lineHeight: 1.55 }}>
-          {firstName ? `${firstName}, ` : ''}
-          votre profil correspond déjà à plusieurs éléments importants
-          de cette offre.
-        </p>
-      </section>
-      )}
-
-      {analysis && questions.length > 0 && (
-        <section style={{ marginTop: 32 }}>
-          <h2>
-            Quelques précisions avant de préparer votre candidature
+          <h2 style={{ marginTop: 0 }}>
+            {getJobTitle(dynamicJob)}
           </h2>
 
-          <p style={{ opacity: 0.7 }}>
-            TalentBusterZ ne vous demande que les informations
-            qu’il ne connaît pas encore.
+          <p>
+            {getCompanyName(dynamicJob)}
           </p>
 
-          {questions.map((question, index) => (
-            <div
-              key={question.id}
-              style={{
-                marginTop: 18,
-                padding: 20,
-                border: '1px solid #d9e1ee',
-                borderRadius: 14,
-                background: '#fff'
-              }}
-            >
-              <label
-                style={{
-                  display: 'block',
-                  fontWeight: 700,
-                  marginBottom: 12
-                }}
-              >
-                {index + 1}. {question.text}
-              </label>
+          {score !== null && (
+            <p>
+              Compatibilité : <strong>{score}/100</strong>
+            </p>
+          )}
 
-              <textarea
-                rows="3"
-                placeholder="Votre réponse..."
-                style={{
-                  width: '100%',
-                  boxSizing: 'border-box',
-                  padding: 12,
-                  borderRadius: 10,
-                  border: '1px solid #cbd5e1',
-                  resize: 'vertical'
-                }}
-              />
-            </div>
-          ))}
+          {firstName && (
+            <p>
+              Profil analysé : <strong>{firstName}</strong>
+            </p>
+          )}
         </section>
       )}
 
-      {analysis && (
-      <section style={{ marginTop: 36 }}>
-        <button
-          type="button"
-          style={{
-            width: '100%',
-            padding: '17px 20px',
-            border: 0,
-            borderRadius: 12,
-            fontSize: 18,
-            fontWeight: 800,
-            cursor: 'pointer',
-            background: '#0b57d0',
-            color: '#fff'
-          }}
-        >
-          Je souhaite postuler
-        </button>
-      </section>
+      {questions.length > 0 && (
+        <section>
+          <h2>Questions complémentaires</h2>
+          {questions.map((question) => (
+            <div
+              key={question.id}
+              style={{
+                padding: '14px 0',
+                borderBottom: '1px solid #eee'
+              }}
+            >
+              <strong>
+                {question.priority === 'critical'
+                  ? 'Prioritaire'
+                  : 'Complémentaire'}
+              </strong>
+              <p style={{ marginBottom: 0 }}>
+                {question.text}
+              </p>
+            </div>
+          ))}
+        </section>
       )}
     </main>
   )
