@@ -44,10 +44,6 @@ function createArtifactId(candidate, job) {
   return `application_readiness_${candidateId}_${jobId}_v1`
 }
 
-function createArtifactFilename(artifactId) {
-  return `${artifactId}.0.json`.replace('_v1.0.json', '_v1.0.json')
-}
-
 export function createApplicationReadinessState({
   candidateDataState,
   jobDataState,
@@ -170,6 +166,15 @@ export function assertApplicationReadinessState(state) {
 
   if (typeof readiness.probe_status !== 'string' || typeof readiness.probe_decision !== 'string') {
     throw new Error('TBZ: application readiness PROBE state is required.')
+  }
+
+  const validCombination =
+    (readiness.status === 'ready' && readiness.decision === 'prepare_application' && readiness.probe_status === 'complete') ||
+    (readiness.status === 'needs_clarification' && readiness.decision === 'clarification_required' && readiness.probe_status === 'needs_clarification') ||
+    (readiness.status === 'not_ready' && readiness.decision === 'continue_probe' && readiness.probe_status === 'open')
+
+  if (!validCombination) {
+    throw new Error('TBZ: application readiness status, decision and PROBE status are inconsistent.')
   }
 
   if (readiness.status === 'ready' && readiness.blockers.length > 0) {
