@@ -20,8 +20,6 @@ import {
   createTbzEngineRegistry
 } from './engineRegistry.js'
 
-import candidateFixture from '../src/tbz-v3/fixtures/doctrine/candidate.json' with { type: 'json' }
-
 const PORT = 8787
 
 const engineRegistry = createTbzEngineRegistry()
@@ -73,7 +71,6 @@ async function persistCanonicalArtifact(
 
   return outputPath
 }
-
 
 function sendJson(res, statusCode, payload) {
   const body = JSON.stringify(payload)
@@ -133,6 +130,36 @@ const server = http.createServer(async (req, res) => {
         })
         return
       }
+
+      const candidateExecution =
+        await executeEngine(
+          engineRegistry,
+          ENGINE_IDS.CANDIDATE,
+          body?.candidate
+            ? { candidate_data_state: body.candidate }
+            : {}
+        )
+
+      if (
+        candidateExecution.status !== 'completed' ||
+        !candidateExecution.output_artifact
+      ) {
+        sendJson(res, 502, {
+          status: 'failed',
+          stage: 'candidate_data_engine',
+          error: candidateExecution.error,
+          engine_status:
+            candidateExecution.status
+        })
+        return
+      }
+
+      const canonicalCandidate =
+        candidateExecution.output_artifact
+
+      await persistCanonicalArtifact(
+        canonicalCandidate
+      )
 
       let extraction
 
@@ -239,7 +266,7 @@ const server = http.createServer(async (req, res) => {
           ENGINE_IDS.MATCH,
           {
             candidate_data_state:
-              candidateFixture,
+              canonicalCandidate,
             job_data_state:
               canonicalJob
           }
@@ -303,6 +330,8 @@ const server = http.createServer(async (req, res) => {
         provider_payload:
           extraction.provider_payload,
         job_engine_processable: true,
+        canonical_candidate_data_state:
+          canonicalCandidate,
         canonical_job_data_state:
           canonicalJob,
         canonical_match_state:
@@ -330,6 +359,11 @@ const server = http.createServer(async (req, res) => {
 server.listen(PORT, () => {
   console.log(
     `TBZ backend listening on http://localhost:${PORT}`
+  )
+
+  console.log(
+    'CANDIDATE DATA ENGINE configured:',
+    engineRegistry.has(ENGINE_IDS.CANDIDATE)
   )
 
   console.log(
