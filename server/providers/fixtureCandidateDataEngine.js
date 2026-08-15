@@ -59,12 +59,47 @@ function updateStudentStatus(candidateState, answer) {
 function updateEnglish(candidateState, answer) {
   const normalized = normalize(answer)
   const levels = ['C2', 'C1', 'B2', 'B1', 'A2', 'A1']
-  const level = levels.find((candidate) => normalized.includes(candidate.toLowerCase()))
-  if (!level) return
+  const declaredLevel = levels.find((candidate) => normalized.includes(candidate.toLowerCase()))
   candidateState.language_state = Array.isArray(candidateState.language_state) ? candidateState.language_state : []
   const existing = candidateState.language_state.find((entry) => ['anglais', 'english', 'en'].includes(normalize(entry.language)))
   const entry = existing || { language: 'anglais' }
-  Object.assign(entry, { claimed_level: level, confirmed_level: level, cefr_level: level, proficiency_confirmed: true, evidence_status: 'confirmed', evidence_origin_type: 'direct_user_statement', data_stability_level: 'volatile', probe_response: answer })
+
+  entry.evidence_items = Array.isArray(entry.evidence_items) ? entry.evidence_items : []
+  entry.evidence_items.push({
+    claim_scope: 'english_professional_exposure',
+    response: answer,
+    evidence_status: 'confirmed',
+    evidence_origin_type: 'direct_user_statement',
+    interpretation_status: declaredLevel ? 'candidate_declared_cefr_level_present' : 'not_cefr_mapped',
+    signals: {
+      english_exam_score_20_20: /20\s*\/\s*20/.test(normalized) && /(anglais|english|exam|oral)/.test(normalized),
+      australia_lived_or_worked: /(australie|australia)/.test(normalized),
+      english_sales_experience: /(vente|sales|satellite)/.test(normalized) && /(anglais|english)/.test(normalized),
+      english_international_recruitment: /(recrut|candidate|candidat|stakeholder|client)/.test(normalized) && /(anglais|english)/.test(normalized) && /(vietnam|canada|inde|india|pakistan)/.test(normalized)
+    }
+  })
+
+  Object.assign(entry, {
+    evidence_status: 'confirmed',
+    evidence_origin_type: 'direct_user_statement',
+    data_stability_level: 'volatile',
+    probe_response: answer
+  })
+
+  if (declaredLevel) {
+    Object.assign(entry, {
+      claimed_level: declaredLevel,
+      confirmed_level: declaredLevel,
+      cefr_level: declaredLevel,
+      proficiency_confirmed: true
+    })
+  } else {
+    delete entry.claimed_level
+    delete entry.confirmed_level
+    delete entry.cefr_level
+    delete entry.proficiency_confirmed
+  }
+
   if (!existing) candidateState.language_state.push(entry)
 }
 
