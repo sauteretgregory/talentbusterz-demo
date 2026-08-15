@@ -3,6 +3,11 @@ import {
   executeEngine
 } from './engineGateway.js'
 
+import {
+  createProbeFinalState,
+  assertProbeFinalState
+} from '../src/tbz-v3/contracts/probeFinalStateContract.js'
+
 function getScore(match) {
   const value = match?.match_state?.professional_compatibility?.professional_match_score
   return typeof value === 'number' ? Math.round(value) : null
@@ -218,6 +223,9 @@ export async function processProbeResponses({
   }
 
   canonicalProbePlan = applyAdaptiveDecision(canonicalProbePlan, probePlan, responseQuality)
+  const probeFinalState = assertProbeFinalState(
+    createProbeFinalState(canonicalProbePlan)
+  )
 
   const previousScore = getScore(previousMatch)
   const currentScore = getScore(updatedMatch)
@@ -227,9 +235,10 @@ export async function processProbeResponses({
     previous_score: previousScore,
     current_score: currentScore,
     score_delta: previousScore !== null && currentScore !== null ? currentScore - previousScore : null,
-    probe_cycle_status: canonicalProbePlan.loop_closure.status,
-    probe_adaptive_decision: canonicalProbePlan.loop_closure.decision,
+    probe_cycle_status: probeFinalState.status,
+    probe_adaptive_decision: probeFinalState.decision,
     probe_response_quality: responseQuality,
+    probe_final_state: probeFinalState,
     canonical_candidate_data_state: updatedCandidate,
     canonical_match_state: updatedMatch,
     canonical_probe_plan: canonicalProbePlan
