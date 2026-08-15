@@ -57,6 +57,7 @@ export default function V3Preview() {
   const [rerunStatus, setRerunStatus] = useState('')
   const [rerunError, setRerunError] = useState('')
   const [previousScore, setPreviousScore] = useState(null)
+  const [probeCycleStatus, setProbeCycleStatus] = useState('')
 
   async function handleJobUrlSubmit(event) {
     event.preventDefault()
@@ -67,6 +68,7 @@ export default function V3Preview() {
     setRerunStatus('')
     setRerunError('')
     setPreviousScore(null)
+    setProbeCycleStatus('')
 
     try {
       const request = createJobIntakeRequest(jobUrl)
@@ -96,6 +98,7 @@ export default function V3Preview() {
         match: result.canonical_match_state,
         probePlan: result.canonical_probe_plan
       })
+      setProbeCycleStatus(result.canonical_probe_plan?.loop_closure?.status || 'open')
     } catch (error) {
       setJobIntake(null)
       setJobIntakeError(error.message)
@@ -146,8 +149,11 @@ export default function V3Preview() {
         match: result.canonical_match_state,
         probePlan: result.canonical_probe_plan
       }))
+      setProbeCycleStatus(result.probe_cycle_status || result.canonical_probe_plan?.loop_closure?.status || 'open')
       setAnswers({})
-      setRerunStatus('Profil enrichi et MATCH recalculé.')
+      setRerunStatus(result.probe_cycle_status === 'complete'
+        ? 'Profil enrichi, MATCH recalculé et boucle PROBE terminée.'
+        : 'Profil enrichi et MATCH recalculé. De nouvelles précisions restent disponibles.')
     } catch (error) {
       setRerunStatus('')
       setRerunError(error.message)
@@ -202,6 +208,12 @@ export default function V3Preview() {
           <p style={{ marginTop: 24, lineHeight: 1.55 }}>
             {firstName ? `${firstName}, ` : ''}TalentBusterZ a identifié les informations qui peuvent encore modifier l’évaluation de votre candidature.
           </p>
+
+          {probeCycleStatus === 'complete' && (
+            <div style={{ marginTop: 20, padding: 16, borderRadius: 12, background: '#ecfdf3', color: '#166534', fontWeight: 700 }}>
+              La boucle de clarification candidat est terminée : toutes les questions PROBE actuellement actionnables ont été traitées.
+            </div>
+          )}
         </section>
       )}
 
