@@ -1,6 +1,6 @@
 import { ENGINE_IDS, executeEngine } from './engineGateway.js'
 import { createProbeFinalState, assertProbeFinalState } from '../src/tbz-v3/contracts/probeFinalStateContract.js'
-import { ENRICHMENT_CYCLE_SIZE, ENRICHMENT_DECISIONS, selectEnrichmentBatch, getRemainingEnrichmentCount, estimatePotentialScoreGain } from '../src/tbz-v3/enrichmentCycle.js'
+import { ENRICHMENT_CYCLE_SIZE, ENRICHMENT_DECISIONS, selectEnrichmentBatch, getRemainingEnrichmentCount, estimatePotentialScoreGain, createOfferIndependentEnrichmentPlan } from '../src/tbz-v3/enrichmentCycle.js'
 
 function getScore(match) { const value = match?.match_state?.professional_compatibility?.professional_match_score; return typeof value === 'number' ? Math.round(value) : null }
 function getQuestionIds(plan) { return [...(plan?.probe_plan?.critical_questions || []), ...(plan?.probe_plan?.secondary_questions || [])].map((q) => q?.question_id).filter(Boolean) }
@@ -57,7 +57,7 @@ function applyAdaptiveDecision(probePlan, responseQuality, originalProbePlan) {
 }
 
 async function runMatch(engineRegistry, candidateDataState, jobDataState) { const execution = await executeEngine(engineRegistry, ENGINE_IDS.MATCH, { candidate_data_state: candidateDataState, job_data_state: jobDataState }); if (execution.status !== 'completed' || !execution.output_artifact) throw new Error(execution.error || 'match_engine_failed'); return execution.output_artifact }
-async function generateNextProbe(engineRegistry, matchState, candidateDataState) { const execution = await executeEngine(engineRegistry, ENGINE_IDS.PROBE, matchState); if (execution.status !== 'completed' || !execution.output_artifact) throw new Error(execution.error || 'probe_engine_failed'); return closeAnsweredQuestions(execution.output_artifact, candidateDataState) }
+async function generateNextProbe(engineRegistry, matchState, candidateDataState, cycleNumber) { const execution = await executeEngine(engineRegistry, ENGINE_IDS.PROBE, matchState); if (execution.status !== 'completed' || !execution.output_artifact) throw new Error(execution.error || 'probe_engine_failed'); const candidateSpecificPlan = closeAnsweredQuestions(execution.output_artifact, candidateDataState); return getQuestionIds(candidateSpecificPlan).length ? candidateSpecificPlan : createOfferIndependentEnrichmentPlan(cycleNumber) }
 
 export async function processProbeResponses({ engineRegistry, candidateDataState, jobDataState, probePlan, responses = [], previousMatchState = null, continueEnrichment = null, cycleNumber = 1 }) {
   const control = responses.find((r) => r?.control === ENRICHMENT_DECISIONS.CONTINUE || r?.control === ENRICHMENT_DECISIONS.STOP)?.control || continueEnrichment
@@ -76,7 +76,7 @@ export async function processProbeResponses({ engineRegistry, candidateDataState
   }
 
   if (control === ENRICHMENT_DECISIONS.CONTINUE && actualResponses.length === 0) {
-    const nextProbe = await generateNextProbe(engineRegistry, previousMatch, candidateDataState)
+    const nextProbe = await generateNextProbe(engineRegistry, previousMatch, candidateDataState, cycleNumber + 1)
     const nextPlan = markAwaitingContinuation(nextProbe, cycleNumber + 1, candidateDataState, previousScore)
     const finalState = assertProbeFinalState(createProbeFinalState(nextPlan))
     return { previous_match_state: previousMatch, previous_score: previousScore, current_score: previousScore, score_delta: 0, probe_cycle_status: nextPlan.loop_closure.status, probe_adaptive_decision: nextPlan.loop_closure.decision, enrichment_cycle: nextPlan.probe_result.enrichment_cycle, probe_final_state: finalState, application_stage: 'enrichment_open', next_stage: null, canonical_candidate_data_state: candidateDataState, canonical_match_state: previousMatch, canonical_probe_plan: nextPlan }
