@@ -47,6 +47,33 @@ test('an individual answer reruns MATCH without closing the five-question cycle'
   assert.equal(result.canonical_probe_plan.probe_plan.secondary_questions.length, 1)
 })
 
+test('continued enrichment starts a new offer-independent five-question cycle', async () => {
+  const registry = createTbzEngineRegistry({ engineMode: 'deterministic' })
+  const result = await processProbeResponses({
+    engineRegistry: registry,
+    candidateDataState: candidate,
+    jobDataState: job,
+    probePlan: probe,
+    previousMatchState: match,
+    responses: [{ control: 'continue_enrichment' }],
+    cycleNumber: 1
+  })
+
+  const questions = [
+    ...result.canonical_probe_plan.probe_plan.critical_questions,
+    ...result.canonical_probe_plan.probe_plan.secondary_questions
+  ]
+  assert.equal(result.probe_cycle_status, 'open')
+  assert.equal(result.probe_adaptive_decision, 'continue_enrichment')
+  assert.equal(result.enrichment_cycle.cycle_number, 2)
+  assert.equal(result.enrichment_cycle.cycle_size, 5)
+  assert.equal(result.enrichment_cycle.estimated_potential_score_gain, 10)
+  assert.equal(result.canonical_match_state, match)
+  assert.equal(questions.length, 5)
+  assert.ok(questions.every((question) => question.scope === 'persistent_candidate_profile'))
+  assert.ok(questions.every((question) => question.question_id.startsWith('GENERIC_PROFILE_CYCLE_2_')))
+})
+
 test('an already completed probe cycle is rejected before engines are rerun', async () => {
   const registry = createTbzEngineRegistry({ engineMode: 'deterministic' })
   const completedProbe = structuredClone(probe)
