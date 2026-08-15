@@ -3,12 +3,13 @@ import assert from 'node:assert/strict'
 
 import candidate from '../../src/tbz-v3/fixtures/doctrine/candidate.json' with { type: 'json' }
 import job from '../../src/tbz-v3/fixtures/job-france-travail-210SDTY.json' with { type: 'json' }
+import match from '../../src/tbz-v3/fixtures/match-france-travail-210SDTY.json' with { type: 'json' }
 import probe from '../../src/tbz-v3/fixtures/probe-france-travail-210SDTY.json' with { type: 'json' }
 
 import { createTbzEngineRegistry } from '../engineRegistry.js'
 import { processProbeResponses } from '../probeResponseLoop.js'
 
-test('probe responses are reingested, MATCH is rerun, and a new PROBE is produced', async () => {
+test('probe responses are reingested, MATCH is rerun, and the current PROBE cycle closes without another PROBE run', async () => {
   const registry = createTbzEngineRegistry({ engineMode: 'deterministic' })
 
   const result = await processProbeResponses({
@@ -16,6 +17,7 @@ test('probe responses are reingested, MATCH is rerun, and a new PROBE is produce
     candidateDataState: candidate,
     jobDataState: job,
     probePlan: probe,
+    previousMatchState: match,
     responses: [
       {
         question_id: 'MPC_FT_001',
@@ -73,6 +75,9 @@ test('probe responses are reingested, MATCH is rerun, and a new PROBE is produce
 
   assert.equal(result.canonical_match_state.artifact_type, 'canonical_match_state')
   assert.equal(result.canonical_probe_plan.artifact_type, 'canonical_probe_plan')
+  assert.equal(result.previous_score, 74)
+  assert.equal(result.current_score, 74)
+  assert.equal(result.score_delta, 0)
   assert.equal(result.probe_cycle_status, 'complete')
   assert.equal(result.canonical_probe_plan.probe_result.loop_status, 'complete')
   assert.equal(result.canonical_probe_plan.probe_result.remaining_question_count, 0)
@@ -87,6 +92,7 @@ test('answered probe questions are retained in history and excluded from the nex
     candidateDataState: candidate,
     jobDataState: job,
     probePlan: probe,
+    previousMatchState: match,
     responses: [{
       question_id: 'MPC_FT_002',
       answer: 'Je me situe à un niveau B2 en anglais professionnel, utilisé régulièrement avec des candidats et clients internationaux.'
@@ -95,10 +101,39 @@ test('answered probe questions are retained in history and excluded from the nex
 
   const state = first.canonical_candidate_data_state.candidate_data_state
   assert.deepEqual(state.probe_response_state.applied_question_ids, ['MPC_FT_002'])
+  assert.equal(first.previous_score, 74)
+  assert.equal(first.current_score, 74)
+  assert.equal(first.score_delta, 0)
   assert.equal(first.probe_cycle_status, 'open')
   assert.equal(first.canonical_probe_plan.probe_plan.secondary_questions.some((question) => question.question_id === 'MPC_FT_002'), false)
   assert.equal(first.canonical_probe_plan.probe_plan.critical_questions.length, 3)
   assert.equal(first.canonical_probe_plan.probe_plan.secondary_questions.length, 1)
+})
+
+test('an already completed probe cycle is rejected before engines are rerun', async () => {
+  const registry = createTbzEngineRegistry({ engineMode: 'deterministic' })
+  const completedProbe = structuredClone(probe)
+  completedProbe.probe_plan.critical_questions = []
+  completedProbe.probe_plan.secondary_questions = []
+  completedProbe.probe_result.loop_status = 'complete'
+  completedProbe.probe_result.probe_triggered = false
+  completedProbe.loop_closure = {
+    status: 'complete',
+    answered_question_ids: [],
+    remaining_question_ids: []
+  }
+
+  await assert.rejects(
+    processProbeResponses({
+      engineRegistry: registry,
+      candidateDataState: candidate,
+      jobDataState: job,
+      probePlan: completedProbe,
+      previousMatchState: match,
+      responses: [{ question_id: 'MPC_FT_002', answer: 'B2' }]
+    }),
+    /probe cycle is already complete/
+  )
 })
 
 test('candidate-declared CEFR remains canonical when explicitly provided', async () => {
@@ -108,6 +143,7 @@ test('candidate-declared CEFR remains canonical when explicitly provided', async
     candidateDataState: candidate,
     jobDataState: job,
     probePlan: probe,
+    previousMatchState: match,
     responses: [{
       question_id: 'MPC_FT_002',
       answer: 'Je me situe à un niveau B2 en anglais professionnel, utilisé régulièrement avec des candidats et clients internationaux.'
