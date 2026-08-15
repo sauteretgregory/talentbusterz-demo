@@ -8,19 +8,66 @@ function getScore(match) {
   return typeof value === 'number' ? Math.round(value) : null
 }
 
+function getQuestionIds(probePlan) {
+  const critical = probePlan?.probe_plan?.critical_questions || []
+  const secondary = probePlan?.probe_plan?.secondary_questions || []
+  return [...critical, ...secondary]
+    .map((question) => question?.question_id)
+    .filter(Boolean)
+}
+
+function closeAnsweredQuestions(probePlan, candidateDataState) {
+  const answered = new Set(candidateDataState?.candidate_data_state?.probe_response_state?.applied_question_ids || [])
+  const next = structuredClone(probePlan)
+  const critical = next?.probe_plan?.critical_questions || []
+  const secondary = next?.probe_plan?.secondary_questions || []
+  const remainingCritical = critical.filter((question) => !answered.has(question?.question_id))
+  const remainingSecondary = secondary.filter((question) => !answered.has(question?.question_id))
+  const remainingIds = new Set([...remainingCritical, ...remainingSecondary].map((question) => question?.question_id).filter(Boolean))
+  const originalIds = getQuestionIds(probePlan)
+
+  next.probe_plan.critical_questions = remainingCritical
+  next.probe_plan.secondary_questions = remainingSecondary
+  next.probe_result = {
+    ...(next.probe_result || {}),
+    probe_triggered: remainingIds.size > 0,
+    recommended_question_count: remainingIds.size,
+    loop_status: remainingIds.size > 0 ? 'open' : 'complete',
+    answered_question_count: originalIds.filter((id) => answered.has(id)).length,
+    remaining_question_count: remainingIds.size
+  }
+
+  next.loop_closure = {
+    status: remainingIds.size > 0 ? 'open' : 'complete',
+    answered_question_ids: [...answered].filter((id) => originalIds.includes(id)),
+    remaining_question_ids: [...remainingIds]
+  }
+
+  return next
+}
+
+function isProbeCycleComplete(probePlan) {
+  return probePlan?.loop_closure?.status === 'complete' || (
+    probePlan?.probe_result?.loop_status === 'complete' &&
+    getQuestionIds(probePlan).length === 0
+  )
+}
+
 export async function processProbeResponses({
   engineRegistry,
   candidateDataState,
   jobDataState,
   probePlan,
-  responses
+  responses,
+  previousMatchState = null
 }) {
   if (!candidateDataState?.artifact_type) throw new Error('TBZ PROBE RESPONSE LOOP: canonical candidate data state is required.')
   if (jobDataState?.artifact_type !== 'canonical_job_data_state') throw new Error('TBZ PROBE RESPONSE LOOP: canonical job data state is required.')
   if (probePlan?.artifact_type !== 'canonical_probe_plan') throw new Error('TBZ PROBE RESPONSE LOOP: canonical probe plan is required.')
   if (!Array.isArray(responses) || !responses.some((item) => item?.question_id && item?.answer?.trim())) throw new Error('TBZ PROBE RESPONSE LOOP: at least one probe response is required.')
+  if (isProbeCycleComplete(probePlan)) throw new Error('TBZ PROBE RESPONSE LOOP: probe cycle is already complete.')
 
-  const previousMatch = candidateDataState?.match_state || null
+  const previousMatch = previousMatchState || candidateDataState?.match_state || null
 
   const candidateExecution = await executeEngine(
     engineRegistry,
@@ -47,15 +94,22 @@ export async function processProbeResponses({
   if (matchExecution.status !== 'completed' || !matchExecution.output_artifact) throw new Error(matchExecution.error || 'match_engine_failed')
   const updatedMatch = matchExecution.output_artifact
 
-  const nextProbeExecution = await executeEngine(
-    engineRegistry,
-    ENGINE_IDS.PROBE,
-    updatedMatch
-  )
+  const candidateClosedProbePlan = closeAnsweredQuestions(probePlan, updatedCandidate)
+  let canonicalProbePlan = candidateClosedProbePlan
 
-  if (nextProbeExecution.status !== 'completed' || !nextProbeExecution.output_artifact) throw new Error(nextProbeExecution.error || 'probe_engine_failed')
+  if (candidateClosedProbePlan.loop_closure.status !== 'complete') {
+    const nextProbeExecution = await executeEngine(
+      engineRegistry,
+      ENGINE_IDS.PROBE,
+      updatedMatch
+    )
 
-  const previousScore = getScore(previousMatch) ?? getScore(candidateDataState)
+    if (nextProbeExecution.status !== 'completed' || !nextProbeExecution.output_artifact) throw new Error(nextProbeExecution.error || 'probe_engine_failed')
+
+    canonicalProbePlan = closeAnsweredQuestions(nextProbeExecution.output_artifact, updatedCandidate)
+  }
+
+  const previousScore = getScore(previousMatch)
   const currentScore = getScore(updatedMatch)
 
   return {
@@ -63,8 +117,9 @@ export async function processProbeResponses({
     previous_score: previousScore,
     current_score: currentScore,
     score_delta: previousScore !== null && currentScore !== null ? currentScore - previousScore : null,
+    probe_cycle_status: canonicalProbePlan.loop_closure.status,
     canonical_candidate_data_state: updatedCandidate,
     canonical_match_state: updatedMatch,
-    canonical_probe_plan: nextProbeExecution.output_artifact
+    canonical_probe_plan: canonicalProbePlan
   }
 }
