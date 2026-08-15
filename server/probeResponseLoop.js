@@ -46,19 +46,28 @@ function closeAnsweredQuestions(probePlan, candidateDataState) {
   return next
 }
 
+function isProbeCycleComplete(probePlan) {
+  return probePlan?.loop_closure?.status === 'complete' || (
+    probePlan?.probe_result?.loop_status === 'complete' &&
+    getQuestionIds(probePlan).length === 0
+  )
+}
+
 export async function processProbeResponses({
   engineRegistry,
   candidateDataState,
   jobDataState,
   probePlan,
-  responses
+  responses,
+  previousMatchState = null
 }) {
   if (!candidateDataState?.artifact_type) throw new Error('TBZ PROBE RESPONSE LOOP: canonical candidate data state is required.')
   if (jobDataState?.artifact_type !== 'canonical_job_data_state') throw new Error('TBZ PROBE RESPONSE LOOP: canonical job data state is required.')
   if (probePlan?.artifact_type !== 'canonical_probe_plan') throw new Error('TBZ PROBE RESPONSE LOOP: canonical probe plan is required.')
   if (!Array.isArray(responses) || !responses.some((item) => item?.question_id && item?.answer?.trim())) throw new Error('TBZ PROBE RESPONSE LOOP: at least one probe response is required.')
+  if (isProbeCycleComplete(probePlan)) throw new Error('TBZ PROBE RESPONSE LOOP: probe cycle is already complete.')
 
-  const previousMatch = candidateDataState?.match_state || null
+  const previousMatch = previousMatchState || candidateDataState?.match_state || null
 
   const candidateExecution = await executeEngine(
     engineRegistry,
@@ -85,16 +94,22 @@ export async function processProbeResponses({
   if (matchExecution.status !== 'completed' || !matchExecution.output_artifact) throw new Error(matchExecution.error || 'match_engine_failed')
   const updatedMatch = matchExecution.output_artifact
 
-  const nextProbeExecution = await executeEngine(
-    engineRegistry,
-    ENGINE_IDS.PROBE,
-    updatedMatch
-  )
+  const candidateClosedProbePlan = closeAnsweredQuestions(probePlan, updatedCandidate)
+  let canonicalProbePlan = candidateClosedProbePlan
 
-  if (nextProbeExecution.status !== 'completed' || !nextProbeExecution.output_artifact) throw new Error(nextProbeExecution.error || 'probe_engine_failed')
+  if (candidateClosedProbePlan.loop_closure.status !== 'complete') {
+    const nextProbeExecution = await executeEngine(
+      engineRegistry,
+      ENGINE_IDS.PROBE,
+      updatedMatch
+    )
 
-  const canonicalProbePlan = closeAnsweredQuestions(nextProbeExecution.output_artifact, updatedCandidate)
-  const previousScore = getScore(previousMatch) ?? getScore(candidateDataState)
+    if (nextProbeExecution.status !== 'completed' || !nextProbeExecution.output_artifact) throw new Error(nextProbeExecution.error || 'probe_engine_failed')
+
+    canonicalProbePlan = closeAnsweredQuestions(nextProbeExecution.output_artifact, updatedCandidate)
+  }
+
+  const previousScore = getScore(previousMatch)
   const currentScore = getScore(updatedMatch)
 
   return {
