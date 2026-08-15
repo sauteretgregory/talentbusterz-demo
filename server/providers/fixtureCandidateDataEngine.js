@@ -144,15 +144,26 @@ export function reingestProbeResponses(candidateArtifact, probeResponses) {
   const nextVersion = nextProbeVersion(previousVersion)
   const versionMatch = nextVersion.match(/^(v\d+\.\d+)_probe_response_integration$/)
   const artifactVersion = versionMatch ? versionMatch[1] : 'v1.4'
+  const previousApplied = Array.isArray(candidateState.probe_response_state?.applied_question_ids)
+    ? candidateState.probe_response_state.applied_question_ids
+    : []
+  const appliedHistory = [...new Set([...previousApplied, ...applied])]
 
   candidateState.state_version = nextVersion
   candidateState.profile_status = 'probe_enriched_with_candidate_answers'
-  candidateState.probe_response_state = { source_probe_artifact_id: null, applied_question_ids: applied, response_count: applied.length, updated_at: new Date().toISOString(), evidence_origin_type: 'direct_user_statement' }
+  candidateState.probe_response_state = {
+    source_probe_artifact_id: null,
+    applied_question_ids: appliedHistory,
+    last_applied_question_ids: applied,
+    response_count: appliedHistory.length,
+    updated_at: new Date().toISOString(),
+    evidence_origin_type: 'direct_user_statement'
+  }
 
   next.state_version = nextVersion
   next.artifact_filename = `candidate_gregory_sauteret_${artifactVersion}.json`
   next.materialization_status = 'updated_from_probe_responses'
-  next.candidate_data_update_result = { engine: 'TBZ_CANDIDATE_DATA_ENGINE', engine_version: 'V1', candidate_id: candidateState.candidate_id, status: 'completed', previous_version: previousVersion, current_version: nextVersion, new_integration_performed: true, canonical_state_materialized: true, consistency_correction_applied: false, new_version_created: true, applied_probe_question_ids: applied }
+  next.candidate_data_update_result = { engine: 'TBZ_CANDIDATE_DATA_ENGINE', engine_version: 'V1', candidate_id: candidateState.candidate_id, status: 'completed', previous_version: previousVersion, current_version: nextVersion, new_integration_performed: true, canonical_state_materialized: true, consistency_correction_applied: false, new_version_created: true, applied_probe_question_ids: applied, applied_probe_question_history: appliedHistory }
 
   return assertCanonicalCandidateDataState(next)
 }
