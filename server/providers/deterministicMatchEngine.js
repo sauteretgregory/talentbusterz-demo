@@ -101,6 +101,48 @@ function buildInputValidation(candidate, job) {
   }
 }
 
+function calculateProfessionalMatchScore(evaluation) {
+  const scoredRequirements =
+    evaluation.requirements.filter(
+      (requirement) =>
+        requirement.weight > 0 &&
+        requirement.status !== 'not_scored'
+    )
+
+  const maximumScore =
+    scoredRequirements.reduce(
+      (total, requirement) =>
+        total + requirement.weight,
+      0
+    )
+
+  const rawScore =
+    scoredRequirements.reduce(
+      (total, requirement) =>
+        total +
+        requirement.weight *
+        requirement.factor,
+      0
+    )
+
+  const professionalMatchScore =
+    maximumScore > 0
+      ? Math.round(
+          (rawScore / maximumScore) * 100
+        )
+      : null
+
+  return {
+    professional_match_score:
+      professionalMatchScore,
+    maximum_score: 100,
+    raw_score: Number(rawScore.toFixed(3)),
+    maximum_weight: maximumScore,
+    normalization_method:
+      'weighted_requirement_factors_normalized_to_professional_score'
+  }
+}
+
 export function createDeterministicMatchEngineProvider() {
   return async function deterministicMatchEngine(input) {
     if (!input || typeof input !== 'object') {
@@ -143,6 +185,9 @@ export function createDeterministicMatchEngineProvider() {
         candidateState,
         jobState
       })
+
+    const professionalScoring =
+      calculateProfessionalMatchScore(evaluation)
 
     const identity =
       buildMatchIdentity(candidate, job)
@@ -214,7 +259,16 @@ export function createDeterministicMatchEngineProvider() {
           evaluation.requirements,
 
         summary:
-          evaluation.summary
+          evaluation.summary,
+
+        professional_compatibility: {
+          professional_match_score:
+            professionalScoring.professional_match_score,
+          score_scale: 100
+        },
+
+        professional_scoring:
+          professionalScoring
       },
 
       validation_report: {
