@@ -8,6 +8,44 @@ function getScore(match) {
   return typeof value === 'number' ? Math.round(value) : null
 }
 
+function getQuestionIds(probePlan) {
+  const critical = probePlan?.probe_plan?.critical_questions || []
+  const secondary = probePlan?.probe_plan?.secondary_questions || []
+  return [...critical, ...secondary]
+    .map((question) => question?.question_id)
+    .filter(Boolean)
+}
+
+function closeAnsweredQuestions(probePlan, candidateDataState) {
+  const answered = new Set(candidateDataState?.candidate_data_state?.probe_response_state?.applied_question_ids || [])
+  const next = structuredClone(probePlan)
+  const critical = next?.probe_plan?.critical_questions || []
+  const secondary = next?.probe_plan?.secondary_questions || []
+  const remainingCritical = critical.filter((question) => !answered.has(question?.question_id))
+  const remainingSecondary = secondary.filter((question) => !answered.has(question?.question_id))
+  const remainingIds = new Set([...remainingCritical, ...remainingSecondary].map((question) => question?.question_id).filter(Boolean))
+  const originalIds = getQuestionIds(probePlan)
+
+  next.probe_plan.critical_questions = remainingCritical
+  next.probe_plan.secondary_questions = remainingSecondary
+  next.probe_result = {
+    ...(next.probe_result || {}),
+    probe_triggered: remainingIds.size > 0,
+    recommended_question_count: remainingIds.size,
+    loop_status: remainingIds.size > 0 ? 'open' : 'complete',
+    answered_question_count: originalIds.filter((id) => answered.has(id)).length,
+    remaining_question_count: remainingIds.size
+  }
+
+  next.loop_closure = {
+    status: remainingIds.size > 0 ? 'open' : 'complete',
+    answered_question_ids: [...answered].filter((id) => originalIds.includes(id)),
+    remaining_question_ids: [...remainingIds]
+  }
+
+  return next
+}
+
 export async function processProbeResponses({
   engineRegistry,
   candidateDataState,
@@ -55,6 +93,7 @@ export async function processProbeResponses({
 
   if (nextProbeExecution.status !== 'completed' || !nextProbeExecution.output_artifact) throw new Error(nextProbeExecution.error || 'probe_engine_failed')
 
+  const canonicalProbePlan = closeAnsweredQuestions(nextProbeExecution.output_artifact, updatedCandidate)
   const previousScore = getScore(previousMatch) ?? getScore(candidateDataState)
   const currentScore = getScore(updatedMatch)
 
@@ -63,8 +102,9 @@ export async function processProbeResponses({
     previous_score: previousScore,
     current_score: currentScore,
     score_delta: previousScore !== null && currentScore !== null ? currentScore - previousScore : null,
+    probe_cycle_status: canonicalProbePlan.loop_closure.status,
     canonical_candidate_data_state: updatedCandidate,
     canonical_match_state: updatedMatch,
-    canonical_probe_plan: nextProbeExecution.output_artifact
+    canonical_probe_plan: canonicalProbePlan
   }
 }
