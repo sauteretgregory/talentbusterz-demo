@@ -1,6 +1,4 @@
-import candidateFixture from '../../src/tbz-v3/fixtures/doctrine/candidate.json' with {
-  type: 'json'
-}
+import candidateFixture from '../../src/tbz-v3/fixtures/doctrine/candidate.json' with { type: 'json' }
 
 function assertCanonicalCandidateDataState(artifact) {
   if (!artifact || typeof artifact !== 'object') throw new Error('TBZ fixture CANDIDATE DATA ENGINE: canonical candidate state is required.')
@@ -17,7 +15,7 @@ function normalize(value) {
 
 function getAnswers(input) {
   return Array.isArray(input?.probe_responses)
-    ? input.probe_responses.filter((item) => item && typeof item.question_id === 'string' && typeof item.answer === 'string' && item.answer.trim())
+    ? input.probe_responses.filter((item) => item && typeof item.question_id === 'string' && (item.skipped === true || (typeof item.answer === 'string' && item.answer.trim())))
     : []
 }
 
@@ -63,43 +61,16 @@ function updateEnglish(candidateState, answer) {
   candidateState.language_state = Array.isArray(candidateState.language_state) ? candidateState.language_state : []
   const existing = candidateState.language_state.find((entry) => ['anglais', 'english', 'en'].includes(normalize(entry.language)))
   const entry = existing || { language: 'anglais' }
-
   entry.evidence_items = Array.isArray(entry.evidence_items) ? entry.evidence_items : []
-  entry.evidence_items.push({
-    claim_scope: 'english_professional_exposure',
-    response: answer,
-    evidence_status: 'confirmed',
-    evidence_origin_type: 'direct_user_statement',
-    interpretation_status: declaredLevel ? 'candidate_declared_cefr_level_present' : 'not_cefr_mapped',
-    signals: {
-      english_exam_score_20_20: /20\s*\/\s*20/.test(normalized) && /(anglais|english|exam|oral)/.test(normalized),
-      australia_lived_or_worked: /(australie|australia)/.test(normalized),
-      english_sales_experience: /(vente|sales|satellite)/.test(normalized) && /(anglais|english)/.test(normalized),
-      english_international_recruitment: /(recrut|candidate|candidat|stakeholder|client)/.test(normalized) && /(anglais|english)/.test(normalized) && /(vietnam|canada|inde|india|pakistan)/.test(normalized)
-    }
-  })
-
-  Object.assign(entry, {
-    evidence_status: 'confirmed',
-    evidence_origin_type: 'direct_user_statement',
-    data_stability_level: 'volatile',
-    probe_response: answer
-  })
-
-  if (declaredLevel) {
-    Object.assign(entry, {
-      claimed_level: declaredLevel,
-      confirmed_level: declaredLevel,
-      cefr_level: declaredLevel,
-      proficiency_confirmed: true
-    })
-  } else {
-    delete entry.claimed_level
-    delete entry.confirmed_level
-    delete entry.cefr_level
-    delete entry.proficiency_confirmed
-  }
-
+  entry.evidence_items.push({ claim_scope: 'english_professional_exposure', response: answer, evidence_status: 'confirmed', evidence_origin_type: 'direct_user_statement', interpretation_status: declaredLevel ? 'candidate_declared_cefr_level_present' : 'not_cefr_mapped', signals: {
+    english_exam_score_20_20: /20\s*\/\s*20/.test(normalized) && /(anglais|english|exam|oral)/.test(normalized),
+    australia_lived_or_worked: /(australie|australia)/.test(normalized),
+    english_sales_experience: /(vente|sales|satellite)/.test(normalized) && /(anglais|english)/.test(normalized),
+    english_international_recruitment: /(recrut|candidate|candidat|stakeholder|client)/.test(normalized) && /(anglais|english)/.test(normalized) && /(vietnam|canada|inde|india|pakistan)/.test(normalized)
+  } })
+  Object.assign(entry, { evidence_status: 'confirmed', evidence_origin_type: 'direct_user_statement', data_stability_level: 'volatile', probe_response: answer })
+  if (declaredLevel) Object.assign(entry, { claimed_level: declaredLevel, confirmed_level: declaredLevel, cefr_level: declaredLevel, proficiency_confirmed: true })
+  else delete entry.claimed_level, entry.confirmed_level, entry.cefr_level, entry.proficiency_confirmed
   if (!existing) candidateState.language_state.push(entry)
 }
 
@@ -124,18 +95,24 @@ function nextProbeVersion(previousVersion) {
 export function reingestProbeResponses(candidateArtifact, probeResponses) {
   const canonical = assertCanonicalCandidateDataState(candidateArtifact)
   const answers = getAnswers({ probe_responses: probeResponses })
-  if (!answers.length) throw new Error('TBZ CANDIDATE DATA ENGINE: at least one non-empty probe response is required.')
+  if (!answers.length) throw new Error('TBZ CANDIDATE DATA ENGINE: at least one answered or skipped probe response is required.')
 
   const next = structuredClone(canonical)
   const candidateState = next.candidate_data_state
   const handlers = { MPC_FT_001: updateEsnExperience, probe_ft_candidate_education_001: updateEducation, probe_ft_candidate_student_status_001: updateStudentStatus, MPC_FT_002: updateEnglish, MPC_FT_003: updateWorkload }
   const applied = []
+  const skipped = []
 
-  for (const answer of answers) {
-    const handler = handlers[answer.question_id]
+  for (const response of answers) {
+    if (response.skipped === true) {
+      applied.push(response.question_id)
+      skipped.push(response.question_id)
+      continue
+    }
+    const handler = handlers[response.question_id]
     if (!handler) continue
-    handler(candidateState, answer.answer)
-    applied.push(answer.question_id)
+    handler(candidateState, response.answer)
+    applied.push(response.question_id)
   }
 
   if (!applied.length) throw new Error('TBZ CANDIDATE DATA ENGINE: no supported probe question_id was supplied.')
@@ -144,9 +121,7 @@ export function reingestProbeResponses(candidateArtifact, probeResponses) {
   const nextVersion = nextProbeVersion(previousVersion)
   const versionMatch = nextVersion.match(/^(v\d+\.\d+)_probe_response_integration$/)
   const artifactVersion = versionMatch ? versionMatch[1] : 'v1.4'
-  const previousApplied = Array.isArray(candidateState.probe_response_state?.applied_question_ids)
-    ? candidateState.probe_response_state.applied_question_ids
-    : []
+  const previousApplied = Array.isArray(candidateState.probe_response_state?.applied_question_ids) ? candidateState.probe_response_state.applied_question_ids : []
   const appliedHistory = [...new Set([...previousApplied, ...applied])]
 
   candidateState.state_version = nextVersion
@@ -155,6 +130,7 @@ export function reingestProbeResponses(candidateArtifact, probeResponses) {
     source_probe_artifact_id: null,
     applied_question_ids: appliedHistory,
     last_applied_question_ids: applied,
+    skipped_question_ids: [...new Set([...(candidateState.probe_response_state?.skipped_question_ids || []), ...skipped])],
     response_count: appliedHistory.length,
     updated_at: new Date().toISOString(),
     evidence_origin_type: 'direct_user_statement'
@@ -163,7 +139,7 @@ export function reingestProbeResponses(candidateArtifact, probeResponses) {
   next.state_version = nextVersion
   next.artifact_filename = `candidate_gregory_sauteret_${artifactVersion}.json`
   next.materialization_status = 'updated_from_probe_responses'
-  next.candidate_data_update_result = { engine: 'TBZ_CANDIDATE_DATA_ENGINE', engine_version: 'V1', candidate_id: candidateState.candidate_id, status: 'completed', previous_version: previousVersion, current_version: nextVersion, new_integration_performed: true, canonical_state_materialized: true, consistency_correction_applied: false, new_version_created: true, applied_probe_question_ids: applied, applied_probe_question_history: appliedHistory }
+  next.candidate_data_update_result = { engine: 'TBZ_CANDIDATE_DATA_ENGINE', engine_version: 'V1', candidate_id: candidateState.candidate_id, status: 'completed', previous_version: previousVersion, current_version: nextVersion, new_integration_performed: true, canonical_state_materialized: true, consistency_correction_applied: false, new_version_created: true, applied_probe_question_ids: applied, applied_probe_question_history: appliedHistory, skipped_probe_question_ids: skipped }
 
   return assertCanonicalCandidateDataState(next)
 }
