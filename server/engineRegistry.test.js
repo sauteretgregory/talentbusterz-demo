@@ -14,6 +14,11 @@ const fixtureRegistry =
   })
 
 assert.equal(
+  fixtureRegistry.has(ENGINE_IDS.CANDIDATE),
+  true
+)
+
+assert.equal(
   fixtureRegistry.has(ENGINE_IDS.JOB_DATA),
   true
 )
@@ -24,6 +29,11 @@ const emptyOpenAIRegistry =
     openaiApiKey: '',
     openaiModel: ''
   })
+
+assert.equal(
+  emptyOpenAIRegistry.has(ENGINE_IDS.CANDIDATE),
+  true
+)
 
 assert.equal(
   emptyOpenAIRegistry.has(ENGINE_IDS.JOB_DATA),
@@ -55,6 +65,11 @@ const configuredOpenAIRegistry =
   })
 
 assert.equal(
+  configuredOpenAIRegistry.has(ENGINE_IDS.CANDIDATE),
+  true
+)
+
+assert.equal(
   configuredOpenAIRegistry.has(ENGINE_IDS.JOB_DATA),
   true
 )
@@ -68,6 +83,10 @@ assert.throws(
 )
 
 console.log('✓ TBZ engine mode registry tests passed')
+console.log(
+  'Fixture CANDIDATE DATA:',
+  fixtureRegistry.has(ENGINE_IDS.CANDIDATE)
+)
 console.log(
   'Fixture JOB DATA:',
   fixtureRegistry.has(ENGINE_IDS.JOB_DATA)
