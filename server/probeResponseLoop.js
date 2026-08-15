@@ -29,15 +29,32 @@ function isInsufficientAnswer(answer) {
   return normalized.length < 2 || /^(je ne sais pas|je sais pas|aucune idee|pas d'idee|je ne peux pas|impossible|pas sur|je ne suis pas sur|inconnu|unknown|n\/a|na)$/i.test(normalized)
 }
 
+function isContradictoryAnswer(answer) {
+  const normalized = normalizeAnswer(answer)
+  const affirmative = /\b(oui|yes)\b/.test(normalized)
+  const negative = /\b(non|no)\b/.test(normalized)
+  return affirmative && negative
+}
+
 function classifyResponseQuality(responses) {
   const insufficientQuestionIds = responses
     .filter((response) => isInsufficientAnswer(response?.answer))
     .map((response) => response?.question_id)
     .filter(Boolean)
 
+  const contradictoryQuestionIds = responses
+    .filter((response) => isContradictoryAnswer(response?.answer))
+    .map((response) => response?.question_id)
+    .filter(Boolean)
+
   return {
-    status: insufficientQuestionIds.length ? 'insufficient' : 'usable',
-    insufficient_question_ids: insufficientQuestionIds
+    status: contradictoryQuestionIds.length
+      ? 'contradictory'
+      : insufficientQuestionIds.length
+        ? 'insufficient'
+        : 'usable',
+    insufficient_question_ids: insufficientQuestionIds,
+    contradictory_question_ids: contradictoryQuestionIds
   }
 }
 
@@ -84,7 +101,10 @@ function applyAdaptiveDecision(probePlan, responseQuality) {
 
   let decision = 'complete'
   let status = 'complete'
-  if (responseQuality.status === 'insufficient') {
+  if (responseQuality.status === 'contradictory') {
+    decision = 'clarification_required'
+    status = 'needs_clarification'
+  } else if (responseQuality.status === 'insufficient') {
     decision = 'clarification_required'
     status = 'needs_clarification'
   } else if (remaining.length > 0) {
@@ -96,12 +116,15 @@ function applyAdaptiveDecision(probePlan, responseQuality) {
     ...(next.loop_closure || {}),
     status,
     decision,
-    decision_reason: responseQuality.status === 'insufficient'
-      ? 'one_or_more_candidate_answers_are_insufficient_to_stabilize_evidence'
-      : remaining.length > 0
-        ? 'material_candidate_answerable_gaps_remain'
-        : 'no_answerable_probe_questions_remain_in_current_cycle',
-    insufficient_question_ids: responseQuality.insufficient_question_ids
+    decision_reason: responseQuality.status === 'contradictory'
+      ? 'one_or_more_candidate_answers_contain_conflicting_assertions'
+      : responseQuality.status === 'insufficient'
+        ? 'one_or_more_candidate_answers_are_insufficient_to_stabilize_evidence'
+        : remaining.length > 0
+          ? 'material_candidate_answerable_gaps_remain'
+          : 'no_answerable_probe_questions_remain_in_current_cycle',
+    insufficient_question_ids: responseQuality.insufficient_question_ids,
+    contradictory_question_ids: responseQuality.contradictory_question_ids
   }
 
   next.probe_result = {
@@ -109,7 +132,8 @@ function applyAdaptiveDecision(probePlan, responseQuality) {
     loop_status: status,
     adaptive_decision: decision,
     decision_reason: next.loop_closure.decision_reason,
-    insufficient_question_count: responseQuality.insufficient_question_ids.length
+    insufficient_question_count: responseQuality.insufficient_question_ids.length,
+    contradictory_question_count: responseQuality.contradictory_question_ids.length
   }
 
   return next
