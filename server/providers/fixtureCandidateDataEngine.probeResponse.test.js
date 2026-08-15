@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 
 import candidate from '../../src/tbz-v3/fixtures/doctrine/candidate.json' with { type: 'json' }
-import job from '../../src/tbz-v3/fixtures/match-france-travail-210SDTY.json' with { type: 'json' }
+import job from '../../src/tbz-v3/fixtures/job-france-travail-210SDTY.json' with { type: 'json' }
 import probe from '../../src/tbz-v3/fixtures/probe-france-travail-210SDTY.json' with { type: 'json' }
 
 import { createTbzEngineRegistry } from '../engineRegistry.js'
