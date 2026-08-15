@@ -171,92 +171,202 @@ export default function V3Preview() {
             placeholder="https://..."
             style={{
               flex: 1,
-              padding: '12px 14px',
-              border: '1px solid #ccc',
-              borderRadius: 8
+              padding: '14px 16px',
+              borderRadius: 10,
+              border: '1px solid #cbd5e1',
+              fontSize: 16
             }}
           />
 
           <button
             type="submit"
             style={{
-              padding: '12px 18px',
-              borderRadius: 8,
-              border: 'none',
+              padding: '14px 20px',
+              border: 0,
+              borderRadius: 10,
+              fontWeight: 800,
               cursor: 'pointer',
-              fontWeight: 700
+              background: '#0b57d0',
+              color: '#fff'
             }}
           >
             Analyser
           </button>
         </form>
 
-        {jobIntake?.extraction_status === 'loading' && (
-          <p style={{ marginTop: 16 }}>
-            Analyse de l’offre en cours…
-          </p>
+        {jobIntake && (
+          <div
+            style={{
+              marginTop: 14,
+              padding: 14,
+              borderRadius: 10,
+              background: '#f3f7ff'
+            }}
+          >
+            Source détectée : <strong>{jobIntake.detected_source}</strong>
+            <br />
+            Extraction :{' '}
+            <strong>
+              {jobIntake.extraction_status === 'loading'
+                ? 'en cours…'
+                : jobIntake.extraction_status === 'completed'
+                  ? 'réussie'
+                  : jobIntake.extraction_status}
+            </strong>
+
+            {jobIntake.provider_payload?.offer_id && (
+              <>
+                <br />
+                Offre détectée :{' '}
+                <strong>{jobIntake.provider_payload.offer_id}</strong>
+              </>
+            )}
+          </div>
         )}
 
         {jobIntakeError && (
-          <p style={{ marginTop: 16 }}>
+          <p style={{ color: '#b42318' }}>
             {jobIntakeError}
           </p>
         )}
       </section>
 
-      {dynamicJob && (
-        <section
+      {analysis && (
+      <section
+        style={{
+          border: '1px solid #d9e1ee',
+          borderRadius: 18,
+          padding: 28,
+          background: '#fff'
+        }}
+      >
+        <p
           style={{
-            border: '1px solid #ddd',
-            borderRadius: 12,
-            padding: 24,
-            marginBottom: 24
+            margin: 0,
+            fontSize: 14,
+            fontWeight: 700,
+            opacity: 0.65
           }}
         >
-          <h2 style={{ marginTop: 0 }}>
-            {getJobTitle(dynamicJob)}
-          </h2>
+          {analysis
+            ? 'Analyse TalentBusterZ'
+            : 'En attente d’une offre'}
+        </p>
 
-          <p>
-            {getCompanyName(dynamicJob)}
-          </p>
+        <h2 style={{ marginBottom: 8 }}>
+          {getJobTitle(dynamicJob)}
+        </h2>
 
-          {score !== null && (
-            <p>
-              Compatibilité : <strong>{score}/100</strong>
-            </p>
-          )}
+        <p
+          style={{
+            marginTop: 0,
+            fontSize: 18,
+            opacity: 0.72
+          }}
+        >
+          {getCompanyName(dynamicJob)}
+        </p>
 
-          {firstName && (
-            <p>
-              Profil analysé : <strong>{firstName}</strong>
-            </p>
-          )}
-        </section>
+        {score !== null && (
+          <div
+            style={{
+              marginTop: 28,
+              padding: 20,
+              borderRadius: 14,
+              background: '#f3f7ff'
+            }}
+          >
+            <strong
+              style={{
+                display: 'block',
+                fontSize: 32
+              }}
+            >
+              {score} %
+            </strong>
+
+            <span>
+              compatibilité professionnelle estimée par TalentBusterZ
+            </span>
+          </div>
+        )}
+
+        <p style={{ marginTop: 24, lineHeight: 1.55 }}>
+          {firstName ? `${firstName}, ` : ''}
+          votre profil correspond déjà à plusieurs éléments importants
+          de cette offre.
+        </p>
+      </section>
       )}
 
-      {questions.length > 0 && (
-        <section>
-          <h2>Questions complémentaires</h2>
-          {questions.map((question) => (
+      {analysis && questions.length > 0 && (
+        <section style={{ marginTop: 32 }}>
+          <h2>
+            Quelques précisions avant de préparer votre candidature
+          </h2>
+
+          <p style={{ opacity: 0.7 }}>
+            TalentBusterZ ne vous demande que les informations
+            qu’il ne connaît pas encore.
+          </p>
+
+          {questions.map((question, index) => (
             <div
               key={question.id}
               style={{
-                padding: '14px 0',
-                borderBottom: '1px solid #eee'
+                marginTop: 18,
+                padding: 20,
+                border: '1px solid #d9e1ee',
+                borderRadius: 14,
+                background: '#fff'
               }}
             >
-              <strong>
-                {question.priority === 'critical'
-                  ? 'Prioritaire'
-                  : 'Complémentaire'}
-              </strong>
-              <p style={{ marginBottom: 0 }}>
-                {question.text}
-              </p>
+              <label
+                style={{
+                  display: 'block',
+                  fontWeight: 700,
+                  marginBottom: 12
+                }}
+              >
+                {index + 1}. {question.text}
+              </label>
+
+              <textarea
+                rows="3"
+                placeholder="Votre réponse..."
+                style={{
+                  width: '100%',
+                  boxSizing: 'border-box',
+                  padding: 12,
+                  borderRadius: 10,
+                  border: '1px solid #cbd5e1',
+                  resize: 'vertical'
+                }}
+              />
             </div>
           ))}
         </section>
+      )}
+
+      {analysis && (
+      <section style={{ marginTop: 36 }}>
+        <button
+          type="button"
+          style={{
+            width: '100%',
+            padding: '17px 20px',
+            border: 0,
+            borderRadius: 12,
+            fontSize: 18,
+            fontWeight: 800,
+            cursor: 'pointer',
+            background: '#0b57d0',
+            color: '#fff'
+          }}
+        >
+          Je souhaite postuler
+        </button>
+      </section>
       )}
     </main>
   )
