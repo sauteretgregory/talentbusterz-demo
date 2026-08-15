@@ -48,6 +48,7 @@ test('adaptive PROBE cycle requires clarification for insufficient answers and d
   assert.deepEqual(result.probe_response_quality.insufficient_question_ids, ['MPC_FT_002'])
   assert.equal(result.canonical_probe_plan.probe_result.adaptive_decision, 'clarification_required')
   assert.equal(result.canonical_probe_plan.probe_result.insufficient_question_count, 1)
+  assert.equal(result.canonical_probe_plan.probe_plan.secondary_questions.some((question) => question.question_id === 'MPC_FT_002'), true)
 })
 
 test('adaptive PROBE cycle requires clarification for contradictory answers', async () => {
@@ -68,4 +69,5 @@ test('adaptive PROBE cycle requires clarification for contradictory answers', as
   assert.equal(result.probe_response_quality.status, 'contradictory')
   assert.deepEqual(result.probe_response_quality.contradictory_question_ids, ['MPC_FT_001'])
   assert.equal(result.canonical_probe_plan.probe_result.contradictory_question_count, 1)
+  assert.equal(result.canonical_probe_plan.probe_plan.critical_questions.some((question) => question.question_id === 'MPC_FT_001'), true)
 })
