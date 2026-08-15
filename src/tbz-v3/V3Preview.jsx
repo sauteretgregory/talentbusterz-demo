@@ -28,6 +28,21 @@ function getCandidateQuestions(probePlan) {
     .filter((question) => question.text)
 }
 
+function getProbeState(probePlan, fallbackStatus = 'open') {
+  const closure = probePlan?.loop_closure || {}
+  const result = probePlan?.probe_result || {}
+  const status = closure.status || result.loop_status || fallbackStatus
+  const decision = closure.decision || result.adaptive_decision || (status === 'complete' ? 'complete' : 'continue_probe')
+  return {
+    status,
+    decision,
+    reason: closure.decision_reason || result.decision_reason || '',
+    insufficientIds: closure.insufficient_question_ids || [],
+    contradictoryIds: closure.contradictory_question_ids || [],
+    remainingCount: typeof result.remaining_question_count === 'number' ? result.remaining_question_count : getCandidateQuestions(probePlan).length
+  }
+}
+
 const styles = {
   card: {
     border: '1px solid #d9e1ee',
@@ -57,6 +72,7 @@ export default function V3Preview() {
   const [rerunStatus, setRerunStatus] = useState('')
   const [rerunError, setRerunError] = useState('')
   const [previousScore, setPreviousScore] = useState(null)
+  const [scoreDelta, setScoreDelta] = useState(null)
   const [probeCycleStatus, setProbeCycleStatus] = useState('')
 
   async function handleJobUrlSubmit(event) {
@@ -68,6 +84,7 @@ export default function V3Preview() {
     setRerunStatus('')
     setRerunError('')
     setPreviousScore(null)
+    setScoreDelta(null)
     setProbeCycleStatus('')
 
     try {
@@ -125,6 +142,7 @@ export default function V3Preview() {
     setRerunStatus('Mise à jour du profil et recalcul du MATCH…')
     setRerunError('')
     setPreviousScore(getCompatibilityScore(analysis.match))
+    setScoreDelta(null)
 
     try {
       const response = await fetch('http://localhost:8787/api/probe-responses', {
@@ -150,10 +168,17 @@ export default function V3Preview() {
         probePlan: result.canonical_probe_plan
       }))
       setProbeCycleStatus(result.probe_cycle_status || result.canonical_probe_plan?.loop_closure?.status || 'open')
+      setScoreDelta(typeof result.score_delta === 'number' ? result.score_delta : null)
       setAnswers({})
-      setRerunStatus(result.probe_cycle_status === 'complete'
-        ? 'Profil enrichi, MATCH recalculé et boucle PROBE terminée.'
-        : 'Profil enrichi et MATCH recalculé. De nouvelles précisions restent disponibles.')
+
+      const state = getProbeState(result.canonical_probe_plan, result.probe_cycle_status)
+      if (state.status === 'complete') {
+        setRerunStatus('Profil enrichi, MATCH recalculé et boucle PROBE terminée.')
+      } else if (state.status === 'needs_clarification') {
+        setRerunStatus('Certaines réponses nécessitent une clarification avant de poursuivre.')
+      } else {
+        setRerunStatus('Profil enrichi et MATCH recalculé. De nouvelles précisions restent nécessaires.')
+      }
     } catch (error) {
       setRerunStatus('')
       setRerunError(error.message)
@@ -166,7 +191,21 @@ export default function V3Preview() {
   const score = getCompatibilityScore(dynamicMatch)
   const questions = getCandidateQuestions(dynamicProbePlan)
   const firstName = candidate?.candidate_data_state?.identity_state?.full_name?.value?.split(' ')?.[0] || ''
-  const scoreDelta = previousScore !== null && score !== null ? score - previousScore : null
+  const probeState = getProbeState(dynamicProbePlan, probeCycleStatus)
+  const displayedScoreDelta = scoreDelta !== null
+    ? scoreDelta
+    : previousScore !== null && score !== null
+      ? score - previousScore
+      : null
+
+  const questionStatus = (questionId) => {
+    if (probeState.insufficientIds.includes(questionId)) return 'Réponse insuffisante — précisez votre réponse.'
+    if (probeState.contradictoryIds.includes(questionId)) return 'Réponse contradictoire — précisez votre réponse.'
+    return ''
+  }
+
+  const showProbeForm = analysis && probeState.status !== 'complete' && questions.length > 0
+  const showApplyButton = analysis && probeState.status === 'complete'
 
   return (
     <main style={{ maxWidth: 760, margin: '0 auto', padding: '48px 24px 80px', fontFamily: 'Arial, sans-serif' }}>
@@ -201,15 +240,25 @@ export default function V3Preview() {
             <div style={{ marginTop: 28, padding: 20, borderRadius: 14, background: '#f3f7ff' }}>
               <strong style={{ display: 'block', fontSize: 32 }}>{score} %</strong>
               <span>compatibilité professionnelle estimée par TalentBusterZ</span>
-              {scoreDelta !== null && <div style={{ marginTop: 8, fontWeight: 700 }}>Évolution depuis vos réponses : {scoreDelta >= 0 ? '+' : ''}{scoreDelta} point{Math.abs(scoreDelta) > 1 ? 's' : ''}</div>}
+              {displayedScoreDelta !== null && <div style={{ marginTop: 8, fontWeight: 700 }}>Évolution depuis vos réponses : {displayedScoreDelta >= 0 ? '+' : ''}{displayedScoreDelta} point{Math.abs(displayedScoreDelta) > 1 ? 's' : ''}</div>}
             </div>
           )}
 
-          <p style={{ marginTop: 24, lineHeight: 1.55 }}>
-            {firstName ? `${firstName}, ` : ''}TalentBusterZ a identifié les informations qui peuvent encore modifier l’évaluation de votre candidature.
-          </p>
+          {probeState.decision === 'continue_probe' && (
+            <div style={{ marginTop: 20, padding: 16, borderRadius: 12, background: '#eff6ff', color: '#1d4ed8', fontWeight: 700 }}>
+              De nouvelles précisions peuvent encore améliorer l’évaluation. {probeState.remainingCount > 0 && `${probeState.remainingCount} question${probeState.remainingCount > 1 ? 's' : ''} reste${probeState.remainingCount > 1 ? 'nt' : ''} à traiter.`}
+            </div>
+          )}
 
-          {probeCycleStatus === 'complete' && (
+          {probeState.status === 'needs_clarification' && (
+            <div style={{ marginTop: 20, padding: 16, borderRadius: 12, background: '#fff7ed', color: '#9a3412', fontWeight: 700 }}>
+              Une clarification est nécessaire avant de poursuivre l’évaluation.
+              {probeState.insufficientIds.length > 0 && <div style={{ marginTop: 8 }}>Réponse insuffisante : {probeState.insufficientIds.length} question{probeState.insufficientIds.length > 1 ? 's' : ''}.</div>}
+              {probeState.contradictoryIds.length > 0 && <div style={{ marginTop: 4 }}>Réponse contradictoire : {probeState.contradictoryIds.length} question{probeState.contradictoryIds.length > 1 ? 's' : ''}.</div>}
+            </div>
+          )}
+
+          {probeState.status === 'complete' && (
             <div style={{ marginTop: 20, padding: 16, borderRadius: 12, background: '#ecfdf3', color: '#166534', fontWeight: 700 }}>
               La boucle de clarification candidat est terminée : toutes les questions PROBE actuellement actionnables ont été traitées.
             </div>
@@ -217,29 +266,37 @@ export default function V3Preview() {
         </section>
       )}
 
-      {analysis && questions.length > 0 && (
+      {showProbeForm && (
         <form onSubmit={handleProbeSubmit} style={{ marginTop: 32 }}>
           <section>
-            <h2>Quelques précisions avant de préparer votre candidature</h2>
+            <h2>{probeState.status === 'needs_clarification' ? 'Précisez vos réponses' : 'Quelques précisions avant de préparer votre candidature'}</h2>
             <p style={{ opacity: 0.7 }}>Vos réponses enrichissent votre profil candidat. Elles sont ensuite réinjectées dans le CANDIDATE DATA ENGINE avant de recalculer le MATCH.</p>
 
-            {questions.map((question, index) => (
-              <div key={question.id} style={{ marginTop: 18, padding: 20, border: '1px solid #d9e1ee', borderRadius: 14, background: '#fff' }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: 12 }}>{index + 1}. {question.text}</label>
-                <textarea rows="4" value={answers[question.id] || ''} onChange={(event) => updateAnswer(question.id, event.target.value)} placeholder="Votre réponse…" style={{ width: '100%', boxSizing: 'border-box', padding: 12, borderRadius: 10, border: '1px solid #cbd5e1', resize: 'vertical' }} />
-              </div>
-            ))}
+            {questions.map((question, index) => {
+              const statusMessage = questionStatus(question.id)
+              return (
+                <div key={question.id} style={{ marginTop: 18, padding: 20, border: '1px solid #d9e1ee', borderRadius: 14, background: '#fff' }}>
+                  <label style={{ display: 'block', fontWeight: 700, marginBottom: 12 }}>{index + 1}. {question.text}</label>
+                  {statusMessage && <p style={{ marginTop: 0, color: '#9a3412', fontWeight: 700 }}>{statusMessage}</p>}
+                  <textarea rows="4" value={answers[question.id] || ''} onChange={(event) => updateAnswer(question.id, event.target.value)} placeholder="Votre réponse…" style={{ width: '100%', boxSizing: 'border-box', padding: 12, borderRadius: 10, border: '1px solid #cbd5e1', resize: 'vertical' }} />
+                </div>
+              )
+            })}
           </section>
 
           <section style={{ marginTop: 24 }}>
-            <button type="submit" style={styles.primaryButton}>Mettre à jour mon profil et recalculer le MATCH</button>
+            <button type="submit" style={styles.primaryButton}>{probeState.status === 'needs_clarification' ? 'Corriger mes réponses et recalculer le MATCH' : 'Mettre à jour mon profil et recalculer le MATCH'}</button>
             {rerunStatus && <p style={{ marginTop: 12, color: '#166534', fontWeight: 700 }}>{rerunStatus}</p>}
             {rerunError && <p style={{ marginTop: 12, color: '#b42318', fontWeight: 700 }}>{rerunError}</p>}
           </section>
         </form>
       )}
 
-      {analysis && questions.length === 0 && (
+      {analysis && !showProbeForm && !showApplyButton && rerunError && (
+        <p style={{ marginTop: 24, color: '#b42318', fontWeight: 700 }}>{rerunError}</p>
+      )}
+
+      {showApplyButton && (
         <section style={{ marginTop: 36 }}>
           <button type="button" style={styles.primaryButton}>Je souhaite postuler</button>
         </section>
