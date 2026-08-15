@@ -95,16 +95,33 @@ function isProbeCycleComplete(probePlan) {
   )
 }
 
-function applyAdaptiveDecision(probePlan, responseQuality) {
+function applyAdaptiveDecision(probePlan, originalProbePlan, responseQuality) {
   const next = structuredClone(probePlan)
-  const remaining = next?.loop_closure?.remaining_question_ids || []
+  const clarificationIds = new Set([
+    ...responseQuality.insufficient_question_ids,
+    ...responseQuality.contradictory_question_ids
+  ])
 
+  if (clarificationIds.size > 0) {
+    const originalCritical = originalProbePlan?.probe_plan?.critical_questions || []
+    const originalSecondary = originalProbePlan?.probe_plan?.secondary_questions || []
+    const currentCritical = next?.probe_plan?.critical_questions || []
+    const currentSecondary = next?.probe_plan?.secondary_questions || []
+
+    next.probe_plan.critical_questions = [
+      ...currentCritical,
+      ...originalCritical.filter((question) => clarificationIds.has(question?.question_id) && !currentCritical.some((item) => item?.question_id === question?.question_id))
+    ]
+    next.probe_plan.secondary_questions = [
+      ...currentSecondary,
+      ...originalSecondary.filter((question) => clarificationIds.has(question?.question_id) && !currentSecondary.some((item) => item?.question_id === question?.question_id))
+    ]
+  }
+
+  const remaining = getQuestionIds(next)
   let decision = 'complete'
   let status = 'complete'
-  if (responseQuality.status === 'contradictory') {
-    decision = 'clarification_required'
-    status = 'needs_clarification'
-  } else if (responseQuality.status === 'insufficient') {
+  if (responseQuality.status === 'contradictory' || responseQuality.status === 'insufficient') {
     decision = 'clarification_required'
     status = 'needs_clarification'
   } else if (remaining.length > 0) {
@@ -124,7 +141,8 @@ function applyAdaptiveDecision(probePlan, responseQuality) {
           ? 'material_candidate_answerable_gaps_remain'
           : 'no_answerable_probe_questions_remain_in_current_cycle',
     insufficient_question_ids: responseQuality.insufficient_question_ids,
-    contradictory_question_ids: responseQuality.contradictory_question_ids
+    contradictory_question_ids: responseQuality.contradictory_question_ids,
+    remaining_question_ids: remaining
   }
 
   next.probe_result = {
@@ -133,7 +151,10 @@ function applyAdaptiveDecision(probePlan, responseQuality) {
     adaptive_decision: decision,
     decision_reason: next.loop_closure.decision_reason,
     insufficient_question_count: responseQuality.insufficient_question_ids.length,
-    contradictory_question_count: responseQuality.contradictory_question_ids.length
+    contradictory_question_count: responseQuality.contradictory_question_ids.length,
+    remaining_question_count: remaining.length,
+    recommended_question_count: remaining.length,
+    probe_triggered: remaining.length > 0
   }
 
   return next
@@ -196,7 +217,7 @@ export async function processProbeResponses({
     canonicalProbePlan = closeAnsweredQuestions(nextProbeExecution.output_artifact, updatedCandidate)
   }
 
-  canonicalProbePlan = applyAdaptiveDecision(canonicalProbePlan, responseQuality)
+  canonicalProbePlan = applyAdaptiveDecision(canonicalProbePlan, probePlan, responseQuality)
 
   const previousScore = getScore(previousMatch)
   const currentScore = getScore(updatedMatch)
