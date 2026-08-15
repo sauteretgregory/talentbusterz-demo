@@ -26,18 +26,19 @@ function closeAnsweredQuestions(probePlan, candidateDataState) {
   return next
 }
 
-function markAwaitingContinuation(probePlan, cycleNumber, candidateDataState, currentScore) {
+function markCycleContinuation(probePlan, cycleNumber, candidateDataState, currentScore) {
   const next = structuredClone(probePlan)
   const applied = candidateDataState?.candidate_data_state?.probe_response_state?.applied_question_ids || []
-  const currentCycleQuestionCount = Math.max(getQuestionIds(probePlan).length, probePlan?.probe_result?.answered_question_count || 0)
+  const cycleIds = getQuestionIds(probePlan)
+  const answeredThisCycle = cycleIds.filter((id) => applied.includes(id)).length
+  const cycleComplete = cycleIds.length > 0 && answeredThisCycle >= cycleIds.length
   const remainingQuestionCount = getRemainingEnrichmentCount(next, applied)
-  const canContinue = currentCycleQuestionCount > 0
-  const potentialScoreGain = canContinue ? Math.max(10, estimatePotentialScoreGain({ remainingQuestionCount, currentScore })) : 0
+  const potentialScoreGain = cycleComplete ? Math.max(10, estimatePotentialScoreGain({ remainingQuestionCount, currentScore })) : 0
   const batch = selectEnrichmentBatch(next, applied)
-  const status = canContinue ? 'awaiting_continuation' : 'complete'
-  const decision = canContinue ? ENRICHMENT_DECISIONS.CONTINUE : 'complete'
-  next.loop_closure = { ...(next.loop_closure || {}), status, decision, decision_reason: canContinue ? 'five_question_enrichment_cycle_completed_waiting_for_candidate_choice' : 'no_remaining_candidate_answerable_gap', remaining_question_ids: batch.map((q) => q.question_id) }
-  next.probe_result = { ...(next.probe_result || {}), loop_status: status, adaptive_decision: decision, remaining_question_count: remainingQuestionCount, recommended_question_count: Math.min(ENRICHMENT_CYCLE_SIZE, remainingQuestionCount), enrichment_cycle: { cycle_number: cycleNumber, cycle_size: ENRICHMENT_CYCLE_SIZE, answered_question_count: applied.length, estimated_potential_score_gain: potentialScoreGain, estimated_gain_basis: canContinue ? 'continued_enrichment_is_estimated_to_be_capable_of_adding_up_to_ten_match_points' : 'no_material_answerable_gap_remaining', profile_scope: 'persistent_candidate_profile', offer_scope: 'current_match_context_only' } }
+  const status = cycleComplete ? 'awaiting_continuation' : (remainingQuestionCount > 0 ? 'open' : 'complete')
+  const decision = cycleComplete ? ENRICHMENT_DECISIONS.CONTINUE : (remainingQuestionCount > 0 ? 'continue_probe' : 'complete')
+  next.loop_closure = { ...(next.loop_closure || {}), status, decision, decision_reason: cycleComplete ? 'five_question_enrichment_cycle_completed_waiting_for_candidate_choice' : 'material_candidate_answerable_gaps_remain', remaining_question_ids: batch.map((q) => q.question_id) }
+  next.probe_result = { ...(next.probe_result || {}), loop_status: status, adaptive_decision: decision, remaining_question_count: remainingQuestionCount, recommended_question_count: Math.min(ENRICHMENT_CYCLE_SIZE, remainingQuestionCount), enrichment_cycle: { cycle_number: cycleNumber, cycle_size: ENRICHMENT_CYCLE_SIZE, answered_question_count: answeredThisCycle, estimated_potential_score_gain: potentialScoreGain, estimated_gain_basis: cycleComplete ? 'continued_enrichment_is_estimated_to_be_capable_of_adding_up_to_ten_match_points' : 'cycle_in_progress', profile_scope: 'persistent_candidate_profile', offer_scope: 'current_match_context_only' } }
   return next
 }
 
@@ -69,17 +70,19 @@ export async function processProbeResponses({ engineRegistry, candidateDataState
   const previousScore = getScore(previousMatch)
 
   if (control === ENRICHMENT_DECISIONS.STOP) {
-    const finalPlan = markAwaitingContinuation(probePlan, cycleNumber, candidateDataState, previousScore)
-    finalPlan.loop_closure.status = 'complete'; finalPlan.loop_closure.decision = ENRICHMENT_DECISIONS.STOP; finalPlan.loop_closure.decision_reason = 'candidate_declined_further_profile_enrichment'; finalPlan.probe_result.loop_status = 'complete'; finalPlan.probe_result.adaptive_decision = ENRICHMENT_DECISIONS.STOP
+    const finalPlan = structuredClone(probePlan)
+    finalPlan.loop_closure = { ...(finalPlan.loop_closure || {}), status: 'complete', decision: ENRICHMENT_DECISIONS.STOP, decision_reason: 'candidate_declined_further_profile_enrichment' }
+    finalPlan.probe_result = { ...(finalPlan.probe_result || {}), loop_status: 'complete', adaptive_decision: ENRICHMENT_DECISIONS.STOP }
     const finalState = assertProbeFinalState(createProbeFinalState(finalPlan))
     return { previous_match_state: previousMatch, previous_score: previousScore, current_score: previousScore, score_delta: 0, probe_cycle_status: 'complete', probe_adaptive_decision: ENRICHMENT_DECISIONS.STOP, enrichment_cycle: finalPlan.probe_result.enrichment_cycle, probe_final_state: finalState, application_stage: 'cv_ready', next_stage: 'render_ready', canonical_candidate_data_state: candidateDataState, canonical_match_state: previousMatch, canonical_probe_plan: finalPlan }
   }
 
   if (control === ENRICHMENT_DECISIONS.CONTINUE && actualResponses.length === 0) {
-    const nextProbe = await generateNextProbe(engineRegistry, previousMatch, candidateDataState, cycleNumber + 1)
-    const nextPlan = markAwaitingContinuation(nextProbe, cycleNumber + 1, candidateDataState, previousScore)
+    const nextPlan = await generateNextProbe(engineRegistry, previousMatch, candidateDataState, cycleNumber + 1)
+    nextPlan.loop_closure = { ...(nextPlan.loop_closure || {}), status: 'open', decision: nextPlan.loop_closure?.decision === 'continue_enrichment' ? 'continue_enrichment' : 'continue_probe', decision_reason: 'new_five_question_enrichment_cycle_ready' }
+    nextPlan.probe_result = { ...(nextPlan.probe_result || {}), loop_status: 'open', adaptive_decision: nextPlan.loop_closure.decision, recommended_question_count: ENRICHMENT_CYCLE_SIZE }
     const finalState = assertProbeFinalState(createProbeFinalState(nextPlan))
-    return { previous_match_state: previousMatch, previous_score: previousScore, current_score: previousScore, score_delta: 0, probe_cycle_status: nextPlan.loop_closure.status, probe_adaptive_decision: nextPlan.loop_closure.decision, enrichment_cycle: nextPlan.probe_result.enrichment_cycle, probe_final_state: finalState, application_stage: 'enrichment_open', next_stage: null, canonical_candidate_data_state: candidateDataState, canonical_match_state: previousMatch, canonical_probe_plan: nextPlan }
+    return { previous_match_state: previousMatch, previous_score: previousScore, current_score: previousScore, score_delta: 0, probe_cycle_status: 'open', probe_adaptive_decision: nextPlan.loop_closure.decision, enrichment_cycle: { ...(nextPlan.probe_result.enrichment_cycle || {}), cycle_number: cycleNumber + 1, cycle_size: ENRICHMENT_CYCLE_SIZE }, probe_final_state: finalState, application_stage: 'enrichment_open', next_stage: null, canonical_candidate_data_state: candidateDataState, canonical_match_state: previousMatch, canonical_probe_plan: nextPlan }
   }
 
   if (!actualResponses.some((item) => item?.question_id && (item?.answer?.trim() || item?.skipped))) throw new Error('TBZ PROBE RESPONSE LOOP: at least one answered or skipped question is required.')
@@ -92,7 +95,7 @@ export async function processProbeResponses({ engineRegistry, candidateDataState
   const scoreDelta = previousScore !== null && currentScore !== null ? currentScore - previousScore : null
   let canonicalProbePlan = closeAnsweredQuestions(probePlan, updatedCandidate)
   canonicalProbePlan = applyAdaptiveDecision(canonicalProbePlan, responseQuality, probePlan)
-  if (responseQuality.status === 'usable') canonicalProbePlan = markAwaitingContinuation(canonicalProbePlan, cycleNumber, updatedCandidate, currentScore)
+  if (responseQuality.status === 'usable') canonicalProbePlan = markCycleContinuation(canonicalProbePlan, cycleNumber, updatedCandidate, currentScore)
   const finalState = assertProbeFinalState(createProbeFinalState(canonicalProbePlan))
   return { previous_match_state: previousMatch, previous_score: previousScore, current_score: currentScore, score_delta: scoreDelta, probe_cycle_status: finalState.status, probe_adaptive_decision: finalState.decision, probe_response_quality: responseQuality, enrichment_cycle: canonicalProbePlan.probe_result.enrichment_cycle, remaining_enrichment_question_count: canonicalProbePlan.probe_result.remaining_question_count || 0, estimated_potential_score_gain: canonicalProbePlan.probe_result.enrichment_cycle?.estimated_potential_score_gain || 0, probe_final_state: finalState, application_stage: 'enrichment_open', next_stage: null, canonical_candidate_data_state: updatedCandidate, canonical_match_state: updatedMatch, canonical_probe_plan: canonicalProbePlan }
 }
