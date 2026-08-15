@@ -8,10 +8,10 @@ export const APPLICATION_READINESS_STATUSES = Object.freeze([
   'not_ready'
 ])
 
-export const APPLICATION_READINESS_DECISIONS = Object.freeze([
+export const APPLICATION_READINESS_RECOMMENDATIONS = Object.freeze([
   'prepare_application',
-  'clarification_required',
-  'continue_probe'
+  'clarification_recommended',
+  'continue_enrichment'
 ])
 
 function assertObject(value, path) {
@@ -28,8 +28,8 @@ function assertCanonicalArtifact(value, artifactType, path) {
 }
 
 function assertNullableNumber(value, path) {
-  if (value !== null && typeof value !== 'number') {
-    throw new Error(`TBZ: ${path} must be a number or null.`)
+  if (value !== null && (typeof value !== 'number' || !Number.isFinite(value))) {
+    throw new Error(`TBZ: ${path} must be a finite number or null.`)
   }
 }
 
@@ -79,20 +79,20 @@ export function createApplicationReadinessState({
   }
 
   let status = 'not_ready'
-  let decision = 'continue_probe'
+  let recommendation = 'continue_enrichment'
   let reason = 'probe_cycle_remains_open'
-  let blockers = ['probe_cycle_incomplete']
+  let attentionPoints = []
 
   if (probeFinalState.status === 'needs_clarification') {
     status = 'needs_clarification'
-    decision = 'clarification_required'
+    recommendation = 'clarification_recommended'
     reason = 'probe_answers_require_clarification_before_application_preparation'
-    blockers = ['probe_clarification_required']
+    attentionPoints = ['probe_clarification_required']
   } else if (probeFinalState.status === 'complete') {
     status = 'ready'
-    decision = 'prepare_application'
+    recommendation = 'prepare_application'
     reason = 'candidate_profile_and_match_evidence_are_stabilized_for_application_preparation'
-    blockers = []
+    attentionPoints = []
   } else if (probeFinalState.status !== 'open') {
     throw new Error('TBZ: unsupported PROBE final state status for application readiness.')
   }
@@ -107,9 +107,9 @@ export function createApplicationReadinessState({
     contract_version: APPLICATION_READINESS_CONTRACT_VERSION,
     application_readiness: {
       status,
-      decision,
+      recommendation,
       reason,
-      blockers,
+      attention_points: attentionPoints,
       match_score: score,
       probe_status: probeFinalState.status,
       probe_decision: probeFinalState.decision
@@ -150,16 +150,16 @@ export function assertApplicationReadinessState(state) {
     throw new Error('TBZ: application readiness has an unsupported status.')
   }
 
-  if (!APPLICATION_READINESS_DECISIONS.includes(readiness.decision)) {
-    throw new Error('TBZ: application readiness has an unsupported decision.')
+  if (!APPLICATION_READINESS_RECOMMENDATIONS.includes(readiness.recommendation)) {
+    throw new Error('TBZ: application readiness has an unsupported recommendation.')
   }
 
   if (typeof readiness.reason !== 'string' || !readiness.reason.trim()) {
     throw new Error('TBZ: application readiness reason is required.')
   }
 
-  if (!Array.isArray(readiness.blockers) || readiness.blockers.some((item) => typeof item !== 'string')) {
-    throw new Error('TBZ: application readiness blockers must be an array of strings.')
+  if (!Array.isArray(readiness.attention_points) || readiness.attention_points.some((item) => typeof item !== 'string')) {
+    throw new Error('TBZ: application readiness attention_points must be an array of strings.')
   }
 
   assertNullableNumber(readiness.match_score, 'application_readiness.match_score')
@@ -169,20 +169,12 @@ export function assertApplicationReadinessState(state) {
   }
 
   const validCombination =
-    (readiness.status === 'ready' && readiness.decision === 'prepare_application' && readiness.probe_status === 'complete') ||
-    (readiness.status === 'needs_clarification' && readiness.decision === 'clarification_required' && readiness.probe_status === 'needs_clarification') ||
-    (readiness.status === 'not_ready' && readiness.decision === 'continue_probe' && readiness.probe_status === 'open')
+    (readiness.status === 'ready' && readiness.probe_status === 'complete') ||
+    (readiness.status === 'needs_clarification' && readiness.probe_status === 'needs_clarification') ||
+    (readiness.status === 'not_ready' && readiness.probe_status === 'open')
 
   if (!validCombination) {
-    throw new Error('TBZ: application readiness status, decision and PROBE status are inconsistent.')
-  }
-
-  if (readiness.status === 'ready' && readiness.blockers.length > 0) {
-    throw new Error('TBZ: ready application readiness cannot contain blockers.')
-  }
-
-  if (readiness.status !== 'ready' && readiness.blockers.length === 0) {
-    throw new Error('TBZ: non-ready application readiness must contain at least one blocker.')
+    throw new Error('TBZ: application readiness status and PROBE status are inconsistent.')
   }
 
   if (state.validation_report?.validation_status !== 'passed') {
