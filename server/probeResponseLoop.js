@@ -66,6 +66,7 @@ export async function processProbeResponses({ engineRegistry, candidateDataState
   if (!candidateDataState?.artifact_type) throw new Error('TBZ PROBE RESPONSE LOOP: canonical candidate data state is required.')
   if (jobDataState?.artifact_type !== 'canonical_job_data_state') throw new Error('TBZ PROBE RESPONSE LOOP: canonical job data state is required.')
   if (probePlan?.artifact_type !== 'canonical_probe_plan') throw new Error('TBZ PROBE RESPONSE LOOP: canonical probe plan is required.')
+  if (!control && probePlan?.loop_closure?.status === 'complete') throw new Error('TBZ PROBE RESPONSE LOOP: probe cycle is already complete.')
   const previousMatch = previousMatchState || candidateDataState?.match_state || null
   const previousScore = getScore(previousMatch)
 
