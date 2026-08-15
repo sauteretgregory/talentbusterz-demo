@@ -9,6 +9,10 @@ import {
 } from './providers/openaiJobDataEngine.js'
 
 import {
+  createFixtureCandidateDataEngineProvider
+} from './providers/fixtureCandidateDataEngine.js'
+
+import {
   createFixtureJobDataEngineProvider
 } from './providers/fixtureJobDataEngine.js'
 
@@ -31,6 +35,12 @@ export function createTbzEngineRegistry({
   openaiClient = null
 } = {}) {
   const registry = createEngineRegistry()
+
+  registerEngineProvider(
+    registry,
+    ENGINE_IDS.CANDIDATE,
+    createFixtureCandidateDataEngineProvider()
+  )
 
   if (engineMode === 'fixture') {
     registerEngineProvider(
