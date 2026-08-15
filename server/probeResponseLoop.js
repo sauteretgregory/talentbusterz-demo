@@ -26,10 +26,10 @@ function closeAnsweredQuestions(probePlan, candidateDataState) {
   return next
 }
 
-function markCycleContinuation(probePlan, cycleNumber, candidateDataState, currentScore) {
+function markCycleContinuation(probePlan, originalProbePlan, cycleNumber, candidateDataState, currentScore) {
   const next = structuredClone(probePlan)
   const applied = candidateDataState?.candidate_data_state?.probe_response_state?.applied_question_ids || []
-  const cycleIds = getQuestionIds(probePlan)
+  const cycleIds = getQuestionIds(originalProbePlan)
   const answeredThisCycle = cycleIds.filter((id) => applied.includes(id)).length
   const cycleComplete = cycleIds.length > 0 && answeredThisCycle >= cycleIds.length
   const remainingQuestionCount = getRemainingEnrichmentCount(next, applied)
@@ -95,7 +95,7 @@ export async function processProbeResponses({ engineRegistry, candidateDataState
   const scoreDelta = previousScore !== null && currentScore !== null ? currentScore - previousScore : null
   let canonicalProbePlan = closeAnsweredQuestions(probePlan, updatedCandidate)
   canonicalProbePlan = applyAdaptiveDecision(canonicalProbePlan, responseQuality, probePlan)
-  if (responseQuality.status === 'usable') canonicalProbePlan = markCycleContinuation(canonicalProbePlan, cycleNumber, updatedCandidate, currentScore)
+  if (responseQuality.status === 'usable') canonicalProbePlan = markCycleContinuation(canonicalProbePlan, probePlan, cycleNumber, updatedCandidate, currentScore)
   const finalState = assertProbeFinalState(createProbeFinalState(canonicalProbePlan))
   return { previous_match_state: previousMatch, previous_score: previousScore, current_score: currentScore, score_delta: scoreDelta, probe_cycle_status: finalState.status, probe_adaptive_decision: finalState.decision, probe_response_quality: responseQuality, enrichment_cycle: canonicalProbePlan.probe_result.enrichment_cycle, remaining_enrichment_question_count: canonicalProbePlan.probe_result.remaining_question_count || 0, estimated_potential_score_gain: canonicalProbePlan.probe_result.enrichment_cycle?.estimated_potential_score_gain || 0, probe_final_state: finalState, application_stage: 'enrichment_open', next_stage: null, canonical_candidate_data_state: updatedCandidate, canonical_match_state: updatedMatch, canonical_probe_plan: canonicalProbePlan }
 }
