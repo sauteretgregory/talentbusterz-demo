@@ -47,6 +47,13 @@ test('probe responses are reingested, MATCH is rerun, and a new PROBE is produce
   const state = result.canonical_candidate_data_state.candidate_data_state
   assert.equal(state.highest_completed_education_level.value, 'bac_plus_5')
   assert.equal(state.current_student_status.active, false)
+  assert.deepEqual(state.probe_response_state.applied_question_ids, [
+    'MPC_FT_001',
+    'probe_ft_candidate_education_001',
+    'probe_ft_candidate_student_status_001',
+    'MPC_FT_002',
+    'MPC_FT_003'
+  ])
 
   const english = state.language_state.find((entry) => entry.language === 'anglais')
   assert.ok(english)
@@ -66,6 +73,32 @@ test('probe responses are reingested, MATCH is rerun, and a new PROBE is produce
 
   assert.equal(result.canonical_match_state.artifact_type, 'canonical_match_state')
   assert.equal(result.canonical_probe_plan.artifact_type, 'canonical_probe_plan')
+  assert.equal(result.probe_cycle_status, 'complete')
+  assert.equal(result.canonical_probe_plan.probe_result.loop_status, 'complete')
+  assert.equal(result.canonical_probe_plan.probe_result.remaining_question_count, 0)
+  assert.equal(result.canonical_probe_plan.probe_plan.critical_questions.length, 0)
+  assert.equal(result.canonical_probe_plan.probe_plan.secondary_questions.length, 0)
+})
+
+test('answered probe questions are retained in history and excluded from the next cycle', async () => {
+  const registry = createTbzEngineRegistry({ engineMode: 'deterministic' })
+  const first = await processProbeResponses({
+    engineRegistry: registry,
+    candidateDataState: candidate,
+    jobDataState: job,
+    probePlan: probe,
+    responses: [{
+      question_id: 'MPC_FT_002',
+      answer: 'Je me situe à un niveau B2 en anglais professionnel, utilisé régulièrement avec des candidats et clients internationaux.'
+    }]
+  })
+
+  const state = first.canonical_candidate_data_state.candidate_data_state
+  assert.deepEqual(state.probe_response_state.applied_question_ids, ['MPC_FT_002'])
+  assert.equal(first.probe_cycle_status, 'open')
+  assert.equal(first.canonical_probe_plan.probe_plan.secondary_questions.some((question) => question.question_id === 'MPC_FT_002'), false)
+  assert.equal(first.canonical_probe_plan.probe_plan.critical_questions.length, 3)
+  assert.equal(first.canonical_probe_plan.probe_plan.secondary_questions.length, 1)
 })
 
 test('candidate-declared CEFR remains canonical when explicitly provided', async () => {
