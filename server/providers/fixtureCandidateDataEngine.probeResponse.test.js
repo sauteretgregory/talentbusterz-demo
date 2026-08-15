@@ -31,7 +31,7 @@ test('probe responses are reingested, MATCH is rerun, and a new PROBE is produce
       },
       {
         question_id: 'MPC_FT_002',
-        answer: 'Je peux assumer un niveau B2 en anglais professionnel, utilisé en visio et avec des candidats.'
+        answer: 'J’ai obtenu 20/20 à un oral d’anglais pendant mon BTS. J’ai vécu et travaillé environ deux ans en Australie, où j’ai vendu des abonnements satellite en anglais. J’ai aussi recruté en anglais avec des candidats et parties prenantes au Vietnam, au Canada, en Inde et au Pakistan.'
       },
       {
         question_id: 'MPC_FT_003',
@@ -47,9 +47,42 @@ test('probe responses are reingested, MATCH is rerun, and a new PROBE is produce
   const state = result.canonical_candidate_data_state.candidate_data_state
   assert.equal(state.highest_completed_education_level.value, 'bac_plus_5')
   assert.equal(state.current_student_status.active, false)
-  assert.equal(state.language_state.find((entry) => entry.language === 'anglais').cefr_level, 'B2')
-  assert.ok(state.experience_state.find((entry) => entry.experience_id === 'exp_anywr_2022_2025').probe_response_state.context_confirmed)
+
+  const english = state.language_state.find((entry) => entry.language === 'anglais')
+  assert.ok(english)
+  assert.equal(english.cefr_level, undefined)
+  assert.equal(english.proficiency_confirmed, undefined)
+  assert.equal(english.evidence_status, 'confirmed')
+  assert.equal(english.evidence_origin_type, 'direct_user_statement')
+  assert.equal(english.evidence_items.length, 1)
+  assert.equal(english.evidence_items[0].interpretation_status, 'not_cefr_mapped')
+  assert.equal(english.evidence_items[0].signals.english_exam_score_20_20, true)
+  assert.equal(english.evidence_items[0].signals.australia_lived_or_worked, true)
+  assert.equal(english.evidence_items[0].signals.english_sales_experience, true)
+  assert.equal(english.evidence_items[0].signals.english_international_recruitment, true)
+
+  const experience = state.experience_state.find((entry) => entry.experience_id === 'exp_anywr_2022_2025')
+  assert.ok(experience.probe_response_state.context_confirmed)
 
   assert.equal(result.canonical_match_state.artifact_type, 'canonical_match_state')
   assert.equal(result.canonical_probe_plan.artifact_type, 'canonical_probe_plan')
+})
+
+test('candidate-declared CEFR remains canonical when explicitly provided', async () => {
+  const registry = createTbzEngineRegistry({ engineMode: 'deterministic' })
+  const result = await processProbeResponses({
+    engineRegistry: registry,
+    candidateDataState: candidate,
+    jobDataState: job,
+    probePlan: probe,
+    responses: [{
+      question_id: 'MPC_FT_002',
+      answer: 'Je me situe à un niveau B2 en anglais professionnel, utilisé régulièrement avec des candidats et clients internationaux.'
+    }]
+  })
+
+  const english = result.canonical_candidate_data_state.candidate_data_state.language_state.find((entry) => entry.language === 'anglais')
+  assert.equal(english.cefr_level, 'B2')
+  assert.equal(english.proficiency_confirmed, true)
+  assert.equal(english.evidence_items.at(-1).interpretation_status, 'candidate_declared_cefr_level_present')
 })
