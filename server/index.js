@@ -20,6 +20,10 @@ import {
   createTbzEngineRegistry
 } from './engineRegistry.js'
 
+import {
+  processProbeResponses
+} from './probeResponseLoop.js'
+
 const PORT = 8787
 
 const engineRegistry = createTbzEngineRegistry()
@@ -108,6 +112,53 @@ const server = http.createServer(async (req, res) => {
     })
 
     res.end()
+    return
+  }
+
+  if (
+    req.method === 'POST' &&
+    req.url === '/api/probe-responses'
+  ) {
+    try {
+      const body = await readJsonBody(req)
+
+      const result = await processProbeResponses({
+        engineRegistry,
+        candidateDataState:
+          body?.canonical_candidate_data_state,
+        jobDataState:
+          body?.canonical_job_data_state,
+        probePlan:
+          body?.canonical_probe_plan,
+        responses:
+          body?.responses
+      })
+
+      await Promise.all([
+        persistCanonicalArtifact(
+          result.canonical_candidate_data_state
+        ),
+        persistCanonicalArtifact(
+          result.canonical_match_state
+        ),
+        persistCanonicalArtifact(
+          result.canonical_probe_plan
+        )
+      ])
+
+      sendJson(res, 200, {
+        status: 'completed',
+        stage: 'probe_responses_reingested_and_match_rerun',
+        ...result
+      })
+    } catch (error) {
+      sendJson(res, 500, {
+        status: 'failed',
+        stage: 'probe_response_loop',
+        error: error.message
+      })
+    }
+
     return
   }
 
