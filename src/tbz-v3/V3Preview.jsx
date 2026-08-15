@@ -19,7 +19,6 @@ function getCompatibilityScore(match) {
 function getCandidateQuestions(probePlan) {
   const critical = probePlan?.probe_plan?.critical_questions || []
   const secondary = probePlan?.probe_plan?.secondary_questions || []
-
   return [...critical, ...secondary]
     .map((question, index) => ({
       id: question.question_id || `question-${index}`,
@@ -92,6 +91,7 @@ export default function V3Preview() {
       })
 
       setAnalysis({
+        candidate: result.canonical_candidate_data_state,
         job: result.canonical_job_data_state,
         match: result.canonical_match_state,
         probePlan: result.canonical_probe_plan
@@ -171,17 +171,8 @@ export default function V3Preview() {
         <p style={{ opacity: 0.7 }}>Collez simplement son lien. TalentBusterZ s’occupe du reste.</p>
 
         <form onSubmit={handleJobUrlSubmit} style={{ display: 'flex', gap: 10, marginTop: 18 }}>
-          <input
-            type="url"
-            required
-            value={jobUrl}
-            onChange={(event) => setJobUrl(event.target.value)}
-            placeholder="https://..."
-            style={{ flex: 1, padding: '14px 16px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: 16 }}
-          />
-          <button type="submit" style={{ padding: '14px 20px', border: 0, borderRadius: 10, fontWeight: 800, cursor: 'pointer', background: '#0b57d0', color: '#fff' }}>
-            Analyser
-          </button>
+          <input type="url" required value={jobUrl} onChange={(event) => setJobUrl(event.target.value)} placeholder="https://..." style={{ flex: 1, padding: '14px 16px', borderRadius: 10, border: '1px solid #cbd5e1', fontSize: 16 }} />
+          <button type="submit" style={{ padding: '14px 20px', border: 0, borderRadius: 10, fontWeight: 800, cursor: 'pointer', background: '#0b57d0', color: '#fff' }}>Analyser</button>
         </form>
 
         {jobIntake && (
@@ -222,16 +213,8 @@ export default function V3Preview() {
 
             {questions.map((question, index) => (
               <div key={question.id} style={{ marginTop: 18, padding: 20, border: '1px solid #d9e1ee', borderRadius: 14, background: '#fff' }}>
-                <label style={{ display: 'block', fontWeight: 700, marginBottom: 12 }}>
-                  {index + 1}. {question.text}
-                </label>
-                <textarea
-                  rows="4"
-                  value={answers[question.id] || ''}
-                  onChange={(event) => updateAnswer(question.id, event.target.value)}
-                  placeholder="Votre réponse…"
-                  style={{ width: '100%', boxSizing: 'border-box', padding: 12, borderRadius: 10, border: '1px solid #cbd5e1', resize: 'vertical' }}
-                />
+                <label style={{ display: 'block', fontWeight: 700, marginBottom: 12 }}>{index + 1}. {question.text}</label>
+                <textarea rows="4" value={answers[question.id] || ''} onChange={(event) => updateAnswer(question.id, event.target.value)} placeholder="Votre réponse…" style={{ width: '100%', boxSizing: 'border-box', padding: 12, borderRadius: 10, border: '1px solid #cbd5e1', resize: 'vertical' }} />
               </div>
             ))}
           </section>
