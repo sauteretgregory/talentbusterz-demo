@@ -24,6 +24,15 @@ import {
   processProbeResponses
 } from './probeResponseLoop.js'
 
+import {
+  createProbeFinalState
+} from '../src/tbz-v3/contracts/probeFinalStateContract.js'
+
+import {
+  createApplicationReadinessState,
+  assertApplicationReadinessState
+} from '../src/tbz-v3/contracts/applicationReadinessContract.js'
+
 const PORT = 8787
 
 const engineRegistry = createTbzEngineRegistry()
@@ -74,6 +83,24 @@ async function persistCanonicalArtifact(
   )
 
   return outputPath
+}
+
+function createReadinessFromProbePlan({
+  candidateDataState,
+  jobDataState,
+  matchState,
+  probePlan
+}) {
+  const probeFinalState = createProbeFinalState(probePlan)
+
+  return assertApplicationReadinessState(
+    createApplicationReadinessState({
+      candidateDataState,
+      jobDataState,
+      matchState,
+      probeFinalState
+    })
+  )
 }
 
 function sendJson(res, statusCode, payload) {
@@ -133,8 +160,24 @@ const server = http.createServer(async (req, res) => {
         previousMatchState:
           body?.previous_match_state,
         responses:
-          body?.responses
+          body?.responses,
+        continueEnrichment:
+          body?.continue_enrichment,
+        cycleNumber:
+          body?.cycle_number || 1
       })
+
+      const applicationReadiness =
+        createReadinessFromProbePlan({
+          candidateDataState:
+            result.canonical_candidate_data_state,
+          jobDataState:
+            body?.canonical_job_data_state,
+          matchState:
+            result.canonical_match_state,
+          probePlan:
+            result.canonical_probe_plan
+        })
 
       await Promise.all([
         persistCanonicalArtifact(
@@ -145,13 +188,18 @@ const server = http.createServer(async (req, res) => {
         ),
         persistCanonicalArtifact(
           result.canonical_probe_plan
+        ),
+        persistCanonicalArtifact(
+          applicationReadiness
         )
       ])
 
       sendJson(res, 200, {
         status: 'completed',
-        stage: 'probe_responses_reingested_and_match_rerun',
-        ...result
+        stage: 'probe_responses_reingested_and_application_readiness_updated',
+        ...result,
+        canonical_application_readiness_state:
+          applicationReadiness
       })
     } catch (error) {
       sendJson(res, 500, {
@@ -374,6 +422,22 @@ const server = http.createServer(async (req, res) => {
         canonicalProbe
       )
 
+      const applicationReadiness =
+        createReadinessFromProbePlan({
+          candidateDataState:
+            canonicalCandidate,
+          jobDataState:
+            canonicalJob,
+          matchState:
+            canonicalMatch,
+          probePlan:
+            canonicalProbe
+        })
+
+      await persistCanonicalArtifact(
+        applicationReadiness
+      )
+
       sendJson(res, 200, {
         status: 'completed',
         stage:
@@ -390,7 +454,9 @@ const server = http.createServer(async (req, res) => {
         canonical_match_state:
           canonicalMatch,
         canonical_probe_plan:
-          canonicalProbe
+          canonicalProbe,
+        canonical_application_readiness_state:
+          applicationReadiness
       })
     } catch (error) {
       sendJson(res, 500, {

@@ -140,8 +140,11 @@ function applyAdaptiveDecision(probePlan, responseQuality, originalProbePlan) {
     loop_status: 'needs_clarification',
     adaptive_decision: 'clarification_required',
     decision_reason: next.loop_closure.decision_reason,
-    remaining_question_count: getQuestionIds(next).length
+    remaining_question_count: getQuestionIds(next),
+    insufficient_question_count: responseQuality.insufficient_question_ids.length,
+    contradictory_question_count: responseQuality.contradictory_question_ids.length
   }
+  next.probe_result.remaining_question_count = getQuestionIds(next).length
   return next
 }
 

@@ -86,10 +86,14 @@ test('HTTP probe response loop transports previous_match_state into score delta 
     assert.equal(result.body.previous_score, 74)
     assert.equal(typeof result.body.current_score, 'number')
     assert.equal(result.body.score_delta, result.body.current_score - result.body.previous_score)
+    assert.equal(result.body.canonical_application_readiness_state.artifact_type, 'canonical_application_readiness_state')
+    assert.equal(result.body.canonical_application_readiness_state.application_readiness.status, 'not_ready')
+    assert.equal(result.body.canonical_application_readiness_state.application_readiness.recommendation, 'continue_enrichment')
+    assert.equal(result.body.canonical_application_readiness_state.source_alignment.probe.artifact_id, probe.artifact_id)
   })
 })
 
-test('HTTP continue_enrichment preserves previous match without rerunning MATCH', async () => {
+test('HTTP continue_enrichment preserves previous match without rerunning MATCH and updates readiness', async () => {
   await withServer(async () => {
     const result = await postProbeResponses({
       canonical_candidate_data_state: candidate,
@@ -109,5 +113,8 @@ test('HTTP continue_enrichment preserves previous match without rerunning MATCH'
     assert.equal(result.body.enrichment_cycle.cycle_number, 2)
     assert.equal(result.body.canonical_probe_plan.probe_result.loop_status, 'open')
     assert.equal(result.body.canonical_probe_plan.probe_result.adaptive_decision, 'continue_enrichment')
+    assert.equal(result.body.canonical_application_readiness_state.artifact_type, 'canonical_application_readiness_state')
+    assert.equal(result.body.canonical_application_readiness_state.application_readiness.status, 'not_ready')
+    assert.equal(result.body.canonical_application_readiness_state.application_readiness.recommendation, 'continue_enrichment')
   })
 })
