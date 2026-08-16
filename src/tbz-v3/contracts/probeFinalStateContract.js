@@ -34,6 +34,11 @@ export function createProbeFinalState(probePlan) {
 
   return {
     contract_version: PROBE_FINAL_STATE_CONTRACT_VERSION,
+    artifact_id: probePlan.artifact_id || null,
+    artifact_filename: probePlan.artifact_filename || null,
+    state_version: probePlan.state_version || null,
+    engine_name: probePlan.engine_name || null,
+    engine_version: probePlan.engine_version || null,
     status,
     decision,
     decision_reason: closure.decision_reason || result.decision_reason || '',
