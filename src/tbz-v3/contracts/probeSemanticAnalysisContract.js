@@ -1,4 +1,7 @@
-const SEMANTIC_RELATIONS = Object.freeze([
+const CONTRACT_VERSION = 'v1.0'
+const ARTIFACT_TYPE = 'probe_semantic_analysis_state'
+
+const ALLOWED_RELATIONS = Object.freeze([
   'KNOWN',
   'NEW',
   'NUANCE',
@@ -6,111 +9,162 @@ const SEMANTIC_RELATIONS = Object.freeze([
   'UNKNOWN'
 ])
 
-const SOURCE_TYPES = Object.freeze(['probe_response'])
+const FORBIDDEN_FIELDS = Object.freeze([
+  'score',
+  'delta',
+  'score_delta',
+  'weight',
+  'match_score',
+  'match_decision',
+  'decision',
+  'recommendation'
+])
 
-function assertNonEmptyString(value, field) {
-  if (typeof value !== 'string' || !value.trim()) {
-    throw new Error(`${field} must be a non-empty string`)
+const ROOT_FIELDS = Object.freeze([
+  'artifact_type',
+  'contract_version',
+  'analysis_id',
+  'candidate_id',
+  'probe_cycle_id',
+  'question_id',
+  'response',
+  'interpretations'
+])
+
+const RESPONSE_FIELDS = Object.freeze([
+  'response_id',
+  'text'
+])
+
+const INTERPRETATION_FIELDS = Object.freeze([
+  'relation',
+  'memory_item_id',
+  'claim',
+  'evidence'
+])
+
+const EVIDENCE_FIELDS = Object.freeze([
+  'source_type',
+  'source_id',
+  'question_id',
+  'response_hash'
+])
+
+function assertPlainObject(value, label) {
+  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+    throw new Error(`${label} must be an object.`)
   }
+}
+
+function assertString(value, label) {
+  if (typeof value !== 'string' || value.length === 0) {
+    throw new Error(`${label} must be a non-empty string.`)
+  }
+}
+
+function assertNullableString(value, label) {
+  if (value !== null && (typeof value !== 'string' || value.length === 0)) {
+    throw new Error(`${label} must be null or a non-empty string.`)
+  }
+}
+
+function assertExactFields(object, allowedFields, label) {
+  for (const field of Object.keys(object)) {
+    if (FORBIDDEN_FIELDS.includes(field)) {
+      throw new Error(`Forbidden semantic-analysis field: ${field}`)
+    }
+    if (!allowedFields.includes(field)) {
+      throw new Error(`Unknown semantic-analysis field: ${label}.${field}`)
+    }
+  }
+}
+
+function assertRequiredFields(object, requiredFields, label) {
+  for (const field of requiredFields) {
+    if (!Object.prototype.hasOwnProperty.call(object, field)) {
+      throw new Error(`Missing semantic-analysis field: ${label}.${field}`)
+    }
+  }
+}
+
+function validateResponse(response) {
+  assertPlainObject(response, 'response')
+  assertExactFields(response, RESPONSE_FIELDS, 'response')
+  assertRequiredFields(response, RESPONSE_FIELDS, 'response')
+  assertString(response.response_id, 'response.response_id')
+  assertString(response.text, 'response.text')
 }
 
 function validateEvidence(evidence) {
-  if (!evidence || typeof evidence !== 'object') {
-    throw new Error('interpretation.evidence must be an object')
-  }
-
-  assertNonEmptyString(evidence.source_type, 'interpretation.evidence.source_type')
-  if (!SOURCE_TYPES.includes(evidence.source_type)) {
-    throw new Error(`Unsupported evidence source_type: ${evidence.source_type}`)
-  }
-
-  assertNonEmptyString(evidence.source_id, 'interpretation.evidence.source_id')
-  assertNonEmptyString(evidence.question_id, 'interpretation.evidence.question_id')
-  assertNonEmptyString(evidence.response_hash, 'interpretation.evidence.response_hash')
+  assertPlainObject(evidence, 'interpretation.evidence')
+  assertExactFields(evidence, EVIDENCE_FIELDS, 'interpretation.evidence')
+  assertRequiredFields(evidence, EVIDENCE_FIELDS, 'interpretation.evidence')
+  assertString(evidence.source_type, 'interpretation.evidence.source_type')
+  assertString(evidence.source_id, 'interpretation.evidence.source_id')
+  assertString(evidence.question_id, 'interpretation.evidence.question_id')
+  assertString(evidence.response_hash, 'interpretation.evidence.response_hash')
 }
 
-function validateInterpretation(interpretation) {
-  if (!interpretation || typeof interpretation !== 'object') {
-    throw new Error('interpretation must be an object')
+function validateInterpretation(interpretation, index) {
+  const label = `interpretations[${index}]`
+  assertPlainObject(interpretation, label)
+  assertExactFields(interpretation, INTERPRETATION_FIELDS, label)
+  assertRequiredFields(interpretation, INTERPRETATION_FIELDS, label)
+
+  if (!ALLOWED_RELATIONS.includes(interpretation.relation)) {
+    throw new Error(`Invalid semantic relation: ${interpretation.relation}`)
   }
 
-  if (!SEMANTIC_RELATIONS.includes(interpretation.relation)) {
-    throw new Error(`Unsupported semantic relation: ${interpretation.relation}`)
-  }
-
-  assertNonEmptyString(interpretation.claim, 'interpretation.claim')
+  assertNullableString(interpretation.memory_item_id, `${label}.memory_item_id`)
+  assertString(interpretation.claim, `${label}.claim`)
   validateEvidence(interpretation.evidence)
 
-  if (interpretation.relation === 'NEW' && interpretation.memory_item_id != null) {
+  if (['KNOWN', 'NUANCE', 'CONTRADICTION'].includes(interpretation.relation)) {
+    if (!interpretation.memory_item_id) {
+      throw new Error(`${interpretation.relation} interpretation requires memory_item_id`)
+    }
+  }
+
+  if (interpretation.relation === 'NEW' && interpretation.memory_item_id !== null) {
     throw new Error('NEW interpretation must not invent memory_item_id')
   }
 
-  if (
-    interpretation.relation !== 'NEW' &&
-    interpretation.relation !== 'UNKNOWN' &&
-    interpretation.memory_item_id != null
-  ) {
-    assertNonEmptyString(interpretation.memory_item_id, 'interpretation.memory_item_id')
-  }
-
-  if (interpretation.relation === 'UNKNOWN' && interpretation.memory_item_id != null) {
+  if (interpretation.relation === 'UNKNOWN' && interpretation.memory_item_id !== null) {
     throw new Error('UNKNOWN interpretation must not reference memory_item_id')
   }
 }
 
-function validateProbeSemanticAnalysisState(state) {
-  if (!state || typeof state !== 'object') {
-    throw new Error('probe_semantic_analysis_state must be an object')
+export function validateProbeSemanticAnalysisState(state) {
+  assertPlainObject(state, 'probe_semantic_analysis_state')
+  assertExactFields(state, ROOT_FIELDS, 'state')
+  assertRequiredFields(state, ROOT_FIELDS, 'state')
+
+  if (state.artifact_type !== ARTIFACT_TYPE) {
+    throw new Error(`Invalid artifact_type: ${state.artifact_type}`)
   }
 
-  if (state.artifact_type !== 'probe_semantic_analysis_state') {
-    throw new Error('artifact_type must be probe_semantic_analysis_state')
+  if (state.contract_version !== CONTRACT_VERSION) {
+    throw new Error(`Invalid contract_version: ${state.contract_version}`)
   }
 
-  if (state.contract_version !== 'v1.0') {
-    throw new Error('contract_version must be v1.0')
-  }
-
-  assertNonEmptyString(state.analysis_id, 'analysis_id')
-  assertNonEmptyString(state.candidate_id, 'candidate_id')
-  assertNonEmptyString(state.probe_cycle_id, 'probe_cycle_id')
-  assertNonEmptyString(state.question_id, 'question_id')
-
-  if (!state.response || typeof state.response !== 'object') {
-    throw new Error('response must be an object')
-  }
-
-  assertNonEmptyString(state.response.response_id, 'response.response_id')
-  assertNonEmptyString(state.response.text, 'response.text')
+  assertString(state.analysis_id, 'analysis_id')
+  assertString(state.candidate_id, 'candidate_id')
+  assertString(state.probe_cycle_id, 'probe_cycle_id')
+  assertString(state.question_id, 'question_id')
+  validateResponse(state.response)
 
   if (!Array.isArray(state.interpretations)) {
-    throw new Error('interpretations must be an array')
+    throw new Error('interpretations must be an array.')
   }
 
   state.interpretations.forEach(validateInterpretation)
 
-  // The semantic layer is interpretation-only. These fields are explicitly forbidden.
-  const forbiddenFields = [
-    'score',
-    'delta',
-    'score_delta',
-    'weight',
-    'match_score',
-    'match_decision',
-    'decision'
-  ]
-
-  forbiddenFields.forEach((field) => {
-    if (Object.prototype.hasOwnProperty.call(state, field)) {
-      throw new Error(`Forbidden semantic-analysis field: ${field}`)
-    }
-  })
-
   return true
 }
 
-module.exports = {
-  SEMANTIC_RELATIONS,
-  SOURCE_TYPES,
-  validateProbeSemanticAnalysisState
+export {
+  ALLOWED_RELATIONS,
+  ARTIFACT_TYPE,
+  CONTRACT_VERSION,
+  FORBIDDEN_FIELDS
 }
