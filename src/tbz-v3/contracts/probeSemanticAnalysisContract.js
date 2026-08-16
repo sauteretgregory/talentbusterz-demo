@@ -119,20 +119,24 @@ function validateInterpretation(interpretation, index) {
   validateEvidence(interpretation.evidence)
 
   const hasMemoryItemId = Object.prototype.hasOwnProperty.call(interpretation, 'memory_item_id')
+  const memoryItemId = interpretation.memory_item_id
 
   if (['KNOWN', 'NUANCE', 'CONTRADICTION'].includes(interpretation.relation)) {
-    if (!hasMemoryItemId) {
+    if (!hasMemoryItemId || memoryItemId === undefined) {
       throw new Error(`${interpretation.relation} interpretation requires memory_item_id`)
     }
-    assertString(interpretation.memory_item_id, `${label}.memory_item_id`)
+    assertString(memoryItemId, `${label}.memory_item_id`)
   }
 
-  if (interpretation.relation === 'NEW' || interpretation.relation === 'UNKNOWN') {
-    if (hasMemoryItemId) {
-      assertNullableString(interpretation.memory_item_id, `${label}.memory_item_id`)
-      if (interpretation.memory_item_id !== null) {
-        throw new Error(`${interpretation.relation} interpretation must not reference memory_item_id`)
-      }
+  if (interpretation.relation === 'NEW') {
+    if (memoryItemId !== undefined && memoryItemId !== null) {
+      throw new Error('NEW interpretation must not invent memory_item_id')
+    }
+  }
+
+  if (interpretation.relation === 'UNKNOWN') {
+    if (memoryItemId !== undefined && memoryItemId !== null) {
+      throw new Error('UNKNOWN interpretation must not reference memory_item_id')
     }
   }
 }
