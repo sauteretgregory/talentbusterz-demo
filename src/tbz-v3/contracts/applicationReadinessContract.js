@@ -64,21 +64,9 @@ export function createApplicationReadinessState({
   probeFinalState,
   generatedAt = new Date().toISOString()
 }) {
-  assertCanonicalArtifact(
-    candidateDataState,
-    TBZ_ARTIFACT_TYPES.CANDIDATE,
-    'candidate_data_state'
-  )
-  assertCanonicalArtifact(
-    jobDataState,
-    TBZ_ARTIFACT_TYPES.JOB,
-    'job_data_state'
-  )
-  assertCanonicalArtifact(
-    matchState,
-    TBZ_ARTIFACT_TYPES.MATCH,
-    'match_state'
-  )
+  assertCanonicalArtifact(candidateDataState, TBZ_ARTIFACT_TYPES.CANDIDATE, 'candidate_data_state')
+  assertCanonicalArtifact(jobDataState, TBZ_ARTIFACT_TYPES.JOB, 'job_data_state')
+  assertCanonicalArtifact(matchState, TBZ_ARTIFACT_TYPES.MATCH, 'match_state')
   assertProbeFinalState(probeFinalState)
 
   if (typeof generatedAt !== 'string' || !generatedAt.trim() || Number.isNaN(Date.parse(generatedAt))) {
@@ -100,7 +88,7 @@ export function createApplicationReadinessState({
   }
   const probeProvenance = {
     artifact_id: probeFinalState.artifact_id,
-    state_version: probeFinalState.state_version || 'v1.0',
+    state_version: probeFinalState.state_version,
     engine_name: probeFinalState.engine_name,
     engine_version: probeFinalState.engine_version
   }
@@ -123,7 +111,17 @@ export function createApplicationReadinessState({
     recommendation = 'prepare_application'
     reason = 'candidate_profile_and_match_evidence_are_stabilized_for_application_preparation'
     attentionPoints = []
-  } else if (probeFinalState.status !== 'open') {
+  } else if (probeFinalState.status === 'awaiting_continuation') {
+    status = 'not_ready'
+    recommendation = 'continue_enrichment'
+    reason = 'completed_enrichment_cycle_is_waiting_for_candidate_continuation_choice'
+    attentionPoints = ['enrichment_continuation_choice_required']
+  } else if (probeFinalState.status === 'open') {
+    status = 'not_ready'
+    recommendation = 'continue_enrichment'
+    reason = 'probe_cycle_remains_open'
+    attentionPoints = []
+  } else {
     throw new Error('TBZ: unsupported PROBE final state status for application readiness.')
   }
 
@@ -224,7 +222,7 @@ export function assertApplicationReadinessState(state) {
   const validCombination =
     (readiness.status === 'ready' && readiness.probe_status === 'complete') ||
     (readiness.status === 'needs_clarification' && readiness.probe_status === 'needs_clarification') ||
-    (readiness.status === 'not_ready' && readiness.probe_status === 'open')
+    (readiness.status === 'not_ready' && ['open', 'awaiting_continuation'].includes(readiness.probe_status))
 
   if (!validCombination) {
     throw new Error('TBZ: application readiness status and PROBE status are inconsistent.')
