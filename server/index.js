@@ -130,6 +130,8 @@ const server = http.createServer(async (req, res) => {
           body?.canonical_job_data_state,
         probePlan:
           body?.canonical_probe_plan,
+        previousMatchState:
+          body?.previous_match_state,
         responses:
           body?.responses
       })
@@ -409,7 +411,7 @@ const server = http.createServer(async (req, res) => {
 
 server.listen(PORT, () => {
   console.log(
-    `TBZ backend listening on http://localhost:${PORT}`
+    `TBZ backend listening on http://localhost:8787`
   )
 
   console.log(
