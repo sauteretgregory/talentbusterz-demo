@@ -109,28 +109,31 @@ function validateInterpretation(interpretation, index) {
   const label = `interpretations[${index}]`
   assertPlainObject(interpretation, label)
   assertExactFields(interpretation, INTERPRETATION_FIELDS, label)
-  assertRequiredFields(interpretation, INTERPRETATION_FIELDS, label)
+  assertRequiredFields(interpretation, ['relation', 'claim', 'evidence'], label)
 
   if (!ALLOWED_RELATIONS.includes(interpretation.relation)) {
     throw new Error(`Invalid semantic relation: ${interpretation.relation}`)
   }
 
-  assertNullableString(interpretation.memory_item_id, `${label}.memory_item_id`)
   assertString(interpretation.claim, `${label}.claim`)
   validateEvidence(interpretation.evidence)
 
+  const hasMemoryItemId = Object.prototype.hasOwnProperty.call(interpretation, 'memory_item_id')
+
   if (['KNOWN', 'NUANCE', 'CONTRADICTION'].includes(interpretation.relation)) {
-    if (!interpretation.memory_item_id) {
+    if (!hasMemoryItemId) {
       throw new Error(`${interpretation.relation} interpretation requires memory_item_id`)
     }
+    assertString(interpretation.memory_item_id, `${label}.memory_item_id`)
   }
 
-  if (interpretation.relation === 'NEW' && interpretation.memory_item_id !== null) {
-    throw new Error('NEW interpretation must not invent memory_item_id')
-  }
-
-  if (interpretation.relation === 'UNKNOWN' && interpretation.memory_item_id !== null) {
-    throw new Error('UNKNOWN interpretation must not reference memory_item_id')
+  if (interpretation.relation === 'NEW' || interpretation.relation === 'UNKNOWN') {
+    if (hasMemoryItemId) {
+      assertNullableString(interpretation.memory_item_id, `${label}.memory_item_id`)
+      if (interpretation.memory_item_id !== null) {
+        throw new Error(`${interpretation.relation} interpretation must not reference memory_item_id`)
+      }
+    }
   }
 }
 
