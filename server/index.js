@@ -33,6 +33,10 @@ import {
   assertApplicationReadinessState
 } from '../src/tbz-v3/contracts/applicationReadinessContract.js'
 
+import {
+  candidateMemoryStore
+} from './candidateMemoryStore.js'
+
 const PORT = 8787
 
 const engineRegistry = createTbzEngineRegistry()
@@ -183,6 +187,9 @@ const server = http.createServer(async (req, res) => {
         persistCanonicalArtifact(
           result.canonical_candidate_data_state
         ),
+        candidateMemoryStore.save(
+          result.canonical_candidate_data_state
+        ),
         persistCanonicalArtifact(
           result.canonical_match_state
         ),
@@ -198,6 +205,7 @@ const server = http.createServer(async (req, res) => {
         status: 'completed',
         stage: 'probe_responses_reingested_and_application_readiness_updated',
         ...result,
+        candidate_memory_persisted: true,
         canonical_application_readiness_state:
           applicationReadiness
       })
@@ -232,13 +240,26 @@ const server = http.createServer(async (req, res) => {
         return
       }
 
+      const candidateMemory = await candidateMemoryStore.resolve({
+        candidate: body?.candidate || null,
+        candidateId: body?.candidate_id || null
+      })
+
+      if (!candidateMemory.candidate) {
+        sendJson(res, 400, {
+          status: 'failed',
+          stage: 'candidate_memory_resolution',
+          error: 'candidate_memory_not_found',
+          candidate_id: body?.candidate_id || null
+        })
+        return
+      }
+
       const candidateExecution =
         await executeEngine(
           engineRegistry,
           ENGINE_IDS.CANDIDATE,
-          body?.candidate
-            ? { candidate_data_state: body.candidate }
-            : {}
+          { candidate_data_state: candidateMemory.candidate }
         )
 
       if (
@@ -258,9 +279,10 @@ const server = http.createServer(async (req, res) => {
       const canonicalCandidate =
         candidateExecution.output_artifact
 
-      await persistCanonicalArtifact(
-        canonicalCandidate
-      )
+      await Promise.all([
+        persistCanonicalArtifact(canonicalCandidate),
+        candidateMemoryStore.save(canonicalCandidate)
+      ])
 
       let extraction
 
@@ -446,6 +468,9 @@ const server = http.createServer(async (req, res) => {
         provider_id: extraction.provider_id,
         provider_payload:
           extraction.provider_payload,
+        candidate_memory_source:
+          candidateMemory.source,
+        candidate_memory_persisted: true,
         job_engine_processable: true,
         canonical_candidate_data_state:
           canonicalCandidate,
