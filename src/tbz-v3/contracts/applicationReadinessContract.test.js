@@ -100,6 +100,21 @@ test('application readiness recommends continued enrichment while PROBE remains 
   assertApplicationReadinessState(state)
 })
 
+test('application readiness remains not ready while a completed enrichment cycle awaits continuation', () => {
+  const state = createApplicationReadinessState({
+    candidateDataState: makeCandidate(),
+    jobDataState: makeJob(),
+    matchState: makeMatch(),
+    probeFinalState: makeProbe('awaiting_continuation', 'continue_enrichment')
+  })
+
+  assert.equal(state.application_readiness.status, 'not_ready')
+  assert.equal(state.application_readiness.recommendation, 'continue_enrichment')
+  assert.equal(state.application_readiness.probe_status, 'awaiting_continuation')
+  assert.deepEqual(state.application_readiness.attention_points, ['enrichment_continuation_choice_required'])
+  assertApplicationReadinessState(state)
+})
+
 test('application readiness rejects missing MATCH score', () => {
   assert.throws(
     () => createApplicationReadinessState({
