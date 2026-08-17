@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "better-sqlite3": "^13.0.2",
     "jszip": "latest",
     "lucide-react": "latest",
     "openai": "^7.4.0",
