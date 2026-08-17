@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - lab/candidate-memory-sqlite-v0
+      - lab/candidate-memory-runtime-experiment-v0
   workflow_dispatch:
 
 jobs:
@@ -23,4 +24,4 @@ jobs:
         run: npm install
 
       - name: Run Candidate Memory tests
-        run: node --test server/repositories/sqliteCandidateMemoryRepository.test.js server/repositories/sqliteCandidateMemoryRepository.integration.test.js
+        run: node --test server/repositories/sqliteCandidateMemoryRepository.test.js server/repositories/sqliteCandidateMemoryRepository.integration.test.js server/labCandidateMemoryRuntimeExperiment.test.js
