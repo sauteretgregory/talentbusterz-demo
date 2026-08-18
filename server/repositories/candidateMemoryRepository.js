@@ -27,6 +27,19 @@
 
 export const CANDIDATE_MEMORY_REPOSITORY_CONTRACT_VERSION = 'v0'
 
+export class CandidateMemoryRepositoryConflictError extends Error {
+  constructor(candidateId, expectedVersion, actualVersion) {
+    super(
+      `TBZ candidate memory version conflict for "${candidateId}": expected ${String(expectedVersion)}, actual ${String(actualVersion)}.`
+    )
+    this.name = 'CandidateMemoryRepositoryConflictError'
+    this.code = 'CANDIDATE_MEMORY_VERSION_CONFLICT'
+    this.candidateId = candidateId
+    this.expectedVersion = expectedVersion
+    this.actualVersion = actualVersion
+  }
+}
+
 export class CandidateMemoryRepository {
   /**
    * Load the complete persisted candidate memory state.
