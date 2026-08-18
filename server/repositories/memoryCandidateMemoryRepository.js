@@ -1,4 +1,7 @@
-import { assertCandidateMemoryRepository } from './candidateMemoryRepository.js'
+import {
+  assertCandidateMemoryRepository,
+  CandidateMemoryRepositoryConflictError
+} from './candidateMemoryRepository.js'
 
 export class MemoryCandidateMemoryRepository {
   #states = new Map()
@@ -24,22 +27,24 @@ export class MemoryCandidateMemoryRepository {
     }
 
     const current = this.#states.get(candidateId) || null
-    const currentVersion = current?.state_version ?? null
+    const currentVersion = current?.state_version ?? current?.candidate_data_state?.state_version ?? null
 
-    if (expectedVersion !== null && expectedVersion !== currentVersion) {
-      const error = new Error('TBZ_CANDIDATE_MEMORY_CONFLICT')
-      error.code = 'CANDIDATE_MEMORY_CONFLICT'
-      error.expectedVersion = expectedVersion
-      error.currentVersion = currentVersion
-      throw error
+    if (expectedVersion !== null && expectedVersion !== undefined && String(expectedVersion) !== String(currentVersion)) {
+      throw new CandidateMemoryRepositoryConflictError(
+        candidateId,
+        expectedVersion,
+        currentVersion
+      )
     }
 
+    const nextVersion = candidateState.state_version ?? candidateState.candidate_data_state?.state_version ?? null
     this.#states.set(candidateId, structuredClone(candidateState))
 
     return {
       candidate_id: candidateId,
       status: 'persisted',
-      state_version: candidateState.state_version ?? null
+      state_version: nextVersion,
+      created: current === null
     }
   }
 }
