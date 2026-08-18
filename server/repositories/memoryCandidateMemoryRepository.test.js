@@ -54,9 +54,9 @@ test('memory repository rejects a stale expected version without changing state'
       candidate('v1.5_probe_response_integration'),
       'v1.3_probe_response_integration'
     ),
-    (error) => error.code === 'CANDIDATE_MEMORY_CONFLICT' &&
+    (error) => error.code === 'CANDIDATE_MEMORY_VERSION_CONFLICT' &&
       error.expectedVersion === 'v1.3_probe_response_integration' &&
-      error.currentVersion === 'v1.4_probe_response_integration'
+      error.actualVersion === 'v1.4_probe_response_integration'
   )
 
   const loaded = await repository.get('candidate-test')
