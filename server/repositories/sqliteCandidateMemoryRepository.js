@@ -1,19 +1,12 @@
 import Database from 'better-sqlite3'
 
+import {
+  CandidateMemoryRepositoryConflictError
+} from './candidateMemoryRepository.js'
+
 export const SQLITE_CANDIDATE_MEMORY_REPOSITORY_VERSION = 'v0'
 
-export class CandidateMemoryRepositoryConflictError extends Error {
-  constructor(candidateId, expectedVersion, actualVersion) {
-    super(
-      `TBZ candidate memory version conflict for "${candidateId}": expected ${String(expectedVersion)}, actual ${String(actualVersion)}.`
-    )
-    this.name = 'CandidateMemoryRepositoryConflictError'
-    this.code = 'CANDIDATE_MEMORY_VERSION_CONFLICT'
-    this.candidateId = candidateId
-    this.expectedVersion = expectedVersion
-    this.actualVersion = actualVersion
-  }
-}
+export { CandidateMemoryRepositoryConflictError }
 
 function assertCandidateId(candidateId) {
   if (typeof candidateId !== 'string' || !candidateId.trim()) {
@@ -100,6 +93,7 @@ export class SqliteCandidateMemoryRepository {
         this.insertStatement.run(candidateId, nextVersion, serializedState, updatedAt)
         return {
           candidate_id: candidateId,
+          status: 'persisted',
           state_version: nextVersion,
           updated_at: updatedAt,
           created: true
@@ -142,6 +136,7 @@ export class SqliteCandidateMemoryRepository {
 
       return {
         candidate_id: candidateId,
+        status: 'persisted',
         state_version: nextVersion,
         updated_at: updatedAt,
         created: false
