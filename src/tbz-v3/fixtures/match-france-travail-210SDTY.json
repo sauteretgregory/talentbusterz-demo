@@ -1,0 +1,357 @@
+{
+  "artifact_type": "canonical_match_state",
+  "artifact_id": "match_gregory_sauteret_france_travail_210SDTY",
+  "artifact_filename": "match_gregory_france_travail_210SDTY_v1.0.json",
+  "state_version": "v1.0",
+  "engine_name": "TBZ_MATCH_ENGINE",
+  "engine_version": "V4",
+  "processing_mode": "PRODUCTION",
+  "generated_at": "2026-08-12T18:25:08.980417+00:00",
+  "match_id": "match_gregory_sauteret_france_travail_210SDTY_v1",
+  "source_alignment": {
+    "source_job_artifact_id": "job_france_travail_talent_acquisition_210SDTY",
+    "source_job_data_state_version": "v1.0",
+    "source_candidate_artifact_id": "candidate_gregory_sauteret_v1",
+    "source_candidate_data_state_version": "v1.3_probe_response_integration",
+    "source_states_modified": false
+  },
+  "input_validation": {
+    "status": "passed",
+    "checks": {
+      "job_artifact_type": true,
+      "job_engine": true,
+      "job_state_version": true,
+      "job_validation": true,
+      "job_complete": true,
+      "candidate_artifact_type": true,
+      "candidate_engine": true,
+      "candidate_state_version": true,
+      "candidate_validation": true,
+      "candidate_complete": true
+    }
+  },
+  "match_state": {
+    "professional_compatibility": {
+      "professional_match_score": 74,
+      "score_scale": 100,
+      "classification": "strong_operational_match_with_formal_requirement_risk",
+      "confidence": 0.88,
+      "strengths": [
+        "Expérience recrutement très supérieure au seuil de deux ans",
+        "Recrutement IT documenté",
+        "Sourcing multicanal, approche directe et recherche booléenne documentés",
+        "Préqualifications, entretiens, synthèses et suivi de processus documentés",
+        "Exposition à des volumes soutenus",
+        "Prospection et environnement digital cohérents avec le poste"
+      ],
+      "gaps_and_unknowns": [
+        "Statut étudiant actuel non établi",
+        "Bac+5 ou équivalent non établi",
+        "Expérience directement exercée en ESN non établie avec certitude",
+        "Anglais B2+ plausible mais non confirmé selon un référentiel identifiable",
+        "Cold calling récent en contexte recrutement non explicitement documenté"
+      ]
+    },
+    "professional_scoring": {
+      "professional_match_score": 74,
+      "maximum_score": 100,
+      "dimensions": [
+        {
+          "id": "recruitment_experience",
+          "max": 18,
+          "score": 18,
+          "status": "strong_match"
+        },
+        {
+          "id": "it_recruitment_and_esn",
+          "max": 18,
+          "score": 14,
+          "status": "partial_to_strong_match"
+        },
+        {
+          "id": "sourcing_prospecting_cold_calling",
+          "max": 14,
+          "score": 12,
+          "status": "strong_match"
+        },
+        {
+          "id": "end_to_end_recruitment",
+          "max": 14,
+          "score": 13,
+          "status": "strong_match"
+        },
+        {
+          "id": "volume_and_pace",
+          "max": 10,
+          "score": 9,
+          "status": "strong_match"
+        },
+        {
+          "id": "digital_environment",
+          "max": 8,
+          "score": 7,
+          "status": "strong_match"
+        },
+        {
+          "id": "languages",
+          "max": 8,
+          "score": 5.5,
+          "status": "partial_match"
+        },
+        {
+          "id": "education_and_student_status",
+          "max": 10,
+          "score": 5.5,
+          "status": "unknown_with_material_risk"
+        }
+      ],
+      "raw_total": 84,
+      "normalization_method": "raw_total_normalized_to_professional_score",
+      "final_professional_match_score": 74,
+      "actionability_adjustment": 0,
+      "preferred_requirement_negative_adjustment": 0,
+      "governance": {
+        "professional_score_independent_from_actionability": true,
+        "unknown_not_equal_confirmed_absence": true,
+        "platform_affinity_used": false,
+        "sensitive_candidate_information_used": false
+      }
+    },
+    "application_actionability": {
+      "status": "actionable_with_material_clarifications",
+      "professional_score_affected": false,
+      "confirmed_compatible": [
+        "Paris",
+        "CDI",
+        "Temps plein",
+        "Télétravail deux jours par semaine",
+        "Disponibilité immédiate",
+        "Modes présentiel et hybride acceptés"
+      ],
+      "material_uncertainties": [
+        "Incohérence entre exigence de statut étudiant et CDI cadre 35h",
+        "Bac+5 non confirmé",
+        "Périmètre exact de l’expérience ESN non confirmé",
+        "Anglais B2+ non formellement confirmé"
+      ],
+      "salary_context": {
+        "gross_annual_eur": 34999.92,
+        "variable_present": true,
+        "candidate_salary_preference_available_in_canonical_state": false
+      },
+      "application_actionability_blockers": []
+    },
+    "candidate_unknowns": [
+      {
+        "id": "cand_current_student",
+        "scope": "current_student_status",
+        "impact": "high",
+        "candidate_answerable": true
+      },
+      {
+        "id": "cand_bac5",
+        "scope": "highest_completed_education_level",
+        "impact": "high",
+        "candidate_answerable": true
+      },
+      {
+        "id": "cand_esn",
+        "scope": "it_recruitment_in_esn_context",
+        "impact": "critical",
+        "candidate_answerable": true,
+        "probe_candidate_id": "MPC_FT_001"
+      },
+      {
+        "id": "cand_english_b2",
+        "scope": "english_professional_level",
+        "impact": "high",
+        "candidate_answerable": true,
+        "probe_candidate_id": "MPC_FT_002"
+      },
+      {
+        "id": "cand_cold_calling",
+        "scope": "sourcing_prospecting_cold_calling",
+        "impact": "medium",
+        "candidate_answerable": true,
+        "probe_candidate_id": "MPC_FT_003"
+      },
+      {
+        "id": "cand_full_time_acceptance",
+        "scope": "full_time_acceptance",
+        "impact": "medium_actionability",
+        "candidate_answerable": true
+      }
+    ],
+    "job_unknowns": [
+      {
+        "id": "job_employer_identity",
+        "scope": "employer_identity",
+        "impact": "medium"
+      },
+      {
+        "id": "job_student_cdi_consistency",
+        "scope": "student_requirement_vs_cdi_35h",
+        "impact": "high"
+      },
+      {
+        "id": "job_esn_requirement_scope",
+        "scope": "meaning_of_it_recruitment_and_esn_experience",
+        "impact": "medium_high"
+      },
+      {
+        "id": "job_exact_start_date",
+        "scope": "exact_start_date",
+        "impact": "low"
+      },
+      {
+        "id": "job_bonus_formula",
+        "scope": "variable_compensation_formula",
+        "impact": "medium"
+      },
+      {
+        "id": "job_exact_worksite",
+        "scope": "exact_worksite_address",
+        "impact": "low_to_medium"
+      }
+    ],
+    "employer_confirmation_needed": [
+      {
+        "id": "emp_student_requirement",
+        "priority": "critical",
+        "required_confirmation": "Confirmer si le statut étudiant est réellement obligatoire pour ce CDI cadre 35h."
+      },
+      {
+        "id": "emp_bac5",
+        "priority": "high",
+        "required_confirmation": "Confirmer le caractère strict ou compensable du Bac+5."
+      },
+      {
+        "id": "emp_esn_scope",
+        "priority": "high",
+        "required_confirmation": "Préciser le périmètre exact de l’expérience ESN indispensable."
+      },
+      {
+        "id": "emp_bonus",
+        "priority": "medium",
+        "required_confirmation": "Préciser le mode de calcul de la prime."
+      },
+      {
+        "id": "emp_identity",
+        "priority": "medium",
+        "required_confirmation": "Identifier l’entreprise employeuse."
+      }
+    ],
+    "professional_decision_blockers": [
+      {
+        "id": "blocker_formal_education",
+        "severity": "high",
+        "basis": "Statut étudiant et Bac+5 explicites dans l’offre mais non établis dans le candidate state; l’offre est elle-même incohérente sur le statut étudiant."
+      },
+      {
+        "id": "blocker_esn_scope",
+        "severity": "medium_high",
+        "basis": "L’expérience IT/ESN est déclarée indispensable mais son périmètre exact reste ambigu."
+      }
+    ],
+    "application_actionability_blockers": [],
+    "match_probe_candidates": [
+      {
+        "probe_candidate_id": "MPC_FT_001",
+        "priority": "critical",
+        "target_scope": "it_recruitment_in_esn_context",
+        "target_requirement_ids": [
+          "req_experience_it_esn_001"
+        ],
+        "missing_information": "Expérience de recrutement IT directement exercée au sein d’une ESN ou société de services, période, profils et responsabilité.",
+        "expected_score_impact": {
+          "minimum": -3,
+          "maximum": 5
+        },
+        "candidate_answerable": true
+      },
+      {
+        "probe_candidate_id": "MPC_FT_002",
+        "priority": "high",
+        "target_scope": "english_professional_level",
+        "target_requirement_ids": [
+          "req_english_b2_001"
+        ],
+        "missing_information": "Usage professionnel concret de l’anglais et niveau selon un référentiel identifiable.",
+        "expected_score_impact": {
+          "minimum": -1.5,
+          "maximum": 3
+        },
+        "candidate_answerable": true
+      },
+      {
+        "probe_candidate_id": "MPC_FT_003",
+        "priority": "medium",
+        "target_scope": "sourcing_prospecting_cold_calling",
+        "target_requirement_ids": [
+          "req_sourcing_prospecting_cold_calling_001"
+        ],
+        "missing_information": "Usage récent du cold calling en recrutement ou prospection, fréquence et objectif.",
+        "expected_score_impact": {
+          "minimum": -1,
+          "maximum": 2
+        },
+        "candidate_answerable": true
+      }
+    ],
+    "recommendation": {
+      "decision": "apply_conditionally_after_clarifying_formal_requirements",
+      "positioning": "strong_operational_fit_with_nontrivial_formal_requirement_risk",
+      "priority_arguments": [
+        "Expérience nettement supérieure aux deux ans demandés",
+        "Recrutement IT documenté sur plusieurs années",
+        "Sourcing, approche directe, entretiens et suivi de processus fortement alignés",
+        "Habitude de volumes soutenus",
+        "Prospection et environnement digital cohérents"
+      ]
+    },
+    "recalculation_conditions": {
+      "professional_recalculation_required_after_valid_candidate_probe_integration": true,
+      "candidate_state_update_required_before_recalculation": true,
+      "job_side_recalculation_required_after_employer_confirmation": true,
+      "professional_score_may_change_after_job_requirement_clarification": true,
+      "professional_score_must_remain_unchanged_by_actionability_only_updates": true,
+      "score_may_decrease_after_negative_or_limiting_candidate_answer": true,
+      "potential_score_range_after_clarification": {
+        "minimum": 66,
+        "maximum": 83
+      }
+    },
+    "safety_checks": {
+      "candidate_data_state_modified": false,
+      "job_data_state_modified": false,
+      "candidate_questions_directly_asked": false,
+      "professional_score_actionability_separation_passed": true,
+      "sensitive_candidate_information_used_for_scoring": false,
+      "medical_information_used": false,
+      "disability_status_used": false,
+      "accessibility_information_exposed": false,
+      "unknown_treated_as_confirmed_absence": false,
+      "preferred_requirement_absence_penalized": false,
+      "platform_generated_affinity_used": false,
+      "international_exposure_treated_as_english_mastery": false,
+      "it_recruitment_treated_as_confirmed_esn_experience": false,
+      "current_student_status_inferred": false,
+      "bac5_absence_inferred": false
+    }
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "artifact_type_is_canonical_match_state": true,
+    "artifact_id_present": true,
+    "match_id_present": true,
+    "source_job_data_state_version_exact": true,
+    "source_candidate_data_state_version_exact": true,
+    "professional_score_actionability_separation_passed": true,
+    "no_cross_engine_state_mutation": true,
+    "json_parse_passed": true,
+    "utf8_validation_passed": true,
+    "file_size_greater_than_zero": true,
+    "artifact_filename_matches_metadata": true,
+    "required_layers_present": true
+  }
+}

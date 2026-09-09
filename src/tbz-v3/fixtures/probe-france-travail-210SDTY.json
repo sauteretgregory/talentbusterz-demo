@@ -1,0 +1,220 @@
+{
+  "artifact_type": "canonical_probe_plan",
+  "artifact_id": "probe_gregory_sauteret_france_travail_210SDTY_v1_0",
+  "artifact_filename": "probe_gregory_france_travail_210SDTY_v1.0.json",
+  "state_version": "v1.0",
+  "engine_name": "TBZ_PROBE_ENGINE",
+  "engine_version": "V1",
+  "processing_mode": "PRODUCTION",
+  "generated_at": "2026-08-12T18:36:01.746639+00:00",
+  "source_match_artifact": {
+    "artifact_type": "canonical_match_state",
+    "artifact_id": "match_gregory_sauteret_france_travail_210SDTY",
+    "artifact_filename": "match_gregory_sauteret_france_travail_210SDTY_v1.0.json",
+    "state_version": "v1.0",
+    "engine_name": "TBZ_MATCH_ENGINE",
+    "engine_version": "V1",
+    "match_id": "match_gregory_sauteret_france_travail_210SDTY_v1"
+  },
+  "input_validation": {
+    "status": "passed",
+    "canonical_match_state_valid": true,
+    "match_id_present": true,
+    "source_candidate_data_state_version": "v1.3_probe_response_integration",
+    "source_job_data_state_version": "v1.0",
+    "source_states_modified": false
+  },
+  "probe_result": {
+    "probe_triggered": true,
+    "trigger_reason": "candidate_answerable_unknowns_with_material_formal_requirement_risk_before_cv",
+    "priority_level": "high",
+    "recommended_question_count": 5,
+    "estimated_information_gain": "high",
+    "probe_version": "probe_v2.1_actionability_corrected",
+    "source_reference": "match_gregory_sauteret_france_travail_210SDTY_v1"
+  },
+  "probe_plan": {
+    "critical_questions": [
+      {
+        "rank": 1,
+        "question_id": "MPC_FT_001",
+        "question": "As-tu déjà recruté des profils IT dans un contexte ESN, société de services ou prestation informatique ? Si oui, précise l’employeur, la période, les types de profils recrutés et ton rôle exact.",
+        "why_this_matters": "Le MATCH identifie l’expérience IT/ESN comme une exigence centrale dont le périmètre reste à confirmer côté candidat.",
+        "linked_gap": "it_recruitment_in_esn_context",
+        "impact_weight": "high",
+        "expected_information_gain": "very_high",
+        "possible_score_effect": {
+          "min": -3,
+          "max": 5
+        },
+        "answer_effort_estimate": "medium",
+        "minimum_useful_answer": "Oui/non + contexte ESN ou société de services + profils recrutés + période.",
+        "skip_cost": "Le périmètre ESN restera ambigu et le risque formel du MATCH restera élevé."
+      },
+      {
+        "rank": 2,
+        "question_id": "probe_ft_candidate_education_001",
+        "question": "Quel est ton plus haut niveau de diplôme validé aujourd’hui, et as-tu un Bac+5 ou un équivalent reconnu ?",
+        "why_this_matters": "Le MATCH signale un risque formel sur le Bac+5 ou équivalent ; seule la donnée candidat peut stabiliser ce point.",
+        "linked_gap": "highest_completed_education_level",
+        "impact_weight": "high",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -2,
+          "max": 4
+        },
+        "answer_effort_estimate": "very_low",
+        "minimum_useful_answer": "Diplôme/niveau le plus élevé + Bac+5 oui/non/équivalent.",
+        "skip_cost": "Le risque de filtre diplôme restera ouvert dans les futurs MATCH et CV."
+      },
+      {
+        "rank": 3,
+        "question_id": "probe_ft_candidate_student_status_001",
+        "question": "As-tu actuellement un statut étudiant, alternant ou inscrit dans une formation active ? Si non, confirme simplement que ce n’est pas le cas.",
+        "why_this_matters": "Le MATCH mentionne un statut étudiant non établi ; la réponse doit enrichir candidate_data_state sans résoudre l’incohérence de l’offre.",
+        "linked_gap": "current_student_status",
+        "impact_weight": "high",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -2,
+          "max": 3
+        },
+        "answer_effort_estimate": "very_low",
+        "minimum_useful_answer": "Étudiant/alternant/formation active : oui ou non.",
+        "skip_cost": "Le statut candidat restera inconnu pour les offres imposant ce critère."
+      }
+    ],
+    "secondary_questions": [
+      {
+        "rank": 4,
+        "question_id": "MPC_FT_002",
+        "question": "Pour l’anglais, quel niveau peux-tu assumer aujourd’hui selon un référentiel identifiable : B2, C1, courant professionnel, fluent ou bilingue ? Précise aussi les contextes récents d’usage : entretiens, clients, candidats, écrit, visio.",
+        "why_this_matters": "Le MATCH identifie un niveau B2+ plausible mais non stabilisé.",
+        "linked_gap": "english_professional_level",
+        "impact_weight": "medium",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -1.5,
+          "max": 3
+        },
+        "answer_effort_estimate": "low",
+        "minimum_useful_answer": "Niveau revendiqué + 1 ou 2 contextes récents d’utilisation.",
+        "skip_cost": "Le niveau anglais restera formulé prudemment et pourra limiter le positionnement."
+      },
+      {
+        "rank": 5,
+        "question_id": "MPC_FT_003",
+        "question": "Dans tes expériences récentes en recrutement, quel volume et quel rythme devais-tu gérer concrètement ? Précise si possible le nombre d'entretiens, de recrutements ou de placements par semaine ou par mois, et comment tu gérais les périodes de forte charge.",
+        "why_this_matters": "Le MATCH établit une expérience significative du volume de recrutement mais ne confirme pas encore la capacité à maintenir un rythme soutenu.",
+        "linked_gap": "workload_capacity",
+        "impact_weight": "medium",
+        "expected_information_gain": "medium",
+        "possible_score_effect": {
+          "min": -1,
+          "max": 2
+        },
+        "answer_effort_estimate": "low",
+        "minimum_useful_answer": "Volume approximatif + rythme hebdomadaire ou mensuel + exemple de période de forte charge.",
+        "skip_cost": "Le volume restera documenté mais la capacité à maintenir un rythme soutenu restera partiellement établie."
+      }
+    ],
+    "deferred_questions": [
+      {
+        "question_id": "probe_ft_candidate_full_time_001",
+        "topic": "Acceptation d’un temps plein",
+        "activation_condition": "À activer uniquement si TALENTBUSTERZ_CORE prépare effectivement la candidature à cette offre ou une offre équivalente temps plein.",
+        "reason": "Actionabilité utile mais moins prioritaire que ESN, diplôme, statut étudiant, anglais et cold calling."
+      }
+    ],
+    "external_job_checks": [
+      {
+        "check_id": "job_check_student_cdi_consistency_001",
+        "target": "Cohérence entre statut étudiant obligatoire et CDI cadre 35h",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_check_bac5_strictness_001",
+        "target": "Caractère strict ou compensable du Bac+5",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_check_esn_requirement_scope_001",
+        "target": "Périmètre exact attendu pour l’expérience ESN",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_check_employer_identity_001",
+        "target": "Identité de l’entreprise employeuse",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_check_bonus_formula_001",
+        "target": "Mode de calcul de la prime variable",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      }
+    ],
+    "questions_to_avoid": [
+      "Questions demandant au candidat de résoudre l’incohérence statut étudiant vs CDI cadre 35h",
+      "Questions demandant au candidat de confirmer le caractère strict du Bac+5 côté employeur",
+      "Questions demandant au candidat d’identifier l’entreprise employeuse",
+      "Questions sur l’adresse exacte du site ou le mode de calcul de la prime",
+      "Questions médicales, handicap ou accessibilité",
+      "Questions sur Solutions30, BTSA, bac STAE ou ART’RENOV sauf besoin de CV très spécifique",
+      "Questions redondantes sur sourcing, entretiens et LinkedIn Recruiter déjà documentés"
+    ],
+    "reingestion_targets": {
+      "candidate_data_engine": [
+        "experience_state.it_recruitment_in_esn_context",
+        "education_state.highest_completed_education_level",
+        "education_state.current_student_or_training_status",
+        "language_state.english_professional_level",
+        "experience_state.cold_calling_and_phone_prospecting_scope"
+      ],
+      "job_data_engine": [
+        "job.requirements.student_status_requirement",
+        "job.requirements.bac5_strictness",
+        "job.requirements.esn_scope",
+        "job.identity.employer_identity",
+        "job.compensation.variable_formula"
+      ]
+    },
+    "stop_conditions": [
+      "MPC_FT_001, probe_ft_candidate_education_001 and probe_ft_candidate_student_status_001 answered",
+      "candidate_answers_confirm_no_esn_context_and_no_required_formal_status_then_classify_formal_risk_for_rerun",
+      "enough_candidate_information_available_to_update_candidate_data_state_and_rerun_match",
+      "external_job_checks_remain_separate_from_candidate_probe"
+    ],
+    "next_step_after_answers": {
+      "candidate_answers": "send_to_candidate_data_engine",
+      "job_checks": "send_to_job_data_engine_or_employer_verification",
+      "after_candidate_data_update": "rerun_match_engine"
+    }
+  },
+  "safety_checks": {
+    "no_matching_performed": true,
+    "no_score_recalculated": true,
+    "candidate_data_state_not_modified": true,
+    "job_data_state_not_modified": true,
+    "candidate_answerability_boundary_respected": true,
+    "job_unknowns_not_converted_to_candidate_questions": true,
+    "probe_candidate_ids_preserved_when_present": true,
+    "sensitive_data_not_requested_without_need": true
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "json_parse_passed": true,
+    "utf8_validation_passed": true,
+    "file_size_greater_than_zero": true,
+    "artifact_type_is_canonical_probe_plan": true,
+    "source_artifact_type_is_canonical_match_state": true,
+    "source_match_id_present": true,
+    "candidate_questions_are_candidate_answerable": true,
+    "job_unknowns_routed_externally": true,
+    "no_cross_engine_state_mutation": true
+  }
+}

@@ -1,0 +1,1616 @@
+{
+  "artifact_type": "canonical_candidate_data_state",
+  "artifact_id": "candidate_gregory_sauteret_v1",
+  "artifact_filename": "candidate_gregory_sauteret_v1.3.json",
+  "engine_name": "TBZ_CANDIDATE_DATA_ENGINE",
+  "engine_version": "V1",
+  "state_version": "v1.3_probe_response_integration",
+  "materialization_status": "recovered_from_complete_existing_canonical_state",
+  "recovery_source": {
+    "source_filename": "Texte collé (2)(1).txt",
+    "business_content_modified": false,
+    "candidate_state_preserved_integrally": true
+  },
+  "candidate_data_update_result": {
+    "engine": "TBZ_CANDIDATE_DATA_ENGINE",
+    "engine_version": "V1",
+    "candidate_id": "candidate_gregory_sauteret_v1",
+    "status": "completed",
+    "previous_version": "v1.2_probe_response_integration",
+    "current_version": "v1.3_probe_response_integration",
+    "new_integration_performed": false,
+    "canonical_state_materialized": true,
+    "consistency_correction_applied": true,
+    "new_version_created": false,
+    "corrected_field": "experience_state.exp_hire_2019_2022.role_titles"
+  },
+  "candidate_data_state": {
+    "candidate_id": "candidate_gregory_sauteret_v1",
+    "state_version": "v1.3_probe_response_integration",
+    "profile_status": "initial_consolidated_with_remaining_open_points",
+    "creation_status": "completed",
+    "contract_compatibility": {
+      "engine_contract": "TBZ_CANDIDATE_DATA_ENGINE_V1",
+      "compatible": true,
+      "schema_locked": true,
+      "uncertainty_preserved": true,
+      "confirmation_escalation_applied": false
+    },
+    "created_from": {
+      "primary_origins": [
+        "imported_cv",
+        "linkedin_claim",
+        "direct_user_statement",
+        "manual_core_override"
+      ],
+      "excluded_origins": [
+        "legacy_match",
+        "match_score",
+        "generated_candidate_summary"
+      ]
+    },
+    "identity_state": {
+      "full_name": {
+        "value": "Grégory Sauteret",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "data_stability_level": "stable"
+      },
+      "professional_headline": {
+        "value": "Consultant Senior en Recrutement IT International | Sourcing Stratégique & Mobilité Globale | Coaching de Talents Tech",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "data_stability_level": "volatile",
+        "claim_type": "self_positioning"
+      },
+      "location": {
+        "value": "Fontenay-sous-Bois, Île-de-France, France",
+        "evidence_status": "partial",
+        "evidence_origin_type": "imported_cv",
+        "data_stability_level": "semi_stable"
+      },
+      "contact": {
+        "email_variants": [
+          {
+            "value": "[contact@gsauteret.com](mailto:contact@gsauteret.com)",
+            "status": "current_preferred",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv",
+            "data_stability_level": "semi_stable"
+          },
+          {
+            "value": "[sauteret.gregory@gmail.com](mailto:sauteret.gregory@gmail.com)",
+            "status": "legacy_variant",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv",
+            "data_stability_level": "semi_stable"
+          }
+        ],
+        "phone": {
+          "value": "06 66 42 97 94",
+          "evidence_status": "partial",
+          "evidence_origin_type": "imported_cv",
+          "data_stability_level": "semi_stable"
+        },
+        "linkedin_url": {
+          "value": "[https://www.linkedin.com/in/gsauteret/](https://www.linkedin.com/in/gsauteret/)",
+          "evidence_status": "partial",
+          "evidence_origin_type": "imported_cv",
+          "data_stability_level": "semi_stable"
+        }
+      }
+    },
+    "availability_state": {
+      "availability": {
+        "value": "immédiate",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "direct_user_statement",
+        "data_stability_level": "volatile",
+        "needs_reconfirmation": false
+      },
+      "work_mode_preference": {
+        "strict_preference": false,
+        "accepted_modes": [
+          "présentiel",
+          "hybride",
+          "remote",
+          "télétravail partiel"
+        ],
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "direct_user_statement",
+        "data_stability_level": "volatile"
+      },
+      "historical_variants": [
+        {
+          "field": "availability",
+          "value": "immédiate",
+          "evidence_status": "partial",
+          "evidence_origin_type": "imported_cv",
+          "status": "superseded_by_direct_user_statement",
+          "recoverable": true
+        },
+        {
+          "field": "work_modes",
+          "values": [
+            "hybride",
+            "remote selon accessibilité"
+          ],
+          "evidence_status": "partial",
+          "evidence_origin_type": "imported_cv",
+          "status": "superseded_as_preference_description",
+          "recoverable": true
+        }
+      ]
+    },
+    "mobility_state": {
+      "geographic_scope": {
+        "values": [
+          "Île-de-France",
+          "Paris"
+        ],
+        "evidence_status": "partial",
+        "evidence_origin_type": "imported_cv",
+        "data_stability_level": "semi_stable"
+      },
+      "work_modes": {
+        "values": [
+          "présentiel",
+          "hybride",
+          "remote",
+          "télétravail partiel"
+        ],
+        "strict_preference": false,
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "direct_user_statement",
+        "data_stability_level": "volatile"
+      },
+      "accessibility_and_transport": {
+        "wheelchair_user": {
+          "value": true,
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "data_stability_level": "stable",
+          "sensitive": true
+        },
+        "metro": {
+          "suitability": "not_suitable",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "data_stability_level": "semi_stable"
+        },
+        "car": {
+          "preference": "preferred",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "data_stability_level": "volatile"
+        },
+        "bus": {
+          "conditions": null,
+          "evidence_status": "missing",
+          "data_stability_level": "needs_confirmation"
+        },
+        "rer": {
+          "conditions": null,
+          "evidence_status": "missing",
+          "data_stability_level": "needs_confirmation"
+        },
+        "privacy_policy_reference": "privacy_constraints.sensitive_candidate_information"
+      }
+    },
+    "privacy_constraints": {
+      "sensitive_candidate_information": {
+        "categories": [
+          "wheelchair_use",
+          "disability_status",
+          "medical_information",
+          "accessibility_constraints"
+        ],
+        "default_cv_exposure": false,
+        "default_match_exposure": false,
+        "default_reply_exposure": false,
+        "explicit_candidate_instruction_required": true,
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "direct_user_statement"
+      },
+      "candidate_disclosure_preference": {
+        "value": "do_not_mention_disability_directly_in_applications_by_default",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "direct_user_statement",
+        "data_stability_level": "volatile"
+      }
+    },
+    "experience_state": [
+      {
+        "experience_id": "exp_anywr_2022_2025",
+        "employer": "Anywr",
+        "role_titles": [
+          {
+            "value": "Consultant en Recrutement IT Global",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          }
+        ],
+        "preferred_functional_positioning": {
+          "value": "Senior Talent Acquisition Specialist",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "interpretation_boundary": "preferred_functional_positioning_not_contractual_or_official_title"
+        },
+        "functional_positioning_limit": {
+          "value": "absence_de_gestion_commerciale_complete_d_un_portefeuille_client",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement"
+        },
+        "employment_type": "CDI",
+        "start_date": {
+          "value": "2022-04",
+          "evidence_status": "partial",
+          "evidence_origin_type": "linkedin_claim"
+        },
+        "end_date": {
+          "value": "2025-03",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "data_stability_level": "stable",
+          "historical_variants": [
+            {
+              "value": "2025-06",
+              "evidence_origin_type": "linkedin_claim",
+              "status": "superseded_by_direct_user_statement",
+              "recoverable": true,
+              "must_not_be_used_as_active_end_date": true
+            }
+          ]
+        },
+        "location": {
+          "value": "Paris et périphérie / remote",
+          "evidence_status": "partial",
+          "evidence_origin_type": "linkedin_claim"
+        },
+        "activities": [
+          {
+            "value": "recueil, clarification et reformulation des besoins de recrutement",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "value": "sourcing en France et à l’international",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "recherche booléenne, LinkedIn Recruiter, CVthèques et approche directe",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "value": "qualification des compétences, motivations, disponibilités, mobilités et attentes salariales",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "value": "préparation des candidats aux entretiens et rédaction de synthèses",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "suivi de processus, relances, reporting et gestion de viviers",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "value": "référent handicap",
+            "evidence_status": "partial",
+            "evidence_origin_type": "external_reference",
+            "corroboration": [
+              "publication LinkedIn personnelle",
+              "publication d’une responsable Anywr présentant le candidat comme référent handicap"
+            ]
+          }
+        ],
+        "technical_recruitment_domains": {
+          "values": [
+            "Java",
+            "Python",
+            "Angular",
+            "React",
+            "React Native",
+            "Salesforce",
+            "COBOL",
+            "support",
+            "infrastructure",
+            "cloud",
+            "data",
+            "cybersécurité"
+          ],
+          "evidence_status": "partial",
+          "evidence_origin_type": "imported_cv",
+          "interpretation_boundary": "technologies_recruited_not_candidate_technical_mastery"
+        },
+        "geographic_exposure": {
+          "values": [
+            "France",
+            "Europe",
+            "Afrique",
+            "Canada",
+            "Roumanie",
+            "Vietnam",
+            "Inde"
+          ],
+          "evidence_status": "partial",
+          "evidence_origin_type": "linkedin_claim",
+          "interpretation_boundary": "international_exposure_not_automatic_international_expertise"
+        },
+        "salary_guidance": {
+          "activity": "conseil_en_negociation_salariale",
+          "target_population": "candidats_internationaux_connaissant_peu_le_marche_francais",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "interpretation_boundary": "candidate_guidance_not_final_salary_negotiation_on_behalf_of_employer"
+        },
+        "informal_peer_support": {
+          "activity": "accompagnement_informel_d_un_collegue_sur_la_conduite_des_entretiens",
+          "context": "collegue_ancien_joueur_international_de_water_polo_sans_experience_prealable_en_entretien_de_recrutement",
+          "transmitted_practices": [
+            "pratiques_de_conduite_d_entretien"
+          ],
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "interpretation_boundaries": {
+            "must_not_infer": [
+              "hierarchical_management",
+              "official_training_responsibility",
+              "team_supervision"
+            ]
+          }
+        },
+        "portfolio_development_scope": {
+          "identified_or_initiated_opportunities": {
+            "value": true,
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "handover_recipient": {
+            "value": "Business Manager",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "full_commercial_relationship_ownership": {
+            "value": false,
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "interpretation_boundary": "portfolio_development_participation_not_full_client_portfolio_management"
+        },
+        "quantified_claims": [
+          {
+            "metric": "entretiens_hebdomadaires",
+            "value": 10,
+            "evidence_status": "partial",
+            "evidence_origin_type": "direct_user_statement",
+            "needs_confirmation": false,
+            "original_value_evidence_origin_type": "imported_cv",
+            "value_type": "average_order_of_magnitude",
+            "exactness": "approximate",
+            "evidence_scope": "qualification_of_metric_as_average_not_confirmation_of_exact_value",
+            "must_not_be_presented_as_exact_kpi": true,
+            "technology_specific_breakdown_available": false
+          },
+          {
+            "metric": "recrutements_mensuels",
+            "value": 5,
+            "evidence_status": "partial",
+            "evidence_origin_type": "direct_user_statement",
+            "needs_confirmation": false,
+            "original_value_evidence_origin_type": "imported_cv",
+            "value_type": "average_order_of_magnitude",
+            "exactness": "approximate",
+            "evidence_scope": "qualification_of_metric_as_average_not_confirmation_of_exact_value",
+            "must_not_be_presented_as_exact_kpi": true,
+            "technology_specific_breakdown_available": false
+          }
+        ],
+        "forbidden_metrics": [
+          "salesforce_metric_previously_invalidated",
+          "cobol_metric_previously_invalidated"
+        ]
+      },
+      {
+        "experience_id": "exp_hire_2019_2022",
+        "employer": "HIRE SAS",
+        "role_titles": [
+          {
+            "value": "Chargé de recrutement",
+            "title_type": "contractual_role_title",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          }
+        ],
+        "role_progression_status": "partially_resolved",
+        "employment_type": "CDI",
+        "start_date": "2019-03",
+        "end_date": "2022-04",
+        "location": "Paris 9e",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "activities": [
+          "analyse des besoins clients",
+          "rédaction et diffusion d’annonces",
+          "sourcing multicanal et approche directe",
+          "qualification et conduite d’entretiens",
+          "présentation de profils et suivi des processus",
+          "constitution de viviers",
+          "prospection et développement commercial",
+          "structuration de messages, supports et argumentaires",
+          "contribution à l’amélioration des processus métiers"
+        ],
+        "sales_marketing_manager_scope": {
+          "functional_scope_label": {
+            "value": "Sales & Marketing Manager",
+            "title_type": "functional_scope_label",
+            "official_contractual_title": false,
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement",
+            "needs_confirmation": false
+          },
+          "start_period": {
+            "value": "peu_avant_premier_confinement_covid",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement",
+            "exact_month": {
+              "value": null,
+              "evidence_status": "missing"
+            }
+          },
+          "end_date": {
+            "value": null,
+            "evidence_status": "missing",
+            "data_stability_level": "needs_confirmation"
+          },
+          "declared_context": {
+            "platform": "hire.hr",
+            "platform_status": "ne_décollait_pas",
+            "activity": "prospection_d_entreprises_pour_promouvoir_le_produit",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "interpretation_boundaries": {
+            "must_not_infer": [
+              "commercial_director_role",
+              "team_management",
+              "product_ownership",
+              "full_commercial_strategy_ownership",
+              "undeclared_commercial_results",
+              "official_promotion",
+              "contractual_title_change",
+              "second_contractual_role_title",
+              "exact_end_date"
+            ]
+          },
+          "start_year": {
+            "value": 2020,
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "title_status": {
+            "value": "functional_not_contractual",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "contract_modified": {
+            "value": false,
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          "execution_mode": {
+            "value": "function_assumed_in_practice_in_addition_to_primary_role",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          }
+        },
+        "quantified_claims": [
+          {
+            "metric": "placements_mensuels",
+            "value": 4,
+            "evidence_status": "partial",
+            "evidence_origin_type": "direct_user_statement",
+            "needs_confirmation": false,
+            "original_value_evidence_origin_type": "imported_cv",
+            "value_type": "average_order_of_magnitude",
+            "exactness": "approximate",
+            "evidence_scope": "qualification_of_metric_as_average_not_confirmation_of_exact_value",
+            "must_not_be_presented_as_exact_kpi": true,
+            "technology_specific_breakdown_available": false
+          }
+        ]
+      },
+      {
+        "experience_id": "exp_abil_2018_2019",
+        "employer": "ABIL Ressources",
+        "role_title": "Chargé de recrutement",
+        "employment_type": "temps_plein",
+        "start_date": "2018-03",
+        "end_date": "2019-02",
+        "location": "Nogent-sur-Marne",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "activities": [
+          {
+            "value": "analyse des besoins de recrutement",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "value": "rédaction et diffusion des annonces",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "sourcing sur CVthèques et LinkedIn",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "value": "préqualifications et entretiens",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "comptes rendus, présentation de profils et suivi client",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv"
+          }
+        ],
+        "quantified_claims": [
+          {
+            "metric": "entretiens_par_semaine",
+            "value": "environ 8",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "manual_core_override"
+          },
+          {
+            "metric": "recrutements_par_mois",
+            "value": "3 à 4",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "manual_core_override"
+          }
+        ],
+        "deprecated_variants": [
+          {
+            "metric": "entretiens_par_mois",
+            "value": 8,
+            "evidence_origin_type": "imported_cv",
+            "status": "superseded_by_manual_core_override",
+            "recoverable": true
+          },
+          {
+            "metric": "placements_par_mois",
+            "value": 3,
+            "evidence_origin_type": "imported_cv",
+            "status": "superseded_by_manual_core_override",
+            "recoverable": true
+          }
+        ]
+      },
+      {
+        "experience_id": "exp_solutions30_2017",
+        "employer": "Solutions30",
+        "role_title": "Chargé de recrutement",
+        "employment_type": {
+          "status": "contradictory",
+          "variants": [
+            {
+              "value": "non_précisé",
+              "evidence_origin_type": "linkedin_claim"
+            },
+            {
+              "value": "intérim",
+              "evidence_origin_type": "imported_cv"
+            }
+          ]
+        },
+        "start_date": {
+          "status": "contradictory",
+          "variants": [
+            {
+              "value": "2017-07",
+              "evidence_origin_type": "linkedin_claim"
+            },
+            {
+              "value": "2017-06",
+              "evidence_origin_type": "imported_cv"
+            }
+          ],
+          "resolution_status": "pending"
+        },
+        "end_date": "2017-11",
+        "location": "Puteaux",
+        "evidence_status": "partial",
+        "activities": [
+          "rédaction d’annonces selon cahier des charges",
+          "sourcing et recherches en CVthèques",
+          "préqualification de candidats",
+          "conduite d’entretiens",
+          "suivi du recrutement",
+          "coaching candidats"
+        ],
+        "quantified_claims": [
+          {
+            "metric": "recrutements_totaux",
+            "value": 15,
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv",
+            "needs_confirmation": true
+          }
+        ]
+      },
+      {
+        "experience_id": "exp_synergie_2016_2017",
+        "employer": "Synergie",
+        "role_title": "Assistant chargé de recrutement",
+        "start_date": "2016-11",
+        "end_date": "2017-06",
+        "location": "Paris 9e",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "activities": [
+          "accueil et orientation des candidats",
+          "préqualifications téléphoniques",
+          "saisie et mise à jour des dossiers",
+          "recherche de profils",
+          "appui à la rédaction d’annonces",
+          "support administratif au recrutement"
+        ]
+      },
+      {
+        "experience_id": "exp_independent_talent_2012_2016",
+        "employer": "Indépendant",
+        "role_title": "Gestionnaire talents",
+        "start_date": "2012-09",
+        "end_date": "2016-07",
+        "location": "Paris et périphérie",
+        "work_mode": "hybride",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "activities": [
+          {
+            "value": "accompagnement global d’un jeune artiste",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "développement de carrière, image et stratégie artistique",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "prospection et organisation de représentations",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "coordination de l’enregistrement d’un single en studio",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          },
+          {
+            "value": "participation au projet caritatif Cœur des Anges",
+            "evidence_status": "partial",
+            "evidence_origin_type": "linkedin_claim"
+          }
+        ],
+        "forbidden_legacy_variant": {
+          "value": "Conseiller d’éducation 2012–2016",
+          "status": "factually_false_invalidated_by_candidate_and_core",
+          "must_not_be_reintroduced": true,
+          "must_not_be_used_as_candidate_evidence": true,
+          "replacement_mapping_forbidden": true,
+          "must_not_be_associated_with_experience_id": "exp_ogec_2010_2012",
+          "must_not_replace_experience_id": "exp_independent_talent_2012_2016",
+          "evidence_origin_type": "manual_core_override",
+          "override_authority": "TALENTBUSTERZ_CORE",
+          "modification_reason": "correction_factuelle_confirmee_par_le_candidat",
+          "historical_status": {
+            "previous_value": "Conseiller d’éducation 2012–2016",
+            "previous_status": "invalidated_by_core",
+            "recoverable": true
+          }
+        }
+      },
+      {
+        "experience_id": "exp_ogec_2010_2012",
+        "employer": "OGEC Jeanne d’Arc",
+        "role_title": "Assistant de vie scolaire (AVS)",
+        "employment_type": "CDD",
+        "start_date": "2010-09",
+        "end_date": "2012-06",
+        "location": "Saintes, Nouvelle-Aquitaine",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "override_authority": "TALENTBUSTERZ_CORE",
+        "modification_reason": "correction_factuelle_confirmee_par_le_candidat",
+        "activities": [
+          "accompagnement scolaire individualisé",
+          "aide à l’organisation et à la compréhension",
+          "soutien à l’autonomie",
+          "travail avec les équipes pédagogiques",
+          "adaptation de la communication aux besoins observés"
+        ],
+        "historical_modifications": [
+          {
+            "field": "role_title",
+            "previous_value": "Auxiliaire scolaire",
+            "new_value": "Assistant de vie scolaire (AVS)",
+            "update_version": "v1.1_core_factual_correction",
+            "evidence_origin_type": "manual_core_override",
+            "override_authority": "TALENTBUSTERZ_CORE",
+            "modification_reason": "correction_factuelle_confirmee_par_le_candidat",
+            "previous_value_recoverable": true
+          }
+        ],
+        "separation_constraints": {
+          "must_remain_distinct_from": "exp_independent_talent_2012_2016",
+          "merge_forbidden": true,
+          "semantic_replacement_forbidden": true
+        }
+      },
+      {
+        "experience_id": "exp_australia_2007_2009",
+        "employer": "Employeurs multiples en Australie",
+        "role_title": "Expériences professionnelles et saisonnières",
+        "experience_type": "voyage_travail",
+        "start_date": "2007-11",
+        "end_date": "2009-11",
+        "locations": [
+          "Territoire de la Capitale australienne",
+          "Kimberleys",
+          "autres régions australiennes"
+        ],
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "activities": [
+          "vente d’abonnements Austar en galerie marchande",
+          "récolte de bananes et de cerises",
+          "découpe de poisson en usine",
+          "tri des déchets",
+          "travail pendant trois mois sur un bateau de pêche",
+          "pêche au Barramundi et au Threadfin"
+        ]
+      },
+      {
+        "experience_id": "exp_alternance_sevre_vienne_2005_2007",
+        "employer": "Alternance Sèvre et Vienne",
+        "role_title": "Conseiller en formation",
+        "employment_type": "contrat_en_alternance",
+        "start_date": "2005-02",
+        "end_date": "2007-07",
+        "location": "Rochefort",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "activities": [
+          "prospection BtoC",
+          "rendez-vous clientèle",
+          "présentation du centre de formation",
+          "vente de solutions de recrutement en alternance",
+          "vente de formations pour tuteurs",
+          "participation aux salons",
+          "entretiens de recrutement individuels et collectifs",
+          "mise en place d’un publipostage SMS personnalisé",
+          "création d’une base de données candidats sur Excel",
+          "recueil d’informations auprès des OPCA"
+        ]
+      },
+      {
+        "experience_id": "exp_artrenov_2004_2005",
+        "employer": "ART’RENOV",
+        "role_title": "Commercial",
+        "start_date": "2004-07",
+        "end_date": "2005-02",
+        "location": "Angoulême",
+        "evidence_status": "confirmed",
+        "evidence_origin_type": "manual_core_override",
+        "activities": [
+          "vente de fenêtres, volets et climatisation",
+          "prospection téléphonique",
+          "prospection en galerie marchande",
+          "porte-à-porte",
+          "négociation commerciale"
+        ],
+        "quantified_claims": [
+          {
+            "metric": "chiffre_affaires_moyen_mensuel",
+            "value": "16 K€",
+            "evidence_status": "partial",
+            "evidence_origin_type": "imported_cv",
+            "needs_confirmation": true
+          }
+        ]
+      }
+    ],
+    "education_state": [
+      {
+        "education_id": "edu_ifae_2016_2017",
+        "institution": "Institut de Formation des Agences d’Emploi",
+        "program": "Formation Assistant Chargé de Recrutement",
+        "start_year": 2016,
+        "end_year": 2017,
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "data_stability_level": "stable"
+      },
+      {
+        "education_id": "edu_bts_nrc_2005_2007",
+        "institution": "LODIMA / Groupe Alternance",
+        "program": "BTS Négociation et Relation Client",
+        "start_year": 2005,
+        "end_year": 2007,
+        "completion_status": {
+          "value": "mené à terme",
+          "evidence_status": "partial",
+          "evidence_origin_type": "imported_cv",
+          "needs_official_confirmation": true
+        },
+        "data_stability_level": "stable"
+      },
+      {
+        "education_id": "edu_btsa_water_2002_2004",
+        "institution": "Lycée Georges Desclaude",
+        "program": "BTSA Gestion et Maîtrise de l’Eau",
+        "start_year": 2002,
+        "end_year": 2004,
+        "completion_status": {
+          "value": "not_completed",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "historical_variants": [
+            {
+              "value": "BTS",
+              "evidence_origin_type": "linkedin_claim",
+              "status": "superseded_by_direct_user_statement",
+              "recoverable": true,
+              "must_not_be_used_as_completed_qualification": true
+            },
+            {
+              "value": "parcours suivi 18 mois",
+              "evidence_origin_type": "imported_cv",
+              "status": "compatible_historical_duration_variant",
+              "recoverable": true
+            }
+          ]
+        },
+        "technical_exposure": [
+          "gestion de l’eau",
+          "hydraulique appliquée",
+          "réseaux",
+          "assainissement",
+          "PowerCAD",
+          "lecture de plans",
+          "calculs de pertes de charge",
+          "principes de Bernoulli",
+          "dimensionnement de pompes"
+        ],
+        "interpretation_boundary": "training_exposure_not_validated_current_engineering_expertise",
+        "training_started": {
+          "value": true,
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement"
+        },
+        "interruption_stage": {
+          "value": "beginning_of_second_year",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement"
+        },
+        "candidate_declared_reason": {
+          "value": "candidate_states_stage_was_at_engineering_school_level_and_too_complex",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "claim_type": "candidate_explanation",
+          "default_cv_exposure": false
+        },
+        "interpretation_boundaries": {
+          "must_not_infer": [
+            "validated_btsa_level",
+            "academic_equivalence",
+            "engineering_school_qualification",
+            "engineering_degree_equivalence",
+            "general_academic_failure"
+          ]
+        }
+      },
+      {
+        "education_id": "edu_bac_stae_2000_2002",
+        "institution": "Lycée Agricole Privé Saint-Antoine",
+        "program": "Baccalauréat technologique STAE",
+        "start_year": 2000,
+        "end_year": 2002,
+        "speciality": {
+          "value": null,
+          "evidence_status": "missing",
+          "data_stability_level": "needs_confirmation"
+        },
+        "evidence_status": "partial",
+        "evidence_origin_type": "imported_cv"
+      },
+      {
+        "education_id": "edu_first_scientific_1999_2000",
+        "institution": "La Providence",
+        "program": "Première scientifique",
+        "start_year": 1999,
+        "end_year": 2000,
+        "completion_status": "interrupted_after_family_move",
+        "evidence_status": "partial",
+        "evidence_origin_type": "imported_cv"
+      }
+    ],
+    "language_state": [
+      {
+        "language": "français",
+        "claimed_level": "natif",
+        "evidence_status": "partial",
+        "evidence_origin_type": "imported_cv",
+        "data_stability_level": "stable",
+        "proficiency_confirmed": false
+      },
+      {
+        "language": "anglais",
+        "evidence_status": "contradictory",
+        "data_stability_level": "semi_stable",
+        "variants": [
+          {
+            "claimed_level": "bilingue",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "claimed_level": "professionnel courant",
+            "evidence_origin_type": "imported_cv"
+          },
+          {
+            "claimed_level": "fluent",
+            "evidence_origin_type": "external_reference",
+            "source_context": "recommandation LinkedIn d’un ancien collègue"
+          }
+        ],
+        "proficiency_confirmed": false,
+        "resolution_status": "pending_assessment"
+      },
+      {
+        "language": "espagnol",
+        "claimed_level": "intermédiaire",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "data_stability_level": "semi_stable",
+        "proficiency_confirmed": false
+      }
+    ],
+    "certification_state": [
+      {
+        "title": "Recruter des personnes en situation de handicap",
+        "issuer": "LinkedIn",
+        "issue_date": "2024-06",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Les fondements de l’UX : L’accessibilité",
+        "issuer": "LinkedIn",
+        "issue_date": "2024-06",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Repenser l’accessibilité numérique au travail",
+        "issuer": "LinkedIn",
+        "issue_date": "2024-05",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Handicap invisible et maladie",
+        "issuer": "LinkedIn",
+        "issue_date": "2024-05",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "L’essentiel de Power BI",
+        "issuer": "LinkedIn",
+        "issue_date": "2024-02",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "interpretation_boundary": "course_completion_not_power_bi_mastery"
+      },
+      {
+        "title": "L’essentiel d’HubSpot",
+        "issuer": "LinkedIn",
+        "issue_date": "2024-02",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "interpretation_boundary": "course_completion_not_hubspot_mastery"
+      },
+      {
+        "title": "Vendre à des cadres supérieurs / supérieures",
+        "issuer": "LinkedIn",
+        "issue_date": "2021-03",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Creating a Business Plan",
+        "issuer": "LinkedIn",
+        "issue_date": "2020-07",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Bien publier sur LinkedIn",
+        "issuer": "LinkedIn",
+        "issue_date": "2019-06",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Interviewing Techniques",
+        "issuer": "LinkedIn",
+        "issue_date": "2019-06",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Learning LinkedIn Recruiter",
+        "issuer": "LinkedIn",
+        "issue_date": "2019-05",
+        "credential_id": "ASqVdH4XM4kLUb7sGmB-oL9XTtt",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Découvrir le réseautage professionnel",
+        "issuer": "LinkedIn",
+        "issue_date": "2019-03",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim"
+      },
+      {
+        "title": "Les fondements de la méthode Scrum",
+        "issuer": "LinkedIn",
+        "issue_date": "2019-03",
+        "evidence_status": "partial",
+        "evidence_origin_type": "linkedin_claim",
+        "interpretation_boundary": "course_completion_not_scrum_practice_confirmation"
+      }
+    ],
+    "skills_state": {
+      "recruitment_practices": [
+        "sourcing",
+        "approche directe",
+        "recherche booléenne",
+        "préqualification",
+        "conduite d’entretiens",
+        "rédaction d’annonces",
+        "qualification de candidatures",
+        "présentation de profils",
+        "suivi de processus",
+        "coaching candidats",
+        "constitution de viviers",
+        "reporting"
+      ],
+      "tools_claimed": [
+        "LinkedIn Recruiter",
+        "Bullhorn",
+        "JIRA",
+        "CodingGame",
+        "HubSpot",
+        "Power BI",
+        "Microsoft Excel",
+        "Microsoft PowerPoint",
+        "Microsoft Office",
+        "GitHub",
+        "AssessFirst"
+      ],
+      "commercial_and_client_claims": [
+        "analyse du besoin",
+        "prospection",
+        "négociation",
+        "relation client",
+        "planification commerciale",
+        "vente aux dirigeants",
+        "structuration d’argumentaires"
+      ],
+      "accessibility_claims": [
+        "référent handicap",
+        "accessibilité numérique",
+        "UX accessibilité",
+        "recrutement de personnes en situation de handicap",
+        "adaptation des environnements de travail"
+      ],
+      "recruitment_channels_declared": {
+        "primary_ats_type": {
+          "value": "ATS développés en interne",
+          "evidence_status": "confirmed",
+          "evidence_origin_type": "direct_user_statement",
+          "interpretation_boundary": "internal_ats_usage_does_not_confirm_mastery_of_market_ats"
+        },
+        "platforms": [
+          {
+            "name": "LinkedIn",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "APEC",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "Turnover-IT",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "Keljob",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "CVaden",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "Welcome to the Jungle",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "Agefiph",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          },
+          {
+            "name": "Cadremploi",
+            "evidence_status": "confirmed",
+            "evidence_origin_type": "direct_user_statement"
+          }
+        ],
+        "interpretation_boundary": "platform_usage_does_not_confirm_expert_or_mastery_level"
+      },
+      "global_evidence_status": "partial",
+      "primary_evidence_origin_type": "linkedin_claim",
+      "mastery_confirmed": false,
+      "safety_rule": "tool_usage_and_skill_labels_do_not_create_mastery_confirmation"
+    },
+    "project_state": [
+      {
+        "project_id": "project_talentbusterz",
+        "name": "TalentBusterZ",
+        "project_type": "personal_digital_product",
+        "description_status": "partial",
+        "evidence_origin_type": "imported_cv",
+        "data_stability_level": "volatile",
+        "claimed_scope": [
+          "analyse de profils et d’offres",
+          "questions d’enrichissement progressif",
+          "matching explicable",
+          "génération de CV ciblés",
+          "préparation aux objections",
+          "viviers et suivi de parcours",
+          "mémoire locale structurée"
+        ],
+        "production_status": {
+          "value": "en développement",
+          "evidence_status": "partial",
+          "evidence_origin_type": "direct_user_statement",
+          "needs_confirmation": true
+        },
+        "interpretation_boundary": "project_description_not_validated_product_delivery_or_technical_mastery"
+      }
+    ],
+    "recommendation_state": [
+      {
+        "author_context": "ancien client HIRE",
+        "claims": [
+          "investissement",
+          "initiative",
+          "détermination",
+          "professionnalisme",
+          "disponibilité",
+          "réactivité"
+        ],
+        "evidence_status": "partial",
+        "evidence_origin_type": "external_reference"
+      },
+      {
+        "author_context": "ancien collègue",
+        "claims": [
+          "sérieux",
+          "rigueur",
+          "anglais fluent",
+          "écoute",
+          "éthique"
+        ],
+        "evidence_status": "partial",
+        "evidence_origin_type": "external_reference",
+        "interpretation_boundary": "recommendation_does_not_create_automatic_skill_confirmation"
+      },
+      {
+        "author_context": "supérieur non direct",
+        "claims": [
+          "professionnalisme"
+        ],
+        "evidence_status": "partial",
+        "evidence_origin_type": "external_reference"
+      }
+    ],
+    "contradiction_registry": [
+      {
+        "contradiction_id": "contradiction_anywr_end_date",
+        "field": "experience_state.exp_anywr_2022_2025.end_date",
+        "variants": [
+          "2025-03",
+          "2025-06"
+        ],
+        "resolution_status": "resolved",
+        "active_value": "2025-03",
+        "historical_variant": {
+          "value": "2025-06",
+          "status": "superseded_by_direct_user_statement",
+          "recoverable": true,
+          "must_not_be_used_as_active_value": true
+        },
+        "resolution_origin": "direct_user_statement"
+      },
+      {
+        "contradiction_id": "contradiction_solutions30_start_date",
+        "field": "experience_state.exp_solutions30_2017.start_date",
+        "variants": [
+          "2017-06",
+          "2017-07"
+        ],
+        "resolution_status": "pending"
+      },
+      {
+        "contradiction_id": "contradiction_solutions30_contract",
+        "field": "experience_state.exp_solutions30_2017.employment_type",
+        "variants": [
+          "intérim",
+          "non_précisé"
+        ],
+        "resolution_status": "pending"
+      },
+      {
+        "contradiction_id": "contradiction_hire_role_progression",
+        "field": "experience_state.exp_hire_2019_2022.sales_marketing_manager_scope",
+        "variants": [
+          "Chargé de recrutement comme titre contractuel",
+          "Sales & Marketing Manager comme périmètre fonctionnel non contractuel"
+        ],
+        "resolution_status": "partially_resolved",
+        "confirmed_information": [
+          "Chargé de recrutement demeure le titre de rôle contractuel conservé dans role_titles",
+          "Sales & Marketing Manager est un libellé de périmètre fonctionnel confirmé",
+          "périmètre fonctionnel commencé peu avant le premier confinement Covid en 2020",
+          "aucune modification du contrat",
+          "fonction assumée dans les faits en complément du rôle principal",
+          "aucune promotion officielle confirmée"
+        ],
+        "remaining_unknown": [
+          "mois exact de début",
+          "date de fin du périmètre fonctionnel"
+        ],
+        "resolution_origin": "direct_user_statement"
+      },
+      {
+        "contradiction_id": "contradiction_english_level",
+        "field": "language_state.anglais",
+        "variants": [
+          "bilingue",
+          "professionnel courant",
+          "fluent selon recommandation"
+        ],
+        "resolution_status": "pending_assessment"
+      },
+      {
+        "contradiction_id": "contradiction_btsa_completion",
+        "field": "education_state.edu_btsa_water_2002_2004.completion_status",
+        "variants": [
+          "BTS",
+          "parcours suivi 18 mois",
+          "not_completed"
+        ],
+        "resolution_status": "resolved",
+        "active_value": "not_completed",
+        "resolution_origin": "direct_user_statement",
+        "historical_variants_preserved": true
+      },
+      {
+        "contradiction_id": "contradiction_abil_metrics",
+        "field": "experience_state.exp_abil_2018_2019.quantified_claims",
+        "resolution_status": "resolved_by_core",
+        "active_values": [
+          "environ 8 entretiens par semaine",
+          "3 à 4 recrutements par mois"
+        ],
+        "prior_variants_preserved": true
+      }
+    ],
+    "missing_or_needs_confirmation": [
+      "date de début exacte chez Solutions30",
+      "nature exacte du contrat Solutions30",
+      "mois exact de début du périmètre Sales & Marketing Manager chez HIRE SAS",
+      "date de fin du périmètre Sales & Marketing Manager chez HIRE SAS",
+      "niveau d’anglais selon un référentiel identifiable",
+      "spécialité exacte du baccalauréat STAE",
+      "conditions exactes d’utilisation du bus",
+      "conditions exactes d’utilisation du RER",
+      "confirmation du chiffre d’affaires ART’RENOV"
+    ],
+    "evidence_registry": {
+      "sources": [
+        {
+          "source_id": "source_cv_current_4_pages",
+          "evidence_origin_type": "imported_cv",
+          "source_scope": "profil, expériences, formation, outils, langues, projet personnel",
+          "default_evidence_status": "partial"
+        },
+        {
+          "source_id": "source_cv_legacy_1_page",
+          "evidence_origin_type": "imported_cv",
+          "source_scope": "coordonnées, synthèse, expériences condensées, métriques et langues",
+          "default_evidence_status": "partial"
+        },
+        {
+          "source_id": "source_linkedin_profile_pasted",
+          "evidence_origin_type": "linkedin_claim",
+          "source_scope": "profil, expériences, compétences, certifications et recommandations",
+          "default_evidence_status": "partial"
+        },
+        {
+          "source_id": "source_linkedin_activity",
+          "evidence_origin_type": "external_reference",
+          "source_scope": "activité publique et éléments relatifs au rôle de référent handicap",
+          "default_evidence_status": "partial"
+        },
+        {
+          "source_id": "source_core_validated_corrections",
+          "evidence_origin_type": "manual_core_override",
+          "source_scope": "corrections factuelles explicitement validées par TALENTBUSTERZ_CORE",
+          "default_evidence_status": "confirmed",
+          "override_source_required": true
+        },
+        {
+          "source_id": "source_probe_direct_candidate_responses_v1_2",
+          "evidence_origin_type": "direct_user_statement",
+          "source_scope": "disponibilité, modes de travail, accessibilité, mobilité, date de fin Anywr, positionnement fonctionnel, accompagnement salarial, transmission informelle, développement de portefeuille, canaux de recrutement et évolution HIRE",
+          "default_evidence_status": "confirmed",
+          "dialog_engine_interpretations_excluded": true,
+          "spanish_confirmation_excluded": true
+        },
+        {
+          "source_id": "source_probe_direct_candidate_responses_v1_3",
+          "evidence_origin_type": "direct_user_statement",
+          "source_scope": "statut fonctionnel HIRE, nature approximative des métriques Anywr et HIRE, non-achèvement du BTSA et motif déclaré",
+          "question_ids": [
+            "probe_gs_v12_002",
+            "probe_gs_v12_003",
+            "probe_gs_v12_004"
+          ],
+          "source_probe_plan_version": "probe_plan_gs_v12_second_pass_v1",
+          "package_timestamp": "2026-07-20T14:00:00Z",
+          "default_evidence_status": "confirmed",
+          "assistant_inferences_excluded": true
+        }
+      ],
+      "rules_applied": [
+        "self_declared_claims_do_not_create_confirmed_evidence_automatically",
+        "direct_user_statement_can_confirm_explicitly_declared_fact",
+        "linkedin_claim_defaults_to_partial",
+        "imported_cv_defaults_to_partial",
+        "exposure_does_not_equal_expertise",
+        "tool_usage_does_not_equal_mastery",
+        "international_project_does_not_equal_international_expert",
+        "collaboration_does_not_equal_leadership",
+        "support_activity_does_not_equal_ownership",
+        "absence_of_information_does_not_equal_absence_of_experience",
+        "dialog_engine_reformulation_does_not_equal_direct_user_statement",
+        "sensitive_information_not_exposed_without_explicit_instruction",
+        "average_metric_qualification_does_not_confirm_exact_numeric_value",
+        "functional_scope_does_not_equal_contractual_promotion",
+        "functional_scope_label_must_not_be_stored_as_unresolved_contractual_title",
+        "candidate_declared_interruption_reason_does_not_create_academic_equivalence"
+      ]
+    },
+    "version_registry": [
+      {
+        "version_id": "v1_initial_consolidated",
+        "update_type": "initial_creation",
+        "update_origin": [
+          "imported_cv",
+          "linkedin_claim",
+          "direct_user_statement",
+          "manual_core_override"
+        ],
+        "previous_version": null,
+        "historical_recoverability": true,
+        "contract_version": "TBZ_CANDIDATE_DATA_ENGINE_V1",
+        "schema_locked": true
+      },
+      {
+        "version_id": "v1.1_core_factual_correction",
+        "update_type": "factual_correction",
+        "update_origin": [
+          "manual_core_override"
+        ],
+        "override_authority": "TALENTBUSTERZ_CORE",
+        "modification_reason": "correction_factuelle_confirmee_par_le_candidat",
+        "previous_version": "v1_initial_consolidated",
+        "historical_recoverability": true,
+        "contract_version": "TBZ_CANDIDATE_DATA_ENGINE_V1",
+        "schema_locked": true,
+        "modified_fields": [
+          "experience_state.exp_ogec_2010_2012.role_title",
+          "experience_state.exp_independent_talent_2012_2016.forbidden_legacy_variant"
+        ]
+      },
+      {
+        "version_id": "v1.2_probe_response_integration",
+        "update_type": "probe_response_integration",
+        "update_origin": [
+          "direct_user_statement"
+        ],
+        "previous_version": "v1.1_core_factual_correction",
+        "historical_recoverability": true,
+        "contract_version": "TBZ_CANDIDATE_DATA_ENGINE_V1",
+        "schema_locked": true,
+        "state_integrity_correction_applied": true,
+        "partial_patch_rejected_as_canonical_state": true,
+        "full_state_reconstructed_from_previous_version": true,
+        "modified_fields": [
+          "availability_state",
+          "mobility_state",
+          "privacy_constraints",
+          "experience_state.exp_anywr_2022_2025.end_date",
+          "experience_state.exp_anywr_2022_2025.preferred_functional_positioning",
+          "experience_state.exp_anywr_2022_2025.functional_positioning_limit",
+          "experience_state.exp_anywr_2022_2025.salary_guidance",
+          "experience_state.exp_anywr_2022_2025.informal_peer_support",
+          "experience_state.exp_anywr_2022_2025.portfolio_development_scope",
+          "experience_state.exp_hire_2019_2022.role_progression_status",
+          "experience_state.exp_hire_2019_2022.sales_marketing_manager_scope",
+          "skills_state.recruitment_channels_declared",
+          "contradiction_registry.contradiction_anywr_end_date",
+          "contradiction_registry.contradiction_hire_role_progression",
+          "missing_or_needs_confirmation",
+          "evidence_registry",
+          "safety_flags"
+        ]
+      },
+      {
+        "version_id": "v1.3_probe_response_integration",
+        "update_type": "probe_response_integration",
+        "update_origin": [
+          "direct_user_statement"
+        ],
+        "source_probe_plan_version": "probe_plan_gs_v12_second_pass_v1",
+        "integrated_question_ids": [
+          "probe_gs_v12_002",
+          "probe_gs_v12_003",
+          "probe_gs_v12_004"
+        ],
+        "previous_version": "v1.2_probe_response_integration",
+        "historical_recoverability": true,
+        "contract_version": "TBZ_CANDIDATE_DATA_ENGINE_V1",
+        "schema_locked": true,
+        "canonical_state_materialized": true,
+        "consistency_correction_applied": true,
+        "consistency_correction_new_version_created": false,
+        "modified_fields": [
+          "experience_state.exp_hire_2019_2022.role_titles",
+          "experience_state.exp_hire_2019_2022.sales_marketing_manager_scope.functional_scope_label",
+          "experience_state.exp_hire_2019_2022.sales_marketing_manager_scope",
+          "experience_state.exp_anywr_2022_2025.quantified_claims",
+          "experience_state.exp_hire_2019_2022.quantified_claims",
+          "education_state.edu_btsa_water_2002_2004",
+          "contradiction_registry.contradiction_hire_role_progression",
+          "contradiction_registry.contradiction_btsa_completion",
+          "missing_or_needs_confirmation",
+          "evidence_registry",
+          "remaining_probe_points",
+          "safety_flags"
+        ]
+      }
+    ],
+    "safety_flags": [
+      "no_matching_performed",
+      "no_scoring_performed",
+      "no_market_value_estimation",
+      "no_hire_probability_estimation",
+      "no_storytelling_prioritization",
+      "no_recruiter_perception_optimization",
+      "no_experience_attractiveness_ranking",
+      "no_semantic_upgrading",
+      "uncertainty_preserved_until_resolution",
+      "invalidated_legacy_experience_blocked",
+      "invalidated_salesforce_and_cobol_metrics_blocked",
+      "ogec_and_independent_experiences_must_remain_distinct",
+      "conseiller_education_variant_must_never_be_reintroduced",
+      "no_medical_information_auto_exposure",
+      "no_disability_status_auto_exposure",
+      "explicit_candidate_instruction_required_for_sensitive_disclosure",
+      "informal_peer_support_not_management",
+      "informal_peer_support_not_official_training_role",
+      "salary_guidance_not_final_employer_negotiation",
+      "portfolio_opportunity_identification_not_full_client_ownership",
+      "preferred_functional_positioning_not_official_title",
+      "hire_sales_marketing_scope_not_commercial_directorship",
+      "hire_sales_marketing_scope_not_product_ownership",
+      "hire_sales_marketing_scope_not_team_management",
+      "hire_sales_marketing_scope_not_contractual_title",
+      "hire_sales_marketing_scope_not_official_promotion",
+      "hire_functional_scope_label_confirmed_by_direct_statement",
+      "internal_ats_usage_not_market_ats_mastery",
+      "platform_usage_not_expert_level",
+      "spanish_level_not_updated_from_probe_dialog_summary",
+      "partial_v1_2_state_not_canonical",
+      "full_v1_1_data_preserved_in_v1_2",
+      "hire_functional_scope_not_contractual_promotion",
+      "hire_contract_unchanged_for_sales_marketing_scope",
+      "average_metrics_must_not_be_presented_as_exact_kpis",
+      "technology_specific_metric_breakdown_unavailable",
+      "btsa_not_completed",
+      "btsa_interruption_reason_not_for_automatic_cv_exposure",
+      "candidate_declared_stage_complexity_not_engineering_qualification"
+    ],
+    "remaining_probe_points": [
+      {
+        "probe_point_id": "probe_solutions30_start_date",
+        "status": "open"
+      },
+      {
+        "probe_point_id": "probe_solutions30_contract",
+        "status": "open"
+      },
+      {
+        "probe_point_id": "probe_hire_sales_marketing_start_month",
+        "status": "partially_resolved",
+        "known_information": "scope_started_shortly_before_first_covid_lockdown_in_2020",
+        "remaining_uncertainty": "exact_month"
+      },
+      {
+        "probe_point_id": "probe_hire_sales_marketing_end_date",
+        "status": "open"
+      },
+      {
+        "probe_point_id": "probe_english_level",
+        "status": "open"
+      },
+      {
+        "probe_point_id": "probe_bac_stae_speciality",
+        "status": "open"
+      },
+      {
+        "probe_point_id": "probe_bus_conditions",
+        "status": "open",
+        "sensitive": true
+      },
+      {
+        "probe_point_id": "probe_rer_conditions",
+        "status": "open",
+        "sensitive": true
+      },
+      {
+        "probe_point_id": "probe_artrenov_revenue",
+        "status": "open"
+      }
+    ]
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "json_parse_passed": true,
+    "utf8_validation_passed": true,
+    "artifact_type_valid": true,
+    "candidate_id_matches": true,
+    "state_version_matches": true,
+    "complete_candidate_state_embedded": true
+  },
+  "recovered_at": "2026-07-21T13:47:08.597501+00:00"
+}

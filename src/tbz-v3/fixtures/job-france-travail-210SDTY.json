@@ -1,0 +1,561 @@
+{
+  "artifact_type": "canonical_job_data_state",
+  "artifact_id": "job_france_travail_talent_acquisition_210SDTY",
+  "state_version": "v1.0",
+  "engine_name": "TBZ_JOB_DATA_ENGINE",
+  "engine_version": "V1",
+  "processing_mode": "PRODUCTION",
+  "generated_at": "2026-08-12T18:02:30.836666+00:00",
+  "input_contract": {
+    "artifact_type": "job_data_engine_input_payload",
+    "input_contract_version": "v1.0",
+    "request_id": "req_ft_210SDTY_create",
+    "operation": "create",
+    "validation_status": "passed"
+  },
+  "sources": [
+    {
+      "source_id": "source_req_ft_210SDTY_create",
+      "source_type": "url",
+      "provider": "france_travail",
+      "authority_level": "provider_job_posting",
+      "provenance": {
+        "url": "https://candidat.francetravail.fr/offres/recherche/detail/210SDTY",
+        "retrieval_method": "extractor_gateway",
+        "retrieved_at": "2026-08-12T17:47:55.842Z"
+      },
+      "extraction": {
+        "status": "success",
+        "gateway": {
+          "gateway_name": "TBZ_EXTRACTOR_GATEWAY",
+          "gateway_version": "v1"
+        },
+        "provider": "france_travail_public_html"
+      },
+      "provider_payload": {
+        "offer_id": "210SDTY",
+        "source_url": "https://candidat.francetravail.fr/offres/recherche/detail/210SDTY",
+        "http_status": 200,
+        "content_type": "text/html;charset=UTF-8",
+        "parser_id": "france_travail_public_html_parser",
+        "parser_version": "v1"
+      },
+      "content_scope": [
+        "job_identity",
+        "responsibilities",
+        "requirements",
+        "constraints",
+        "compensation",
+        "benefits",
+        "employment_metadata"
+      ]
+    }
+  ],
+  "job_data_state": {
+    "job_identity": {
+      "job_id": "210SDTY",
+      "job_title": "Talent Acquisition (H/F)",
+      "company_name": null,
+      "location": {
+        "city": "Paris",
+        "department_code": "75",
+        "region": "Île-de-France",
+        "country": "France"
+      },
+      "contract_type": "CDI",
+      "employment_type": "Temps plein",
+      "working_time": {
+        "hours_per_week": 35,
+        "schedule": "Travail en journée"
+      },
+      "qualification": "Cadre",
+      "sector": "Autre mise à disposition de ressources humaines",
+      "publication": {
+        "last_updated": "2026-08-06",
+        "provider_offer_id": "210SDTY"
+      }
+    },
+    "job_scope_explicit": {
+      "team_context": "Renforcement de l'équipe Recrutement dans un contexte de croissance.",
+      "role_scope": "Recrutement de bout en bout, du sourcing à la signature.",
+      "work_environment": "Environnement 100 % digital.",
+      "start_timing": "Début septembre"
+    },
+    "responsibilities_explicit": [
+      {
+        "responsibility_id": "resp_sourcing_001",
+        "label": "Identifier et sourcer des candidats qualifiés via différents canaux",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "responsibility_id": "resp_prequalification_001",
+        "label": "Réaliser les préqualifications téléphoniques puis les entretiens en visio",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "responsibility_id": "resp_selection_001",
+        "label": "Sélectionner les profils les plus pertinents en fonction des besoins",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "responsibility_id": "resp_interview_reports_001",
+        "label": "Rédiger les comptes-rendus et synthèses d'entretien",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "responsibility_id": "resp_end_to_end_followup_001",
+        "label": "Assurer un suivi de bout en bout, du sourcing à la signature",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      }
+    ],
+    "requirements_explicit": [
+      {
+        "requirement_id": "req_education_current_student_001",
+        "requirement": "Être étudiant(e) en formation supérieure en Commerce, Sales, Ressources Humaines ou équivalent",
+        "category": "education",
+        "importance": "high",
+        "compensability": "medium",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "current_education_status",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "allowed_statuses": [
+            "current_student"
+          ]
+        }
+      },
+      {
+        "requirement_id": "req_experience_it_esn_001",
+        "requirement": "Avoir une première expérience en recrutement IT et en société de services/ESN",
+        "category": "experience",
+        "importance": "critical",
+        "compensability": "low",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_mandatory_keyword",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "source_text": "Une première expérience en recrutement IT et en sociétes de services/ESN est indispensable",
+        "requirement_type": "domain_experience",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "required_components": [
+            {
+              "component_type": "professional_domain",
+              "value": "recruitment_it"
+            },
+            {
+              "component_type": "employment_context",
+              "value": "esn"
+            }
+          ],
+          "logic": "all"
+        }
+      },
+      {
+        "requirement_id": "req_interest_recruitment_tech_001",
+        "requirement": "Intérêt marqué pour le recrutement et l'univers de la tech",
+        "category": "other_explicit_requirement",
+        "importance": "medium",
+        "compensability": "high",
+        "recruiter_visibility": "medium",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "professional_interest",
+        "evaluation_mode": "self_declared",
+        "structured_parameters": {
+          "target_concepts": [
+            "recruitment",
+            "technology"
+          ]
+        }
+      },
+      {
+        "requirement_id": "req_sourcing_prospecting_cold_calling_001",
+        "requirement": "Être à l'aise avec le sourcing, la prospection et le cold calling",
+        "category": "experience",
+        "importance": "high",
+        "compensability": "medium",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "professional_practice",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "sourcing",
+            "prospecting",
+            "cold_calling"
+          ],
+          "logic": "all"
+        }
+      },
+      {
+        "requirement_id": "req_french_communication_001",
+        "requirement": "Excellente communication orale et écrite en français",
+        "category": "language",
+        "importance": "high",
+        "compensability": "low",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "language_communication",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "french_oral_communication",
+            "french_written_communication"
+          ],
+          "logic": "all"
+        }
+      },
+      {
+        "requirement_id": "req_english_b2_001",
+        "requirement": "Bon niveau d'anglais B2 ou supérieur",
+        "category": "language",
+        "importance": "high",
+        "compensability": "medium",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "language_level",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "language": "en",
+          "minimum_level": "B2"
+        }
+      },
+      {
+        "requirement_id": "req_volume_pace_001",
+        "requirement": "Capacité à gérer du volume et un rythme soutenu",
+        "category": "other_explicit_requirement",
+        "importance": "high",
+        "compensability": "medium",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "workload_capacity",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "high_volume",
+            "fast_pace"
+          ],
+          "logic": "all"
+        }
+      },
+      {
+        "requirement_id": "req_autonomous_dynamic_rigorous_solution_001",
+        "requirement": "Être autonome, dynamique, rigoureux(se) et orienté(e) solutions",
+        "category": "behavioral_requirement",
+        "importance": "medium",
+        "compensability": "high",
+        "recruiter_visibility": "medium",
+        "weight_source": "explicit_soft_requirement_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "behavioral_traits",
+        "evaluation_mode": "non_scoring",
+        "structured_parameters": {
+          "traits": [
+            "autonomy",
+            "dynamism",
+            "rigor",
+            "solution_orientation"
+          ]
+        }
+      },
+      {
+        "requirement_id": "req_interpersonal_persistence_conviction_001",
+        "requirement": "Avoir un bon relationnel, être persévérant(e) et force de conviction",
+        "category": "behavioral_requirement",
+        "importance": "medium",
+        "compensability": "high",
+        "recruiter_visibility": "medium",
+        "weight_source": "explicit_soft_requirement_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "behavioral_traits",
+        "evaluation_mode": "non_scoring",
+        "structured_parameters": {
+          "traits": [
+            "interpersonal_skills",
+            "persistence",
+            "conviction"
+          ]
+        }
+      },
+      {
+        "requirement_id": "req_digital_environment_001",
+        "requirement": "Être à l'aise dans un environnement 100 % digital",
+        "category": "other_explicit_requirement",
+        "importance": "medium",
+        "compensability": "high",
+        "recruiter_visibility": "medium",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "digital_environment",
+        "evaluation_mode": "evidence_supported",
+        "structured_parameters": {
+          "target_concepts": [
+            "digital_environment"
+          ]
+        }
+      },
+      {
+        "requirement_id": "req_expected_qualities_001",
+        "requirement": "Être souriant(e), énergique, résilient(e), organisé(e), persuasif(ve), avec un goût du contact humain et de la prospection",
+        "category": "behavioral_requirement",
+        "importance": "medium",
+        "compensability": "high",
+        "recruiter_visibility": "medium",
+        "weight_source": "explicit_soft_requirement_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "behavioral_traits",
+        "evaluation_mode": "non_scoring",
+        "structured_parameters": {
+          "traits": [
+            "positive_attitude",
+            "energy",
+            "resilience",
+            "organization",
+            "persuasiveness",
+            "human_contact_orientation",
+            "prospecting_orientation"
+          ]
+        }
+      },
+      {
+        "requirement_id": "req_experience_2_years_001",
+        "requirement": "2 ans d'expérience",
+        "category": "experience",
+        "importance": "critical",
+        "compensability": "low",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_mandatory_keyword",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "source_text": "2 An(s) Cette expérience est indispensable",
+        "requirement_type": "experience_duration",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "minimum_months": 24
+        }
+      },
+      {
+        "requirement_id": "req_bac5_001",
+        "requirement": "Bac+5 ou équivalent",
+        "category": "education",
+        "importance": "high",
+        "compensability": "medium",
+        "recruiter_visibility": "high",
+        "weight_source": "explicit_profile_section",
+        "evidence_status": "confirmed",
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ],
+        "requirement_type": "education_level",
+        "evaluation_mode": "structured_verifiable",
+        "structured_parameters": {
+          "minimum_level": "bac_plus_5"
+        }
+      }
+    ],
+    "constraints_explicit": [
+      {
+        "constraint_id": "con_location_paris_001",
+        "label": "Poste situé à Paris",
+        "category": "location",
+        "professional_scoring_eligible": false,
+        "actionability_eligible": true,
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "constraint_id": "con_contract_cdi_001",
+        "label": "Contrat CDI",
+        "category": "contract",
+        "professional_scoring_eligible": false,
+        "actionability_eligible": true,
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "constraint_id": "con_full_time_35h_001",
+        "label": "35 heures par semaine, travail en journée",
+        "category": "work_mode",
+        "professional_scoring_eligible": false,
+        "actionability_eligible": true,
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "constraint_id": "con_remote_2_days_001",
+        "label": "Télétravail 2 jours par semaine",
+        "category": "work_mode",
+        "professional_scoring_eligible": false,
+        "actionability_eligible": true,
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      {
+        "constraint_id": "con_start_september_001",
+        "label": "Démarrage début septembre",
+        "category": "other_explicit_requirement",
+        "professional_scoring_eligible": false,
+        "actionability_eligible": true,
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      }
+    ],
+    "compensation_and_benefits": {
+      "salary": {
+        "gross_monthly_eur": 2916.66,
+        "months_per_year": 12,
+        "gross_annual_eur": 34999.92,
+        "source_ids": [
+          "source_req_ft_210SDTY_create"
+        ]
+      },
+      "variable_compensation": [
+        "Prime sur les recrutements/signatures réalisés",
+        "Primes"
+      ],
+      "benefits": [
+        "Titres restaurant / Prime de panier",
+        "Téléphone mobile",
+        "Ordinateur portable",
+        "Indemnité transports"
+      ]
+    },
+    "company_context_explicit": {
+      "sector": "Autre mise à disposition de ressources humaines"
+    },
+    "missing_job_data": {
+      "globally_missing_job_evidence": [
+        "Nom de l'entreprise employeuse",
+        "Adresse exacte du lieu de travail",
+        "Identité ou taille de l'équipe recrutement",
+        "Volume cible de recrutements",
+        "Outils ATS et sourcing",
+        "Montant ou mode de calcul précis de la prime sur recrutements/signatures",
+        "Date exacte de démarrage",
+        "Politique de période d'essai",
+        "Politique de sponsoring ou d'autorisation de travail"
+      ]
+    },
+    "unresolved": {
+      "ambiguities": [
+        {
+          "id": "ambiguity_student_cdi_001",
+          "description": "L'offre recherche un(e) étudiant(e) en formation supérieure tout en proposant un CDI cadre à 35h/semaine.",
+          "status": "open",
+          "source_ids": [
+            "source_req_ft_210SDTY_create"
+          ]
+        },
+        {
+          "id": "ambiguity_first_experience_vs_two_years_001",
+          "description": "Le profil mentionne une première expérience indispensable en recrutement IT/ESN, tandis que France Travail indique 2 ans d'expérience indispensable.",
+          "status": "open",
+          "source_ids": [
+            "source_req_ft_210SDTY_create"
+          ]
+        }
+      ],
+      "contradictions": [],
+      "volatile_information": [
+        {
+          "id": "volatile_offer_update_001",
+          "target": "publication.last_updated",
+          "value": "2026-08-06",
+          "status": "verification_required"
+        }
+      ]
+    },
+    "source_versions": {
+      "current_version": "v1.0",
+      "base_source_id": "source_req_ft_210SDTY_create",
+      "updates_applied": [],
+      "source_registry": [
+        {
+          "source_id": "source_req_ft_210SDTY_create",
+          "provider": "france_travail",
+          "provider_offer_id": "210SDTY",
+          "source_url": "https://candidat.francetravail.fr/offres/recherche/detail/210SDTY",
+          "retrieved_at": "2026-08-12T17:47:55.842Z",
+          "http_status": 200,
+          "parser_id": "france_travail_public_html_parser",
+          "parser_version": "v1"
+        }
+      ]
+    },
+    "job_data_completeness": {
+      "overall_level": "high",
+      "identity_completeness": "medium",
+      "scope_completeness": "high",
+      "requirements_completeness": "high",
+      "constraints_completeness": "high"
+    },
+    "contradictions_if_any": []
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "input_contract_validation_passed": true,
+    "json_parse_passed": true,
+    "utf8_decode_passed": true,
+    "minimum_evidence_present": true,
+    "canonical_state_owner": "TBZ_JOB_DATA_ENGINE",
+    "provider_agnostic_input_accepted": true,
+    "canonical_job_data_state_created": true
+  },
+  "artifact_filename": "job_france_travail_talent_acquisition_210SDTY_v1.0.json"
+}

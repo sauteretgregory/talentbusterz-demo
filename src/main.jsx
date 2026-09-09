@@ -16,6 +16,7 @@ import {
 } from 'lucide-react'
 import JSZip from 'jszip'
 import './styles.css'
+import V3Preview from './tbz-v3/V3Preview.jsx'
 
 const initialOffer = ''
 const initialMemory = ''
@@ -1273,4 +1274,9 @@ ${text}`.trim()
   )
 }
 
-createRoot(document.getElementById('root')).render(<App />)
+const useV3Preview =
+  new URLSearchParams(window.location.search).get('v3') === '1'
+
+createRoot(document.getElementById('root')).render(
+  useV3Preview ? <V3Preview /> : <App />
+)

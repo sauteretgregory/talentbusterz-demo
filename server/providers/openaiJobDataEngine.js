@@ -1,0 +1,92 @@
+import OpenAI from 'openai'
+
+import {
+  assertCanonicalJobDataState
+} from '../../src/tbz-v3/contracts/jobDataContract.js'
+
+import {
+  assertJobEngineInputPayload
+} from '../../src/tbz-v3/contracts/jobEngineInputContract.js'
+
+export function createOpenAIJobDataEngineProvider({
+  apiKey = process.env.OPENAI_API_KEY,
+  model = process.env.OPENAI_MODEL,
+  client = null
+} = {}) {
+  if (!apiKey && !client) {
+    throw new Error(
+      'TBZ: OPENAI_API_KEY is not configured.'
+    )
+  }
+
+  if (!model) {
+    throw new Error(
+      'TBZ: OPENAI_MODEL is not configured.'
+    )
+  }
+
+  const openai =
+    client || new OpenAI({ apiKey })
+
+  return async function openaiJobDataEngine(input) {
+    assertJobEngineInputPayload(input)
+
+    const response = await openai.responses.create({
+      model,
+      store: false,
+      input: [
+        {
+          role: 'system',
+          content: [
+            {
+              type: 'input_text',
+              text: [
+                'You are TBZ_JOB_DATA_ENGINE V1.',
+                'Operate in PRODUCTION mode.',
+                'The supplied JSON is a validated job_data_engine_input_payload v1.0.',
+                'Produce one canonical_job_data_state only.',
+                'Do not invent missing job information.',
+                'Preserve source provenance.',
+                'Distinguish explicit facts, missing data, ambiguities and contradictions.',
+                'The JOB DATA ENGINE is the exclusive owner of canonical job truth.',
+                'Return JSON only.'
+              ].join('\n')
+            }
+          ]
+        },
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'input_text',
+              text: JSON.stringify(input)
+            }
+          ]
+        }
+      ],
+      text: {
+        format: {
+          type: 'json_object'
+        }
+      }
+    })
+
+    if (!response.output_text) {
+      throw new Error(
+        'TBZ: OpenAI JOB DATA ENGINE returned no output.'
+      )
+    }
+
+    let artifact
+
+    try {
+      artifact = JSON.parse(response.output_text)
+    } catch {
+      throw new Error(
+        'TBZ: OpenAI JOB DATA ENGINE returned invalid JSON.'
+      )
+    }
+
+    return assertCanonicalJobDataState(artifact)
+  }
+}

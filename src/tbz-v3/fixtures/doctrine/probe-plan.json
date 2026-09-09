@@ -1,0 +1,255 @@
+{
+  "artifact_type": "canonical_probe_plan",
+  "artifact_id": "probe_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0",
+  "artifact_filename": "probe_gregory_doctrine_v1.0.json",
+  "probe_id": "probe_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0",
+  "state_version": "v1.0",
+  "engine_name": "TBZ_PROBE_ENGINE",
+  "engine_version": "V1",
+  "execution_contract_version": "probe_v2.1_actionability_corrected",
+  "processing_mode": "PRODUCTION",
+  "generated_at": "2026-07-21T14:22:04.890039+00:00",
+  "source_artifacts": {
+    "match": {
+      "artifact_type": "canonical_match_state",
+      "artifact_id": "match_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0",
+      "state_version": "v1.0",
+      "producer_engine": "TBZ_MATCH_ENGINE",
+      "received_filename_for_audit_only": "match_gregory_doctrine_v1.0(2).json"
+    },
+    "candidate": {
+      "artifact_type": "canonical_candidate_data_state",
+      "artifact_id": "candidate_gregory_sauteret_v1",
+      "state_version": "v1.3_probe_response_integration",
+      "producer_engine": "TBZ_CANDIDATE_DATA_ENGINE",
+      "received_filename_for_audit_only": "candidate_gregory_sauteret_v1.3(1).json"
+    },
+    "job": {
+      "artifact_type": "canonical_job_data_state",
+      "artifact_id": "job_doctrine_talent_acquisition_manager",
+      "state_version": "v1.0",
+      "producer_engine": "TBZ_JOB_DATA_ENGINE",
+      "received_filename_for_audit_only": "job_doctrine_talent_acquisition_manager_v1.0(3).json"
+    }
+  },
+  "input_validation": {
+    "status": "passed",
+    "match_artifact_type_valid": true,
+    "match_id_present": true,
+    "source_candidate_data_state_version": "v1.3_probe_response_integration",
+    "source_job_data_state_version": "v1.0",
+    "complete_required_inputs_present": true,
+    "partial_input_substitution_used": false,
+    "candidate_answerability_boundary_applied": true
+  },
+  "probe_result": {
+    "probe_triggered": true,
+    "trigger_reason": "MATCH identifies candidate-answerable unknowns with high information gain before rerun MATCH or CV preparation; job-side unknowns are routed separately and are not converted into candidate questions.",
+    "priority_level": "high",
+    "recommended_question_count": 5,
+    "estimated_information_gain": "high",
+    "probe_version": "probe_v2.1_actionability_corrected",
+    "source_reference": "match_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0"
+  },
+  "probe_plan": {
+    "critical_questions": [
+      {
+        "rank": 1,
+        "question_id": "MPC_DOCTRINE_001",
+        "question": "As-tu déjà recruté dans un contexte startup ou scale-up ? Si oui, précise l’entreprise, la période, le stade de croissance, le rythme de recrutement et ton rôle exact.",
+        "why_this_matters": "Le MATCH attribue un score partiel sur l’expérience startup/scale-up et signale que le caractère startup ou scale-up des employeurs précédents n’est pas confirmé.",
+        "linked_gap": "candidate_unknown_scaleup_recruitment_001",
+        "impact_weight": "high",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -2,
+          "max": 8
+        },
+        "answer_effort_estimate": "medium",
+        "minimum_useful_answer": "Oui/non + contexte de croissance + rythme de recrutement + responsabilités personnelles.",
+        "skip_cost": "Le profil reste évalué comme bon opérationnel recrutement sans preuve confirmée d’environnement startup/scale-up."
+      },
+      {
+        "rank": 2,
+        "question_id": "MPC_DOCTRINE_003",
+        "question": "As-tu déjà produit ou utilisé des KPI, reportings ou dashboards de recrutement qui ont influencé une décision ? Donne un exemple concret.",
+        "why_this_matters": "Le MATCH identifie l’approche data-oriented comme partielle : reporting présent, mais aucun dashboard décisionnel ni impact sur décision n’est confirmé.",
+        "linked_gap": "candidate_unknown_data_decisions_001",
+        "impact_weight": "high",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -1,
+          "max": 5
+        },
+        "answer_effort_estimate": "low",
+        "minimum_useful_answer": "Indicateurs suivis + support utilisé + décision influencée + résultat éventuel.",
+        "skip_cost": "L’expérience restera qualifiée comme reporting opérationnel plutôt que pilotage data-driven."
+      },
+      {
+        "rank": 3,
+        "question_id": "MPC_DOCTRINE_005",
+        "question": "Quel niveau d’anglais peux-tu assumer aujourd’hui dans un contexte professionnel : courant professionnel, fluent ou bilingue ? Précise les usages récents à l’oral et à l’écrit.",
+        "why_this_matters": "Le MATCH signale un niveau d’anglais contradictoire et non confirmé selon un référentiel identifiable.",
+        "linked_gap": "candidate_unknown_english_level_001",
+        "impact_weight": "high",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -3,
+          "max": 3
+        },
+        "answer_effort_estimate": "low",
+        "minimum_useful_answer": "Niveau assumé + contextes d’usage récents + oral/écrit.",
+        "skip_cost": "Le CV ne pourra pas afficher un niveau stable sans risque de surpromesse."
+      }
+    ],
+    "secondary_questions": [
+      {
+        "rank": 4,
+        "question_id": "MPC_DOCTRINE_002",
+        "question": "As-tu déjà conseillé directement des hiring managers internes : cadrage du besoin, challenge du brief, recommandation de shortlist ou influence sur une décision de recrutement ?",
+        "why_this_matters": "Le MATCH soutient la relation parties prenantes mais indique que le partenariat quotidien avec des hiring managers internes n’est pas directement établi.",
+        "linked_gap": "candidate_unknown_internal_business_partner_001",
+        "impact_weight": "high",
+        "expected_information_gain": "high",
+        "possible_score_effect": {
+          "min": -1,
+          "max": 4
+        },
+        "answer_effort_estimate": "medium",
+        "minimum_useful_answer": "Type d’interlocuteurs + exemple de brief ou décision influencée + rôle exact.",
+        "skip_cost": "Le profil reste plus proche recruteur delivery/cabinet que business partner interne."
+      },
+      {
+        "rank": 5,
+        "question_id": "MPC_DOCTRINE_004",
+        "question": "Jusqu’où allait ton autonomie sur le cycle complet : offre, négociation, closing, acceptation et suivi post-acceptation ?",
+        "why_this_matters": "Le MATCH confirme sourcing, qualification et suivi, mais la responsabilité de formulation d’offre, négociation finale et closing employeur n’est pas confirmée.",
+        "linked_gap": "candidate_unknown_closing_scope_001",
+        "impact_weight": "medium",
+        "expected_information_gain": "medium_high",
+        "possible_score_effect": {
+          "min": -1,
+          "max": 3
+        },
+        "answer_effort_estimate": "low",
+        "minimum_useful_answer": "Étapes prises en charge + limites du rôle + exemple si disponible.",
+        "skip_cost": "Le niveau d’autonomie full-cycle restera partiel."
+      }
+    ],
+    "deferred_questions": [
+      {
+        "question_id": "MPC_DOCTRINE_006",
+        "topic": "Employer-brand initiatives and outcomes",
+        "activation_condition": "À activer seulement si le CV ou l’entretien cible insiste sur la marque employeur.",
+        "reason": "Impact moyen et maximum de score faible par rapport aux questions startup/scale-up, data, anglais, business partner et closing.",
+        "candidate_question_allowed": true
+      },
+      {
+        "question_id": "candidate_unknown_full_time_acceptance_001",
+        "topic": "Explicit acceptance of full-time position",
+        "activation_condition": "À activer lors de la préparation de candidature ou si le contrat full-time est confirmé comme requis.",
+        "reason": "Question actionnable mais impact professionnel faible à moyen, non prioritaire avant clarification des preuves métier.",
+        "candidate_question_allowed": true
+      }
+    ],
+    "external_job_checks": [
+      {
+        "check_id": "job_unknown_salary_001",
+        "target": "Salary range and variable compensation structure",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_unknown_contract_type_001",
+        "target": "Precise contract type",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_unknown_exact_address_001",
+        "target": "Exact Paris office address",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_unknown_recruitment_scope_001",
+        "target": "Hiring volumes, role families and geographic perimeter",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_unknown_ats_reporting_001",
+        "target": "ATS, reporting tools and data-oriented practice expectations",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      },
+      {
+        "check_id": "job_unknown_test_nature_001",
+        "target": "Nature of technical tests in the recruitment process",
+        "routing": "TBZ_JOB_DATA_ENGINE_OR_EMPLOYER_VERIFICATION",
+        "candidate_question_allowed": false
+      }
+    ],
+    "questions_to_avoid": [
+      "Questions demandant au candidat de confirmer le salaire, le type de contrat, l’adresse exacte ou les outils internes Doctrine",
+      "Questions médicales, handicap, transport ou accessibilité",
+      "Questions sur Solutions30, BTSA, bac STAE ou ART’RENOV",
+      "Questions redondantes sur LinkedIn Recruiter et sourcing IT déjà fortement prouvés",
+      "Questions qui assimilent sourcing international et leadership mondial",
+      "Questions présentant TalentBusterZ comme produit déployé en entreprise",
+      "Questions demandant des métriques exactes si elles ne sont que des ordres de grandeur"
+    ],
+    "reingestion_targets": {
+      "candidate_data_engine": [
+        "experience_state.startup_scaleup_recruitment_context",
+        "experience_state.data_kpi_and_decision_use",
+        "language_state.anglais.current_professional_level",
+        "experience_state.hiring_manager_business_partner_exposure",
+        "experience_state.full_cycle_and_closing_scope"
+      ],
+      "job_data_engine": [
+        "job.job_constraints.salary",
+        "job.job_constraints.contract_type",
+        "job.offer_ambiguities.exact_office_address",
+        "job.offer_ambiguities.recruitment_scope",
+        "job.offer_ambiguities.ats_reporting_stack",
+        "job.offer_ambiguities.test_nature"
+      ]
+    },
+    "stop_conditions": [
+      "candidate_answers_confirm_no_startup_scaleup_context_no_data_decision_use_and_limited_english_then_rerun_match_as_constrained_fit",
+      "candidate_answers_confirm_startup_scaleup_context_data_decision_use_and_stable_english_then_rerun_match_as_strengthened_fit",
+      "at_least_four_candidate_questions_answered",
+      "enough_information_available_to_rerun_match"
+    ],
+    "next_step_after_answers": {
+      "candidate_answers": "send_to_candidate_data_engine",
+      "job_checks": "send_to_job_data_engine_or_employer_verification",
+      "after_both": "rerun_match_engine"
+    }
+  },
+  "safety_checks": {
+    "no_matching_performed": true,
+    "no_score_recalculated": true,
+    "candidate_data_state_not_modified": true,
+    "job_data_state_not_modified": true,
+    "candidate_answerability_boundary_applied": true,
+    "job_unknowns_not_converted_to_candidate_questions": true,
+    "sensitive_data_not_requested_without_need": true,
+    "invalidated_experience_not_reintroduced": true
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "json_parse_passed": true,
+    "utf8_validation_passed": true,
+    "file_size_greater_than_zero": true,
+    "artifact_type_is_canonical_probe_plan": true,
+    "artifact_id_present": true,
+    "source_match_artifact_id": "match_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0",
+    "source_match_state_version_exact": "v1.0",
+    "recommended_question_count_matches_plan": true,
+    "candidate_questions_are_candidate_answerable": true,
+    "job_checks_routed_externally": true,
+    "no_cross_engine_state_mutation": true
+  }
+}

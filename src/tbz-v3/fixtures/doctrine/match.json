@@ -1,0 +1,736 @@
+{
+  "artifact_type": "canonical_match_state",
+  "artifact_id": "match_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0",
+  "artifact_filename": "match_gregory_doctrine_v1.0.json",
+  "match_id": "match_candidate_gregory_sauteret_doctrine_talent_acquisition_manager_v1_0",
+  "state_version": "v1.0",
+  "engine_name": "TBZ_MATCH_ENGINE",
+  "engine_version": "V4",
+  "execution_contract_version": "v4.1_execution_state_machine_and_artifact_delivery",
+  "processing_mode": "PRODUCTION",
+  "generated_at": "2026-07-21T14:14:17.582181+00:00",
+  "source_artifacts": {
+    "job": {
+      "artifact_type": "canonical_job_data_state",
+      "artifact_id": "job_doctrine_talent_acquisition_manager",
+      "state_version": "v1.0",
+      "producer_engine": "TBZ_JOB_DATA_ENGINE",
+      "received_filename_for_audit_only": "job_doctrine_talent_acquisition_manager_v1.0(3).json"
+    },
+    "candidate": {
+      "artifact_type": "canonical_candidate_data_state",
+      "artifact_id": "candidate_gregory_sauteret_v1",
+      "state_version": "v1.3_probe_response_integration",
+      "producer_engine": "TBZ_CANDIDATE_DATA_ENGINE",
+      "received_filename_for_audit_only": "candidate_gregory_sauteret_v1.3(1).json"
+    }
+  },
+  "input_validation": {
+    "status": "passed",
+    "checks": {
+      "job": {
+        "artifact_type_valid": true,
+        "artifact_id_present": true,
+        "state_version_present": true,
+        "producer_engine_valid": true,
+        "complete_state_embedded": true,
+        "validation_passed": true
+      },
+      "candidate": {
+        "artifact_type_valid": true,
+        "artifact_id_present": true,
+        "state_version_present": true,
+        "producer_engine_valid": true,
+        "complete_state_embedded": true,
+        "validation_passed": true
+      }
+    },
+    "source_job_artifact_id": "job_doctrine_talent_acquisition_manager",
+    "source_candidate_artifact_id": "candidate_gregory_sauteret_v1",
+    "source_job_data_state_version": "v1.0",
+    "source_candidate_data_state_version": "v1.3_probe_response_integration",
+    "complete_required_inputs_present": true,
+    "partial_input_substitution_used": false,
+    "stale_source_used": false
+  },
+  "match_state": {
+    "professional_compatibility": {
+      "professional_match_score": 70,
+      "score_scale": 100,
+      "score_semantics": "professional_compatibility_only",
+      "classification": "good_operational_recruitment_match_with_contextual_scaleup_and_data_gaps",
+      "confidence": 0.84,
+      "professional_fit_summary": {
+        "overall": "The candidate demonstrates a strong operational Talent Acquisition base, especially in direct sourcing, IT recruitment, candidate experience, process follow-up and recruitment-process improvement. The main uncertainties concern confirmed startup or scale-up experience, internal hiring-manager business partnership, data-led decision ownership, closing responsibility and formally evidenced English level.",
+        "strongest_match_areas": [
+          "Direct sourcing and Boolean search",
+          "IT and technical recruitment",
+          "Candidate qualification and interview management",
+          "Needs analysis and stakeholder communication",
+          "Recruitment-process improvement",
+          "Autonomy, ownership and iterative product thinking"
+        ],
+        "main_professional_gaps_or_unknowns": [
+          "Confirmed recruitment experience specifically within a startup or scale-up environment",
+          "Internal business-partner responsibility with hiring managers",
+          "Data dashboards, funnel KPIs and decisions influenced",
+          "Full-cycle ownership through offer and closing",
+          "English level according to a stable identifiable standard",
+          "Documented employer-brand initiatives"
+        ]
+      },
+      "scoring": {
+        "professional_match_score": 70,
+        "maximum_score": 100,
+        "score_breakdown": [
+          {
+            "dimension_id": "dim_startup_scaleup_recruitment_001",
+            "label": "Expérience confirmée en recrutement dans un environnement startup ou scale-up",
+            "maximum_score": 20,
+            "awarded_score": 10,
+            "assessment_status": "partial_match",
+            "evidence_confidence": 0.72,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_hire_2019_2022",
+                "evidence": "Expérience de recrutement dans une structure liée à la plateforme hire.hr, avec contribution au développement et aux processus."
+              },
+              {
+                "candidate_path": "candidate_data_state.project_state.project_talentbusterz",
+                "evidence": "Projet produit personnel démontrant une exposition à une logique de construction et d'itération."
+              }
+            ],
+            "limitations": [
+              "Le caractère startup ou scale-up des employeurs précédents n'est pas confirmé dans le state candidat.",
+              "Aucun volume de recrutements propre à un environnement de forte croissance n'est documenté."
+            ],
+            "probe_candidate_id": "MPC_DOCTRINE_001"
+          },
+          {
+            "dimension_id": "dim_direct_sourcing_recruitment_craft_001",
+            "label": "Approche directe, sourcing multicanal et conduite du recrutement",
+            "maximum_score": 20,
+            "awarded_score": 18,
+            "assessment_status": "strong_match",
+            "evidence_confidence": 0.94,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.skills_state.recruitment_practices",
+                "evidence": "Sourcing, approche directe, recherche booléenne, préqualification, conduite d'entretiens et suivi de processus."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.activities",
+                "evidence": "Recherche multicanale et approche directe sur des profils IT en France et à l'international."
+              },
+              {
+                "candidate_path": "candidate_data_state.skills_state.recruitment_channels_declared",
+                "evidence": "Usage confirmé de LinkedIn, APEC, Turnover-IT, Keljob, CVaden, Welcome to the Jungle, Agefiph et Cadremploi."
+              }
+            ],
+            "limitations": [
+              "Le niveau de maîtrise de chaque plateforme n'est pas confirmé.",
+              "Le closing complet jusqu'à l'acceptation de l'offre reste partiellement documenté."
+            ]
+          },
+          {
+            "dimension_id": "dim_business_partner_stakeholders_001",
+            "label": "Partenariat avec les hiring managers et qualité relationnelle",
+            "maximum_score": 15,
+            "awarded_score": 11,
+            "assessment_status": "supported_match",
+            "evidence_confidence": 0.84,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.activities",
+                "evidence": "Recueil, clarification et reformulation des besoins de recrutement."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_hire_2019_2022.activities",
+                "evidence": "Analyse des besoins clients, présentation de profils et suivi des processus."
+              },
+              {
+                "candidate_path": "candidate_data_state.recommendation_state",
+                "evidence": "Recommandations mentionnant professionnalisme, écoute, disponibilité et réactivité."
+              }
+            ],
+            "limitations": [
+              "Le partenariat quotidien avec des hiring managers internes n'est pas directement établi.",
+              "L'influence sur les décisions de recrutement et la capacité de challenge des managers restent à préciser."
+            ],
+            "probe_candidate_id": "MPC_DOCTRINE_002"
+          },
+          {
+            "dimension_id": "dim_data_oriented_recruitment_001",
+            "label": "Approche data-oriented appliquée au recrutement",
+            "maximum_score": 12,
+            "awarded_score": 7,
+            "assessment_status": "partial_match",
+            "evidence_confidence": 0.78,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.quantified_claims",
+                "evidence": "Ordres de grandeur moyens documentés pour les entretiens et recrutements."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.activities",
+                "evidence": "Suivi de processus, reporting et gestion de viviers."
+              },
+              {
+                "candidate_path": "candidate_data_state.certification_state",
+                "evidence": "Formation LinkedIn sur les fondamentaux de Power BI."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_alternance_sevre_vienne_2005_2007.activities",
+                "evidence": "Création d'une base de données candidats sur Excel."
+              }
+            ],
+            "limitations": [
+              "Aucun dashboard décisionnel ou KPI de funnel explicitement possédé n'est confirmé.",
+              "Les métriques Anywr et HIRE sont des ordres de grandeur et non des KPI exacts.",
+              "L'impact des données sur des décisions de recrutement n'est pas documenté."
+            ],
+            "probe_candidate_id": "MPC_DOCTRINE_003"
+          },
+          {
+            "dimension_id": "dim_english_001",
+            "label": "Anglais courant",
+            "maximum_score": 10,
+            "awarded_score": 7,
+            "assessment_status": "partial_match",
+            "evidence_confidence": 0.69,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.language_state.anglais",
+                "evidence": "Variantes déclarées bilingue, professionnel courant et fluent selon une recommandation."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.geographic_exposure",
+                "evidence": "Exposition professionnelle internationale sur plusieurs zones."
+              }
+            ],
+            "limitations": [
+              "Le niveau d'anglais reste contradictoire et non confirmé selon un référentiel identifiable.",
+              "L'usage professionnel oral et écrit récent n'est pas quantifié."
+            ],
+            "probe_candidate_id": "MPC_DOCTRINE_005"
+          },
+          {
+            "dimension_id": "dim_full_cycle_closing_001",
+            "label": "Autonomie sur le cycle complet du recrutement, du sourcing au closing",
+            "maximum_score": 8,
+            "awarded_score": 5,
+            "assessment_status": "partial_match",
+            "evidence_confidence": 0.79,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.activities",
+                "evidence": "Sourcing, qualification, préparation aux entretiens, synthèses, suivi de processus et relances."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.salary_guidance",
+                "evidence": "Conseil en négociation salariale auprès de candidats internationaux."
+              }
+            ],
+            "limitations": [
+              "La responsabilité de formulation d'offre, de négociation finale et de closing au nom de l'employeur n'est pas confirmée.",
+              "Le périmètre d'onboarding ou de suivi post-acceptation n'est pas documenté."
+            ],
+            "probe_candidate_id": "MPC_DOCTRINE_004"
+          },
+          {
+            "dimension_id": "dim_process_improvement_001",
+            "label": "Amélioration des processus de recrutement",
+            "maximum_score": 7,
+            "awarded_score": 6,
+            "assessment_status": "strong_match",
+            "evidence_confidence": 0.86,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_hire_2019_2022.activities",
+                "evidence": "Contribution à l'amélioration des processus métiers."
+              },
+              {
+                "candidate_path": "candidate_data_state.project_state.project_talentbusterz",
+                "evidence": "Conception d'un produit de matching explicable, de questions d'enrichissement et de génération de CV ciblés."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_alternance_sevre_vienne_2005_2007.activities",
+                "evidence": "Mise en place d'un publipostage SMS personnalisé et création d'une base candidats."
+              }
+            ],
+            "limitations": [
+              "Les gains avant/après et le niveau d'adoption organisationnelle ne sont pas documentés.",
+              "TalentBusterZ reste en développement et ne doit pas être présenté comme un déploiement d'entreprise."
+            ]
+          },
+          {
+            "dimension_id": "dim_employer_brand_001",
+            "label": "Contribution à la marque employeur",
+            "maximum_score": 3,
+            "awarded_score": 1,
+            "assessment_status": "limited_match",
+            "evidence_confidence": 0.63,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_hire_2019_2022.activities",
+                "evidence": "Structuration de messages, supports et argumentaires."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_anywr_2022_2025.activities",
+                "evidence": "Préparation des candidats et qualité du suivi de processus."
+              }
+            ],
+            "limitations": [
+              "Aucune campagne de marque employeur, contenu de recrutement ou indicateur d'attractivité n'est confirmé."
+            ],
+            "probe_candidate_id": "MPC_DOCTRINE_006"
+          },
+          {
+            "dimension_id": "dim_ownership_iteration_001",
+            "label": "Ownership, autonomie, proactivité et culture d'itération",
+            "maximum_score": 5,
+            "awarded_score": 5,
+            "assessment_status": "strong_match",
+            "evidence_confidence": 0.9,
+            "positive_evidence": [
+              {
+                "candidate_path": "candidate_data_state.project_state.project_talentbusterz",
+                "evidence": "Développement autonome d'un produit personnel complexe."
+              },
+              {
+                "candidate_path": "candidate_data_state.experience_state.exp_independent_talent_2012_2016",
+                "evidence": "Expérience indépendante de gestion de talents."
+              },
+              {
+                "candidate_path": "candidate_data_state.recommendation_state",
+                "evidence": "Initiative, détermination, sérieux et rigueur cités par des tiers."
+              }
+            ],
+            "limitations": []
+          }
+        ],
+        "calculation_validation": {
+          "maximum_total": 100,
+          "awarded_total": 70,
+          "preferred_requirement_absence_penalty": 0,
+          "actionability_adjustment": 0,
+          "platform_affinity_adjustment": 0,
+          "double_counting_detected": false,
+          "calculation_passed": true
+        }
+      }
+    },
+    "application_actionability": {
+      "status": "actionable_with_non_blocking_job_unknowns",
+      "professional_score_affected": false,
+      "blocking_conditions": [],
+      "supporting_factors": [
+        {
+          "job_path": "job_data_state.operational_location",
+          "candidate_path": "candidate_data_state.mobility_state.geographic_scope",
+          "assessment": "compatible",
+          "detail": "Paris and Île-de-France are within the candidate's stated geographic scope."
+        },
+        {
+          "job_path": "job_data_state.work_model",
+          "candidate_path": "candidate_data_state.availability_state.work_mode_preference",
+          "assessment": "compatible",
+          "detail": "The hybrid model is included in the candidate's accepted work modes."
+        },
+        {
+          "job_path": "job_data_state.job_identity.employment_type",
+          "candidate_path": "candidate_data_state.availability_state.availability",
+          "assessment": "partially_compatible",
+          "detail": "The candidate is immediately available; explicit confirmation of full-time acceptance is not present in the canonical candidate state."
+        }
+      ],
+      "non_blocking_job_unknowns": [
+        {
+          "unknown_id": "job_unknown_salary_001",
+          "job_path": "job_data_state.job_constraints.salary",
+          "label": "Salary is not stated.",
+          "recommended_route": "employer_confirmation"
+        },
+        {
+          "unknown_id": "job_unknown_contract_type_001",
+          "job_path": "job_data_state.job_constraints.contract_type",
+          "label": "The precise contract type is not stated.",
+          "recommended_route": "employer_confirmation"
+        },
+        {
+          "unknown_id": "job_unknown_exact_address_001",
+          "job_path": "job_data_state.offer_ambiguities",
+          "label": "The exact office address is not stated.",
+          "recommended_route": "employer_confirmation"
+        },
+        {
+          "unknown_id": "job_unknown_recruitment_scope_001",
+          "job_path": "job_data_state.offer_ambiguities",
+          "label": "Hiring volumes, role families and recruiting perimeter are not stated.",
+          "recommended_route": "employer_confirmation"
+        },
+        {
+          "unknown_id": "job_unknown_ats_reporting_001",
+          "job_path": "job_data_state.offer_ambiguities",
+          "label": "ATS, reporting tools and data expectations are not stated.",
+          "recommended_route": "employer_confirmation"
+        }
+      ],
+      "candidate_operational_unknowns": [
+        {
+          "unknown_id": "candidate_unknown_full_time_acceptance_001",
+          "candidate_path": "candidate_data_state.availability_state",
+          "label": "Explicit acceptance of a full-time position",
+          "impact": "low_to_medium",
+          "candidate_answerable": true,
+          "defer_until": "application_preparation_or_probe_prioritization"
+        }
+      ]
+    },
+    "candidate_unknowns": [
+      {
+        "unknown_id": "candidate_unknown_scaleup_recruitment_001",
+        "label": "Confirmed startup or scale-up recruiting context",
+        "candidate_answerable": true,
+        "impact": "high",
+        "related_job_requirement": "Expérience confirmée en recrutement en startup ou scale-up",
+        "target_candidate_path": "candidate_data_state.experience_state",
+        "probe_candidate_id": "MPC_DOCTRINE_001"
+      },
+      {
+        "unknown_id": "candidate_unknown_internal_business_partner_001",
+        "label": "Business-partner responsibility with internal hiring managers",
+        "candidate_answerable": true,
+        "impact": "high",
+        "related_job_requirement": "Capacité à agir comme business partner",
+        "target_candidate_path": "candidate_data_state.experience_state",
+        "probe_candidate_id": "MPC_DOCTRINE_002"
+      },
+      {
+        "unknown_id": "candidate_unknown_data_decisions_001",
+        "label": "Recruitment KPIs, dashboards and decisions influenced",
+        "candidate_answerable": true,
+        "impact": "high",
+        "related_job_requirement": "Approche data-oriented",
+        "target_candidate_path": "candidate_data_state.experience_state",
+        "probe_candidate_id": "MPC_DOCTRINE_003"
+      },
+      {
+        "unknown_id": "candidate_unknown_closing_scope_001",
+        "label": "Full-cycle recruitment ownership through offer and closing",
+        "candidate_answerable": true,
+        "impact": "medium_high",
+        "related_job_requirement": "Autonomie sur le cycle complet du recrutement, du sourcing au closing",
+        "target_candidate_path": "candidate_data_state.experience_state",
+        "probe_candidate_id": "MPC_DOCTRINE_004"
+      },
+      {
+        "unknown_id": "candidate_unknown_english_level_001",
+        "label": "English proficiency according to an identifiable standard and recent use context",
+        "candidate_answerable": true,
+        "impact": "high",
+        "related_job_requirement": "Anglais courant",
+        "target_candidate_path": "candidate_data_state.language_state.anglais",
+        "probe_candidate_id": "MPC_DOCTRINE_005"
+      },
+      {
+        "unknown_id": "candidate_unknown_employer_brand_001",
+        "label": "Employer-brand initiatives and outcomes",
+        "candidate_answerable": true,
+        "impact": "medium",
+        "related_job_requirement": "Contribution à la marque employeur",
+        "target_candidate_path": "candidate_data_state.experience_state",
+        "probe_candidate_id": "MPC_DOCTRINE_006"
+      }
+    ],
+    "job_unknowns": [
+      {
+        "unknown_id": "job_unknown_salary_001",
+        "label": "Salary range",
+        "impact": "medium_actionability",
+        "candidate_answerable": false,
+        "job_path": "job_data_state.job_constraints.salary"
+      },
+      {
+        "unknown_id": "job_unknown_contract_type_001",
+        "label": "Precise contract type",
+        "impact": "medium_actionability",
+        "candidate_answerable": false,
+        "job_path": "job_data_state.job_constraints.contract_type"
+      },
+      {
+        "unknown_id": "job_unknown_exact_address_001",
+        "label": "Exact office address",
+        "impact": "low_to_medium_actionability",
+        "candidate_answerable": false,
+        "job_path": "job_data_state.offer_ambiguities"
+      },
+      {
+        "unknown_id": "job_unknown_recruitment_scope_001",
+        "label": "Recruiting volumes and role families",
+        "impact": "medium_professional_context",
+        "candidate_answerable": false,
+        "job_path": "job_data_state.offer_ambiguities"
+      },
+      {
+        "unknown_id": "job_unknown_ats_reporting_001",
+        "label": "ATS, reporting stack and data-expectation depth",
+        "impact": "medium_professional_context",
+        "candidate_answerable": false,
+        "job_path": "job_data_state.offer_ambiguities"
+      },
+      {
+        "unknown_id": "job_unknown_test_nature_001",
+        "label": "Nature of the technical tests in the recruitment process",
+        "impact": "low_actionability",
+        "candidate_answerable": false,
+        "job_path": "job_data_state.offer_ambiguities"
+      }
+    ],
+    "employer_confirmation_needed": [
+      {
+        "confirmation_id": "employer_confirmation_salary_001",
+        "topic": "salary",
+        "priority": "medium",
+        "required_confirmation": "Provide the salary range and variable-compensation structure, if any."
+      },
+      {
+        "confirmation_id": "employer_confirmation_contract_001",
+        "topic": "contract_type",
+        "priority": "medium",
+        "required_confirmation": "Confirm the precise contract type."
+      },
+      {
+        "confirmation_id": "employer_confirmation_recruitment_scope_001",
+        "topic": "recruitment_scope",
+        "priority": "medium",
+        "required_confirmation": "Clarify expected hiring volumes, role families and geographic perimeter."
+      },
+      {
+        "confirmation_id": "employer_confirmation_tools_001",
+        "topic": "ats_and_data",
+        "priority": "medium",
+        "required_confirmation": "Clarify the ATS, reporting tools and expected data-oriented practices."
+      },
+      {
+        "confirmation_id": "employer_confirmation_address_001",
+        "topic": "exact_office_location",
+        "priority": "low_to_medium",
+        "required_confirmation": "Provide the exact Paris office address."
+      }
+    ],
+    "professional_decision_blockers": [],
+    "application_actionability_blockers": [],
+    "match_probe_candidates": [
+      {
+        "probe_candidate_id": "MPC_DOCTRINE_001",
+        "priority": "high",
+        "target_candidate_field": "candidate_data_state.experience_state",
+        "target_requirement": "Expérience confirmée en recrutement en startup ou scale-up",
+        "accepted_response_scope": "startup_scaleup_recruitment_context",
+        "missing_information": "Whether one or more recruiting roles were performed in a startup or scale-up environment, including company stage, growth context, hiring pace and the candidate's exact responsibilities.",
+        "expected_information_gain": "high",
+        "expected_score_impact": {
+          "minimum": -2,
+          "maximum": 8
+        },
+        "candidate_answerable": true,
+        "negative_answer_storage": {
+          "canonical_evidence_status": "confirmed_absence_for_this_scope",
+          "scope_limitation_required": true,
+          "global_absence_inference_forbidden": true
+        }
+      },
+      {
+        "probe_candidate_id": "MPC_DOCTRINE_002",
+        "priority": "high",
+        "target_candidate_field": "candidate_data_state.experience_state",
+        "target_requirement": "Capacité à agir comme business partner",
+        "accepted_response_scope": "hiring_manager_business_partner_exposure",
+        "missing_information": "Whether the candidate directly advised internal hiring managers, challenged briefs, influenced selection decisions or managed recurring stakeholder relationships.",
+        "expected_information_gain": "high",
+        "expected_score_impact": {
+          "minimum": -1,
+          "maximum": 4
+        },
+        "candidate_answerable": true,
+        "negative_answer_storage": {
+          "canonical_evidence_status": "confirmed_absence_for_this_scope",
+          "scope_limitation_required": true,
+          "global_absence_inference_forbidden": true
+        }
+      },
+      {
+        "probe_candidate_id": "MPC_DOCTRINE_003",
+        "priority": "high",
+        "target_candidate_field": "candidate_data_state.experience_state",
+        "target_requirement": "Approche data-oriented",
+        "accepted_response_scope": "data_kpi_and_decision_use",
+        "missing_information": "Which recruitment KPIs were tracked, which reports or dashboards were produced, and which decisions changed because of the data.",
+        "expected_information_gain": "high",
+        "expected_score_impact": {
+          "minimum": -1,
+          "maximum": 5
+        },
+        "candidate_answerable": true,
+        "negative_answer_storage": {
+          "canonical_evidence_status": "confirmed_absence_for_this_scope",
+          "scope_limitation_required": true,
+          "global_absence_inference_forbidden": true
+        }
+      },
+      {
+        "probe_candidate_id": "MPC_DOCTRINE_004",
+        "priority": "medium_high",
+        "target_candidate_field": "candidate_data_state.experience_state",
+        "target_requirement": "Autonomie sur le cycle complet du recrutement, du sourcing au closing",
+        "accepted_response_scope": "full_cycle_and_closing",
+        "missing_information": "The candidate's actual responsibility for offer preparation, negotiation, acceptance, closing and post-acceptance follow-up.",
+        "expected_information_gain": "medium_high",
+        "expected_score_impact": {
+          "minimum": -1,
+          "maximum": 3
+        },
+        "candidate_answerable": true,
+        "negative_answer_storage": {
+          "canonical_evidence_status": "confirmed_absence_for_this_scope",
+          "scope_limitation_required": true,
+          "global_absence_inference_forbidden": true
+        }
+      },
+      {
+        "probe_candidate_id": "MPC_DOCTRINE_005",
+        "priority": "high",
+        "target_candidate_field": "candidate_data_state.language_state.anglais",
+        "target_requirement": "Anglais courant",
+        "accepted_response_scope": "english_professional_proficiency",
+        "missing_information": "Current oral and written English usage, frequency, professional situations handled and any identifiable proficiency level.",
+        "expected_information_gain": "high",
+        "expected_score_impact": {
+          "minimum": -3,
+          "maximum": 3
+        },
+        "candidate_answerable": true,
+        "negative_answer_storage": {
+          "canonical_evidence_status": "confirmed_absence_for_this_scope",
+          "scope_limitation_required": true,
+          "global_absence_inference_forbidden": true
+        }
+      },
+      {
+        "probe_candidate_id": "MPC_DOCTRINE_006",
+        "priority": "medium",
+        "target_candidate_field": "candidate_data_state.experience_state",
+        "target_requirement": "Contribution à la marque employeur",
+        "accepted_response_scope": "employer_brand_contribution",
+        "missing_information": "Any employer-brand content, event, campaign, candidate communication or measurable attractiveness initiative personally delivered.",
+        "expected_information_gain": "medium",
+        "expected_score_impact": {
+          "minimum": -0.5,
+          "maximum": 2
+        },
+        "candidate_answerable": true,
+        "negative_answer_storage": {
+          "canonical_evidence_status": "confirmed_absence_for_this_scope",
+          "scope_limitation_required": true,
+          "global_absence_inference_forbidden": true
+        }
+      }
+    ],
+    "recommendation": {
+      "decision": "apply",
+      "application_positioning": "credible_match_with_targeted_gap_management",
+      "rationale": [
+        "The candidate strongly matches the role's operational sourcing and recruitment core.",
+        "IT recruitment experience is directly relevant to a LegalTech employer recruiting technical profiles.",
+        "The candidate's process-improvement and iterative product mindset aligns with Doctrine's ownership culture.",
+        "The main uncertainties are probeable and do not currently block application actionability.",
+        "The application should avoid overstating startup or scale-up experience, data maturity, English level, closing ownership or employer-brand ownership until confirmed."
+      ],
+      "recommended_application_emphasis": [
+        "International and IT direct sourcing",
+        "Needs analysis and high-quality candidate experience",
+        "Recruitment-process improvement",
+        "Stakeholder communication and candidate advisory",
+        "Autonomy, ownership and TalentBusterZ product thinking"
+      ],
+      "recommended_application_cautions": [
+        "Do not present TalentBusterZ as an enterprise-deployed product.",
+        "Do not present approximate recruitment metrics as exact KPIs.",
+        "Do not claim a confirmed startup or scale-up background without direct evidence.",
+        "Do not claim full closing ownership without clarification.",
+        "Do not state a definitive English level until the contradiction is resolved."
+      ]
+    },
+    "recalculation_conditions": {
+      "professional_match_recalculation_required_after_valid_candidate_probe_integration": true,
+      "candidate_state_update_required_before_recalculation": true,
+      "highest_impact_probe_candidates": [
+        "MPC_DOCTRINE_001",
+        "MPC_DOCTRINE_003",
+        "MPC_DOCTRINE_005",
+        "MPC_DOCTRINE_002"
+      ],
+      "potential_professional_score_range_after_clarification": {
+        "minimum": 62,
+        "maximum": 84,
+        "interpretation": "The range reflects plausible positive or limiting candidate clarifications and does not assume that all unknowns resolve positively."
+      },
+      "application_actionability_recalculation_triggers": [
+        "contract_type_confirmed",
+        "salary_range_confirmed",
+        "exact_office_address_confirmed",
+        "candidate_full_time_acceptance_confirmed"
+      ],
+      "professional_score_must_not_change_due_to_salary_contract_or_location_confirmation": true
+    },
+    "safety_checks": {
+      "candidate_data_state_modified": false,
+      "job_data_state_modified": false,
+      "professional_score_independent_from_actionability": true,
+      "preferred_requirement_absence_penalized": false,
+      "job_location_used_in_professional_score": false,
+      "contract_preference_used_in_professional_score": false,
+      "work_model_preference_used_in_professional_score": false,
+      "platform_generated_affinity_used_in_professional_score": false,
+      "unknown_treated_as_confirmed_absence": false,
+      "probe_answer_assumed_to_increase_score": false,
+      "candidate_questions_directly_asked": false,
+      "candidate_answerable_unknowns_routed_to_probe_engine": true,
+      "job_side_unknowns_routed_to_employer_confirmation": true,
+      "sensitive_medical_data_used": false,
+      "disability_status_used_for_professional_scoring": false,
+      "accessibility_constraints_exposed": false,
+      "informal_peer_support_treated_as_management": false,
+      "international_sourcing_treated_as_leadership": false,
+      "talentbusterz_treated_as_enterprise_deployment": false,
+      "approximate_metrics_treated_as_exact": false,
+      "english_level_overclaimed": false,
+      "full_cycle_closing_overclaimed": false,
+      "startup_scaleup_experience_overclaimed": false,
+      "employer_brand_ownership_overclaimed": false,
+      "hire_probability_estimated": false,
+      "cv_generated": false,
+      "cover_letter_generated": false
+    }
+  },
+  "validation_report": {
+    "validation_status": "passed",
+    "json_parse_passed": true,
+    "utf8_validation_passed": true,
+    "file_size_greater_than_zero": true,
+    "artifact_type_is_canonical_match_state": true,
+    "artifact_id_present": true,
+    "match_id_present": true,
+    "source_job_artifact_id": "job_doctrine_talent_acquisition_manager",
+    "source_candidate_artifact_id": "candidate_gregory_sauteret_v1",
+    "source_job_data_state_version_exact": "v1.0",
+    "source_candidate_data_state_version_exact": "v1.3_probe_response_integration",
+    "professional_score_actionability_separation_passed": true,
+    "no_cross_engine_state_mutation": true,
+    "artifact_filename_matches_metadata": true,
+    "score_calculation_passed": true,
+    "expected_root_object_present": true,
+    "expected_state_version_present": true
+  }
+}
