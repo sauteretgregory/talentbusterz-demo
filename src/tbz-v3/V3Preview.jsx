@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react'
 import candidate from './fixtures/doctrine/candidate.json'
 import { createJobIntakeRequest } from './jobIntake.js'
 import { resolveInitialCandidateState } from './candidateMemoryClient.js'
+import { isBackendUnreachable, OFFLINE_DEMO_MESSAGE } from './offlineFallback.js'
 
 const styles = {
   page: { maxWidth: 900, margin: '0 auto', padding: '44px 24px 80px', fontFamily: 'Arial, sans-serif', color: '#172033' },
@@ -161,8 +162,13 @@ export default function V3Preview() {
         ? 'Mémoire candidat retrouvée. MATCH recalculé sur la nouvelle offre avec le profil enrichi.'
         : 'Profil candidat initialisé. MATCH établi. Nous allons maintenant enrichir le profil, une réponse à la fois.')
     } catch (err) {
-      setError(err.message)
-      setStatus('')
+      if (isBackendUnreachable(err)) {
+        setError('')
+        setStatus(OFFLINE_DEMO_MESSAGE)
+      } else {
+        setError(err.message)
+        setStatus('')
+      }
     }
   }
 
@@ -210,8 +216,13 @@ export default function V3Preview() {
         ? 'Réponse à clarifier. Le MATCH a déjà été recalculé sur cette réponse ; corrigez-la pour poursuivre.'
         : 'MATCH recalculé après cette réponse. Le profil candidat est enrichi et sauvegardé. Question suivante du cycle.')
     } catch (err) {
-      setError(err.message)
-      setStatus('')
+      if (isBackendUnreachable(err)) {
+        setError('')
+        setStatus(OFFLINE_DEMO_MESSAGE)
+      } else {
+        setError(err.message)
+        setStatus('')
+      }
     }
   }
 
@@ -253,8 +264,13 @@ export default function V3Preview() {
         setStatus('Enrichissement arrêté pour cette offre. Le profil candidat persistant reste disponible pour la prochaine candidature.')
       }
     } catch (err) {
-      setError(err.message)
-      setStatus('')
+      if (isBackendUnreachable(err)) {
+        setError('')
+        setStatus(OFFLINE_DEMO_MESSAGE)
+      } else {
+        setError(err.message)
+        setStatus('')
+      }
     }
   }
 
