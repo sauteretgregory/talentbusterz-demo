@@ -1,6 +1,7 @@
-import React, { useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import candidate from './fixtures/doctrine/candidate.json'
 import { createJobIntakeRequest } from './jobIntake.js'
+import { resolveInitialCandidateState } from './candidateMemoryClient.js'
 
 const styles = {
   page: { maxWidth: 900, margin: '0 auto', padding: '44px 24px 80px', fontFamily: 'Arial, sans-serif', color: '#172033' },
@@ -57,6 +58,34 @@ export default function V3Preview() {
 
   const candidateId = candidateIdOf(candidateState)
   const candidateName = firstNameOf(candidateState)
+
+  // Rehydrate the persistent candidate profile on mount (e.g. after a page
+  // reload) instead of silently starting over from the bundled fixture.
+  useEffect(() => {
+    let cancelled = false
+
+    async function rehydrate() {
+      const result = await resolveInitialCandidateState({
+        candidateId: candidateIdOf(candidate),
+        fallbackCandidate: candidate
+      })
+
+      if (cancelled) return
+
+      setCandidateState(result.candidateState)
+      setCandidateLoaded(result.candidateLoaded)
+
+      if (result.rehydratedOnMount) {
+        setStatus('Mémoire candidat persistante retrouvée automatiquement au chargement de la page.')
+      }
+    }
+
+    rehydrate()
+
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   async function callProbe(body) {
     const response = await fetch('http://localhost:8787/api/probe-responses', {

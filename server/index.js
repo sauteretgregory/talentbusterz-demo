@@ -114,7 +114,7 @@ function sendJson(res, statusCode, payload) {
     'Content-Type': 'application/json; charset=utf-8',
     'Access-Control-Allow-Origin': '*',
     'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS'
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
   })
 
   res.end(body)
@@ -139,10 +139,56 @@ const server = http.createServer(async (req, res) => {
     res.writeHead(204, {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Headers': 'Content-Type',
-      'Access-Control-Allow-Methods': 'POST, OPTIONS'
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS'
     })
 
     res.end()
+    return
+  }
+
+  if (
+    req.method === 'GET' &&
+    req.url.startsWith('/api/candidate-memory/')
+  ) {
+    try {
+      const candidateId = decodeURIComponent(
+        req.url.slice('/api/candidate-memory/'.length).split('?')[0]
+      )
+
+      if (!candidateId) {
+        sendJson(res, 400, {
+          status: 'failed',
+          stage: 'candidate_memory_lookup',
+          error: 'candidate_id_required'
+        })
+        return
+      }
+
+      const stored = await candidateMemoryStore.load(candidateId)
+
+      if (!stored) {
+        sendJson(res, 404, {
+          status: 'not_found',
+          stage: 'candidate_memory_lookup',
+          candidate_id: candidateId
+        })
+        return
+      }
+
+      sendJson(res, 200, {
+        status: 'completed',
+        stage: 'candidate_memory_found',
+        candidate_id: candidateId,
+        canonical_candidate_data_state: stored
+      })
+    } catch (error) {
+      sendJson(res, 500, {
+        status: 'failed',
+        stage: 'candidate_memory_lookup',
+        error: error.message
+      })
+    }
+
     return
   }
 
